@@ -21,11 +21,11 @@ float earthRadius = 6500.0f;
 float maxRadius = earthRadius*100.0f;
 float farClipPlaneDist = earthRadius*1000.0f;
 
-class CrateApp : public D3DApp
+class Renderer : public D3DApp
 {
 public:
-	CrateApp(HINSTANCE hInstance);
-	~CrateApp();
+	Renderer(HINSTANCE hInstance);
+	~Renderer();
 
 	bool Init();
 	void OnResize();
@@ -76,7 +76,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
 
-	CrateApp theApp(hInstance);
+	Renderer theApp(hInstance);
 	
 	if( !theApp.Init() )
 		return 0;
@@ -85,7 +85,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 }
  
 
-CrateApp::CrateApp(HINSTANCE hInstance)
+Renderer::Renderer(HINSTANCE hInstance)
 : D3DApp(hInstance), mBoxVB(0), mBoxIB(0), mDiffuseMapSRV(0), mEyePosW(0.0f, 0.0f, 0.0f), 
   mTheta(1.3f*MathHelper::Pi), mPhi(0.4f*MathHelper::Pi), mRadius(earthRadius * 1.1f)
 {
@@ -115,7 +115,7 @@ CrateApp::CrateApp(HINSTANCE hInstance)
 	mBoxMat.Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
 }
 
-CrateApp::~CrateApp()
+Renderer::~Renderer()
 {
 	ReleaseCOM(mBoxVB);
 	ReleaseCOM(mBoxIB);
@@ -125,7 +125,7 @@ CrateApp::~CrateApp()
 	InputLayouts::DestroyAll();
 }
 
-bool CrateApp::Init()
+bool Renderer::Init()
 {
 	if(!D3DApp::Init())
 		return false;
@@ -147,7 +147,7 @@ bool CrateApp::Init()
 	return true;
 }
 
-void CrateApp::OnResize()
+void Renderer::OnResize()
 {
 	D3DApp::OnResize();
 
@@ -155,7 +155,7 @@ void CrateApp::OnResize()
 	XMStoreFloat4x4(&mProj, P);
 }
 
-void CrateApp::UpdateScene(float dt)
+void Renderer::UpdateScene(float dt)
 {
 	// Convert Spherical to Cartesian coordinates.
 	float x = mRadius*sinf(mPhi)*cosf(mTheta);
@@ -173,7 +173,7 @@ void CrateApp::UpdateScene(float dt)
 	XMStoreFloat4x4(&mView, V);
 }
 
-void CrateApp::DrawScene()
+void Renderer::DrawScene()
 {
 	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::LightSteelBlue));
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -220,7 +220,7 @@ void CrateApp::DrawScene()
 	HR(mSwapChain->Present(0, 0));
 }
 
-void CrateApp::OnMouseWheel(WPARAM wheelState, int delta)
+void Renderer::OnMouseWheel(WPARAM wheelState, int delta)
 {
 	// Update the camera radius based on input.
 	mRadius += (delta/100.0f)*((mRadius-earthRadius)/10.0f);
@@ -229,7 +229,7 @@ void CrateApp::OnMouseWheel(WPARAM wheelState, int delta)
 	mRadius = MathHelper::Clamp(mRadius, earthRadius, maxRadius);
 }
 
-void CrateApp::OnMouseDown(WPARAM btnState, int x, int y)
+void Renderer::OnMouseDown(WPARAM btnState, int x, int y)
 {
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
@@ -237,12 +237,12 @@ void CrateApp::OnMouseDown(WPARAM btnState, int x, int y)
 	SetCapture(mhMainWnd);
 }
 
-void CrateApp::OnMouseUp(WPARAM btnState, int x, int y)
+void Renderer::OnMouseUp(WPARAM btnState, int x, int y)
 {
 	ReleaseCapture();
 }
 
-void CrateApp::OnMouseMove(WPARAM btnState, int x, int y)
+void Renderer::OnMouseMove(WPARAM btnState, int x, int y)
 {
 	if( (btnState & MK_LBUTTON) != 0 )
 	{
@@ -274,7 +274,7 @@ void CrateApp::OnMouseMove(WPARAM btnState, int x, int y)
 	mLastMousePos.y = y;
 }
 
-void CrateApp::BuildGeometryBuffers()
+void Renderer::BuildGeometryBuffers()
 {
 	GeometryGenerator::MeshData box;
 
