@@ -16,6 +16,7 @@
 #include "LightHelper.h"
 #include "Effects.h"
 #include "Vertex.h"
+#include "Camera.h"
 
 float earthRadius = 6500.0f;
 float maxRadius = earthRadius*100.0f;
@@ -52,7 +53,6 @@ private:
 	XMFLOAT4X4 mTexTransform;
 	XMFLOAT4X4 mBoxWorld;
 
-	XMFLOAT4X4 mView;
 	XMFLOAT4X4 mProj;
 
 	int mBoxVertexOffset;
@@ -60,12 +60,11 @@ private:
 	UINT mBoxIndexCount;
 
 	XMFLOAT3 mEyePosW;
-
-	float mTheta;
-	float mPhi;
-	float mRadius;
-
+	
 	POINT mLastMousePos;
+
+	// Camera Related:
+	Camera mCam;
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
@@ -86,18 +85,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
  
 
 Renderer::Renderer(HINSTANCE hInstance)
-: D3DApp(hInstance), mBoxVB(0), mBoxIB(0), mDiffuseMapSRV(0), mEyePosW(0.0f, 0.0f, 0.0f), 
-  mTheta(1.3f*MathHelper::Pi), mPhi(0.4f*MathHelper::Pi), mRadius(earthRadius * 1.1f)
+: D3DApp(hInstance), mBoxVB(0), mBoxIB(0), mDiffuseMapSRV(0), mEyePosW(0.0f, 0.0f, 0.0f)
 {
 	mMainWndCaption = L"Crate Demo";
 	
+	mCam.SetPosition(0,0,-earthRadius*1.1);
 	mLastMousePos.x = 0;
 	mLastMousePos.y = 0;
 
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&mBoxWorld, I);
 	XMStoreFloat4x4(&mTexTransform, I);
-	XMStoreFloat4x4(&mView, I);
 	XMStoreFloat4x4(&mProj, I);
 
 	mDirLights[0].Ambient  = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
@@ -134,13 +132,8 @@ bool Renderer::Init()
 	Effects::InitAll(md3dDevice);
 	InputLayouts::InitAll(md3dDevice);
 	
-#if 1
 	HR(D3DX11CreateShaderResourceViewFromFile(md3dDevice, 
 		L"Textures/earthmap.dds",0, 0, &mDiffuseMapSRV, 0 ));
-#else
-	HR(D3DX11CreateShaderResourceViewFromFile(md3dDevice, 
-		L"Textures/WoodCrate02.dds",0, 0, &mDiffuseMapSRV, 0 ));
-#endif
  
 	BuildGeometryBuffers();
 
@@ -151,26 +144,30 @@ void Renderer::OnResize()
 {
 	D3DApp::OnResize();
 
-	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f*MathHelper::Pi, AspectRatio(), 1.0f, farClipPlaneDist);
-	XMStoreFloat4x4(&mProj, P);
+	mCam.SetLens(0.25f*MathHelper::Pi, AspectRatio(), 1.0f, farClipPlaneDist);
 }
 
 void Renderer::UpdateScene(float dt)
 {
-	// Convert Spherical to Cartesian coordinates.
-	float x = mRadius*sinf(mPhi)*cosf(mTheta);
-	float z = mRadius*sinf(mPhi)*sinf(mTheta);
-	float y = mRadius*cosf(mPhi);
+	XMVECTOR vRadius = XMVector3Length(mCam.GetPositionXM());
+	XMFLOAT3 fRadius;
+	XMStoreFloat3(&fRadius,vRadius);
+	float radius = fRadius.x;
+	// Restrict the radius.
+	radius = MathHelper::Clamp(radius, earthRadius, maxRadius);
 
-	mEyePosW = XMFLOAT3(x, y, z);
+	// Camera control:
+	if (GetAsyncKeyState('W') & 0x8000)
+		mCam.Walk(dt*(radius-earthRadius));
+	
+	if (GetAsyncKeyState('S') & 0x8000)
+		mCam.Walk(-dt*(radius-earthRadius));
 
-	// Build the view matrix.
-	XMVECTOR pos    = XMVectorSet(x, y, z, 1.0f);
-	XMVECTOR target = XMVectorZero();
-	XMVECTOR up     = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	if (GetAsyncKeyState('A') & 0x8000)
+		mCam.Strafe(-dt*(radius-earthRadius));
 
-	XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
-	XMStoreFloat4x4(&mView, V);
+	if (GetAsyncKeyState('D') & 0x8000)
+		mCam.Strafe(dt*(radius-earthRadius));
 }
 
 void Renderer::DrawScene()
@@ -184,9 +181,10 @@ void Renderer::DrawScene()
 	UINT stride = sizeof(Vertex::Basic32);
     UINT offset = 0;
  
-	XMMATRIX view  = XMLoadFloat4x4(&mView);
-	XMMATRIX proj  = XMLoadFloat4x4(&mProj);
-	XMMATRIX viewProj = view*proj;
+	mCam.UpdateViewMatrix();
+	XMMATRIX view  = mCam.View();
+	XMMATRIX proj  = mCam.Proj();
+	XMMATRIX viewProj = mCam.ViewProj();
 
 	// Set per frame constants.
 	Effects::BasicFX->SetDirLights(mDirLights);
@@ -223,10 +221,14 @@ void Renderer::DrawScene()
 void Renderer::OnMouseWheel(WPARAM wheelState, int delta)
 {
 	// Update the camera radius based on input.
-	mRadius += (delta/100.0f)*((mRadius-earthRadius)/10.0f);
 
+	XMVECTOR vRadius = XMVector3Length(mCam.GetPositionXM());
+	XMFLOAT3 fRadius;
+	XMStoreFloat3(&fRadius,vRadius);
+	float radius = fRadius.x;
 	// Restrict the radius.
-	mRadius = MathHelper::Clamp(mRadius, earthRadius, maxRadius);
+	radius = MathHelper::Clamp(radius, earthRadius, maxRadius);
+	mCam.Walk( (delta/100.0f)*((radius-earthRadius)/10.0f) );
 }
 
 void Renderer::OnMouseDown(WPARAM btnState, int x, int y)
@@ -250,24 +252,8 @@ void Renderer::OnMouseMove(WPARAM btnState, int x, int y)
 		float dx = XMConvertToRadians(0.25f*static_cast<float>(x - mLastMousePos.x));
 		float dy = XMConvertToRadians(0.25f*static_cast<float>(y - mLastMousePos.y));
 
-		// Update angles based on input to orbit camera around box.
-		mTheta += dx;
-		mPhi   += dy;
-
-		// Restrict the angle mPhi.
-		mPhi = MathHelper::Clamp(mPhi, 0.1f, MathHelper::Pi-0.1f);
-	}
-	else if( (btnState & MK_RBUTTON) != 0 )
-	{
-		// Make each pixel correspond to 0.01 unit in the scene.
-		float dx = 0.01f*static_cast<float>(x - mLastMousePos.x);
-		float dy = 0.01f*static_cast<float>(y - mLastMousePos.y);
-
-		// Update the camera radius based on input.
-		mRadius += (dx - dy)*((mRadius-earthRadius)/10.0f);
-
-		// Restrict the radius.
-		mRadius = MathHelper::Clamp(mRadius, earthRadius, maxRadius);
+		mCam.Pitch(dy);
+		mCam.RotateY(dx);
 	}
 
 	mLastMousePos.x = x;
@@ -279,11 +265,8 @@ void Renderer::BuildGeometryBuffers()
 	GeometryGenerator::MeshData box;
 
 	GeometryGenerator geoGen;
-#if 1
+
 	geoGen.CreateGeosphere(earthRadius,6000.0f,box);
-#else
-	geoGen.CreateBox(1.0f, 1.0f, 1.0f, box);
-#endif
 
 	// Cache the vertex offsets to each object in the concatenated vertex buffer.
 	mBoxVertexOffset      = 0;
