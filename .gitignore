@@ -54,6 +54,9 @@ build/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
+*.cod
+*.fxo
+
 *_i.c
 *_p.c
 *.ilk
