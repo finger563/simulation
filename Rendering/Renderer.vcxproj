@@ -96,6 +96,7 @@
     <ClCompile Include="..\Common\LightHelper.cpp" />
     <ClCompile Include="..\Common\MathHelper.cpp" />
     <ClCompile Include="..\Common\Waves.cpp" />
+    <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Effects.cpp" />
     <ClCompile Include="Vertex.cpp" />
@@ -110,6 +111,8 @@
     <ClInclude Include="..\Common\MathHelper.h" />
     <ClInclude Include="..\Common\Waves.h" />
     <ClInclude Include="Effects.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="Controller.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
