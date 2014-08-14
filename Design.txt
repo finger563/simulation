@@ -39,6 +39,10 @@ Goals:
 Next Steps:
 -----------
 * Camera that can fly around freely: better movement than the current controls
+* Multiple objects:
+  * Earth
+  * Moon
+  * Sun
 * View Frustum Culling
 * Terrain tessellation 
   * currently, project just creates a huge sphere statically depending on the predefined size
