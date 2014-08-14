@@ -1,71 +1,14 @@
 //***************************************************************************************
-// CrateDemo.cpp by Frank Luna (C) 2011 All Rights Reserved.
-//
-// Demonstrates texturing a box.
-//
-// Controls:
-//		Hold the left mouse button down and move the mouse to rotate.
-//      Hold the right mouse button down to zoom in and out.
-//
+// Renderer.cpp
 //***************************************************************************************
 
-#include "d3dApp.h"
 #include "d3dx11Effect.h"
 #include "GeometryGenerator.h"
 #include "MathHelper.h"
 #include "LightHelper.h"
 #include "Effects.h"
 #include "Vertex.h"
-#include "Camera.h"
-
-float earthRadius = 6500.0f;
-float maxRadius = earthRadius*100.0f;
-float farClipPlaneDist = earthRadius*1000.0f;
-
-class Renderer : public D3DApp
-{
-public:
-	Renderer(HINSTANCE hInstance);
-	~Renderer();
-
-	bool Init();
-	void OnResize();
-	void UpdateScene(float dt);
-	void DrawScene(); 
-
-	void OnMouseWheel(WPARAM wheelState, int delta);
-	void OnMouseDown(WPARAM btnState, int x, int y);
-	void OnMouseUp(WPARAM btnState, int x, int y);
-	void OnMouseMove(WPARAM btnState, int x, int y);
-
-private:
-	void BuildGeometryBuffers();
-
-private:
-	ID3D11Buffer* mBoxVB;
-	ID3D11Buffer* mBoxIB;
-
-	ID3D11ShaderResourceView* mDiffuseMapSRV;
-
-	DirectionalLight mDirLights[3];
-	Material mBoxMat;
-
-	XMFLOAT4X4 mTexTransform;
-	XMFLOAT4X4 mBoxWorld;
-
-	XMFLOAT4X4 mProj;
-
-	int mBoxVertexOffset;
-	UINT mBoxIndexOffset;
-	UINT mBoxIndexCount;
-
-	XMFLOAT3 mEyePosW;
-	
-	POINT mLastMousePos;
-
-	// Camera Related:
-	Camera mCam;
-};
+#include "Renderer.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 				   PSTR cmdLine, int showCmd)
@@ -85,14 +28,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
  
 
 Renderer::Renderer(HINSTANCE hInstance)
-: D3DApp(hInstance), mBoxVB(0), mBoxIB(0), mDiffuseMapSRV(0), mEyePosW(0.0f, 0.0f, 0.0f)
+: D3DApp(hInstance), mBoxVB(0), mBoxIB(0), mDiffuseMapSRV(0), control(hInstance)
 {
 	mMainWndCaption = L"Crate Demo";
 	
-	mCam.SetPosition(0,0,-earthRadius*1.1);
-	mLastMousePos.x = 0;
-	mLastMousePos.y = 0;
-
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&mBoxWorld, I);
 	XMStoreFloat4x4(&mTexTransform, I);
@@ -125,6 +64,7 @@ Renderer::~Renderer()
 
 bool Renderer::Init()
 {
+	control.Init();
 	if(!D3DApp::Init())
 		return false;
 
@@ -144,30 +84,30 @@ void Renderer::OnResize()
 {
 	D3DApp::OnResize();
 
-	mCam.SetLens(0.25f*MathHelper::Pi, AspectRatio(), 1.0f, farClipPlaneDist);
+	control.get_Camera().SetLens(0.25f*MathHelper::Pi, AspectRatio(), 1.0f, control.get_farClipPlaneDist());
 }
 
 void Renderer::UpdateScene(float dt)
 {
-	XMVECTOR vRadius = XMVector3Length(mCam.GetPositionXM());
+	XMVECTOR vRadius = XMVector3Length(control.get_Camera().GetPositionXM());
 	XMFLOAT3 fRadius;
 	XMStoreFloat3(&fRadius,vRadius);
 	float radius = fRadius.x;
 	// Restrict the radius.
-	radius = MathHelper::Clamp(radius, earthRadius, maxRadius);
+	radius = MathHelper::Clamp(radius, control.get_earthRadius(), control.get_maxRadius());
 
 	// Camera control:
 	if (GetAsyncKeyState('W') & 0x8000)
-		mCam.Walk(dt*(radius-earthRadius));
+		control.get_Camera().Walk(dt*(radius-control.get_earthRadius()));
 	
 	if (GetAsyncKeyState('S') & 0x8000)
-		mCam.Walk(-dt*(radius-earthRadius));
+		control.get_Camera().Walk(-dt*(radius-control.get_earthRadius()));
 
 	if (GetAsyncKeyState('A') & 0x8000)
-		mCam.Strafe(-dt*(radius-earthRadius));
+		control.get_Camera().Strafe(-dt*(radius-control.get_earthRadius()));
 
 	if (GetAsyncKeyState('D') & 0x8000)
-		mCam.Strafe(dt*(radius-earthRadius));
+		control.get_Camera().Strafe(dt*(radius-control.get_earthRadius()));
 }
 
 void Renderer::DrawScene()
@@ -181,14 +121,14 @@ void Renderer::DrawScene()
 	UINT stride = sizeof(Vertex::Basic32);
     UINT offset = 0;
  
-	mCam.UpdateViewMatrix();
-	XMMATRIX view  = mCam.View();
-	XMMATRIX proj  = mCam.Proj();
-	XMMATRIX viewProj = mCam.ViewProj();
+	control.get_Camera().UpdateViewMatrix();
+	XMMATRIX view  = control.get_Camera().View();
+	XMMATRIX proj  = control.get_Camera().Proj();
+	XMMATRIX viewProj = control.get_Camera().ViewProj();
 
 	// Set per frame constants.
 	Effects::BasicFX->SetDirLights(mDirLights);
-	Effects::BasicFX->SetEyePosW(mEyePosW);
+	Effects::BasicFX->SetEyePosW(XMFLOAT3(0.0f,0.0f,0.0f));
  
 	ID3DX11EffectTechnique* activeTech = Effects::BasicFX->Light2TexTech;
 
@@ -218,55 +158,13 @@ void Renderer::DrawScene()
 	HR(mSwapChain->Present(0, 0));
 }
 
-void Renderer::OnMouseWheel(WPARAM wheelState, int delta)
-{
-	// Update the camera radius based on input.
-
-	XMVECTOR vRadius = XMVector3Length(mCam.GetPositionXM());
-	XMFLOAT3 fRadius;
-	XMStoreFloat3(&fRadius,vRadius);
-	float radius = fRadius.x;
-	// Restrict the radius.
-	radius = MathHelper::Clamp(radius, earthRadius, maxRadius);
-	mCam.Walk( (delta/100.0f)*((radius-earthRadius)/10.0f) );
-}
-
-void Renderer::OnMouseDown(WPARAM btnState, int x, int y)
-{
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
-
-	SetCapture(mhMainWnd);
-}
-
-void Renderer::OnMouseUp(WPARAM btnState, int x, int y)
-{
-	ReleaseCapture();
-}
-
-void Renderer::OnMouseMove(WPARAM btnState, int x, int y)
-{
-	if( (btnState & MK_LBUTTON) != 0 )
-	{
-		// Make each pixel correspond to a quarter of a degree.
-		float dx = XMConvertToRadians(0.25f*static_cast<float>(x - mLastMousePos.x));
-		float dy = XMConvertToRadians(0.25f*static_cast<float>(y - mLastMousePos.y));
-
-		mCam.Pitch(dy);
-		mCam.RotateY(dx);
-	}
-
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
-}
-
 void Renderer::BuildGeometryBuffers()
 {
 	GeometryGenerator::MeshData box;
 
 	GeometryGenerator geoGen;
 
-	geoGen.CreateGeosphere(earthRadius,6000.0f,box);
+	geoGen.CreateGeosphere(control.get_earthRadius(),6000.0f,box);
 
 	// Cache the vertex offsets to each object in the concatenated vertex buffer.
 	mBoxVertexOffset      = 0;
