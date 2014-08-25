@@ -22,7 +22,7 @@ void Controller::OnMouseWheel(WPARAM wheelState, int delta)
 	XMStoreFloat3(&fRadius,vRadius);
 	float radius = fRadius.x;
 	// Restrict the radius.
-	radius = MathHelper::Clamp(radius, earthRadius, maxRadius);
+	radius = MathHelper::Clamp(radius, earthRadius+earthRadius/100.0f, maxRadius);
 	mCam.Walk( (delta/100.0f)*((radius-earthRadius)/10.0f) );
 }
 
