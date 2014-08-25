@@ -217,7 +217,7 @@ void Renderer::DrawScene()
 			Effects::BasicFX->SetWorld(world);
 			Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
 			Effects::BasicFX->SetWorldViewProj(worldViewProj);
-			Effects::BasicFX->SetTexTransform(XMMatrixScaling(8.0f, 10.0f, 1.0f));
+			Effects::BasicFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
 			Effects::BasicFX->SetMaterial(mBoxMat);
 			Effects::BasicFX->SetDiffuseMap(mDiffuseMapSRV);
 			break;
@@ -225,7 +225,7 @@ void Renderer::DrawScene()
 			Effects::NormalMapFX->SetWorld(world);
 			Effects::NormalMapFX->SetWorldInvTranspose(worldInvTranspose);
 			Effects::NormalMapFX->SetWorldViewProj(worldViewProj);
-			Effects::NormalMapFX->SetTexTransform(XMMatrixScaling(8.0f, 10.0f, 1.0f));
+			Effects::NormalMapFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
 			Effects::NormalMapFX->SetMaterial(mBoxMat);
 			Effects::NormalMapFX->SetDiffuseMap(mDiffuseMapSRV);
 			Effects::NormalMapFX->SetNormalMap(mEarthNormalTexSRV);
@@ -235,7 +235,7 @@ void Renderer::DrawScene()
 			Effects::DisplacementMapFX->SetWorldInvTranspose(worldInvTranspose);
 			Effects::DisplacementMapFX->SetViewProj(viewProj);
 			Effects::DisplacementMapFX->SetWorldViewProj(worldViewProj);
-			Effects::DisplacementMapFX->SetTexTransform(XMMatrixScaling(8.0f, 10.0f, 1.0f));
+			Effects::DisplacementMapFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
 			Effects::DisplacementMapFX->SetMaterial(mBoxMat);
 			Effects::DisplacementMapFX->SetDiffuseMap(mDiffuseMapSRV);
 			Effects::DisplacementMapFX->SetNormalMap(mEarthNormalTexSRV);
