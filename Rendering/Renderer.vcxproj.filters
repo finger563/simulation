@@ -115,18 +115,18 @@
     <CustomBuild Include="FX\Basic.fx">
       <Filter>FX</Filter>
     </CustomBuild>
+    <CustomBuild Include="FX\DisplacementMap.fx">
+      <Filter>FX</Filter>
+    </CustomBuild>
+    <CustomBuild Include="FX\Sky.fx">
+      <Filter>FX</Filter>
+    </CustomBuild>
+    <CustomBuild Include="FX\NormalMap.fx">
+      <Filter>FX</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <None Include="FX\LightHelper.fx">
-      <Filter>FX</Filter>
-    </None>
-    <None Include="FX\DisplacementMap.fx">
-      <Filter>FX</Filter>
-    </None>
-    <None Include="FX\NormalMap.fx">
-      <Filter>FX</Filter>
-    </None>
-    <None Include="FX\Sky.fx">
       <Filter>FX</Filter>
     </None>
   </ItemGroup>
