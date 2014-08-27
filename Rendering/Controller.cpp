@@ -6,8 +6,13 @@ Controller::Controller(HINSTANCE hInstance) : D3DApp(hInstance) {}
 bool Controller::Init() 
 {
 	earthRadius = 6500.0f;
+	earthPosW = XMFLOAT3(0,0,earthRadius);
 	maxRadius = earthRadius*100.0f;
 	farClipPlaneDist = earthRadius*1000.0f;
+
+	speed = 100.0f;
+	minSpeed = 1.0f;
+	maxSpeed = 100000.0f;
 
 	mCam.SetPosition(0,0,-earthRadius*1.1);
 
@@ -17,13 +22,8 @@ bool Controller::Init()
 }
 void Controller::OnMouseWheel(WPARAM wheelState, int delta)
 {
-	XMVECTOR vRadius = XMVector3Length(mCam.GetPositionXM());
-	XMFLOAT3 fRadius;
-	XMStoreFloat3(&fRadius,vRadius);
-	float radius = fRadius.x;
-	// Restrict the radius.
-	radius = MathHelper::Clamp(radius, earthRadius+earthRadius/100.0f, maxRadius);
-	mCam.Walk( (delta/100.0f)*((radius-earthRadius)/10.0f) );
+	speed += speed/(delta/10.0f);
+	speed = MathHelper::Clamp(speed, minSpeed, maxSpeed);
 }
 
 void Controller::OnMouseDown(WPARAM btnState, int x, int y)
@@ -64,9 +64,19 @@ Camera &Controller::get_Camera()
 	return mCam;
 }
 
+float Controller::get_Speed() 
+{
+	return speed;
+}
+
 float Controller::get_earthRadius() 
 {
 	return earthRadius;
+}
+
+XMFLOAT3 Controller::get_earthPosW() 
+{
+	return earthPosW;
 }
 
 float Controller::get_maxRadius() 

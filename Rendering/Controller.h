@@ -25,8 +25,10 @@ public:
 	/*
 	 * Accessor Functions
 	 */
+	float get_Speed();
 	Camera& get_Camera();
 	float get_earthRadius();
+	XMFLOAT3 get_earthPosW();
 	float get_maxRadius();
 	float get_farClipPlaneDist();
 	POINT get_mLastMousePos();
@@ -40,11 +42,17 @@ public:
 	void OnMouseMove(WPARAM btnState, int x, int y);
 
 private: 
+	float speed;
+	float minSpeed, maxSpeed;
+
 	Camera mCam;
 
 	POINT mLastMousePos;
 
 	float earthRadius;	
+
+	XMFLOAT3 earthPosW;
+
 	float maxRadius;
 	float farClipPlaneDist;
 };
