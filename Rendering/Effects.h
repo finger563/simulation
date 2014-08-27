@@ -236,6 +236,9 @@ public:
 	void SetMinTessFactor(float f)                      { MinTessFactor->SetFloat(f); }
 	void SetMaxTessFactor(float f)                      { MaxTessFactor->SetFloat(f); }
 
+	void SetPlanetRadius(float f)						{ planetRadius->SetFloat(f); }
+	void SetPlanetPosW(const XMFLOAT3& v)				{ planetPosW->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
+
 	void SetDiffuseMap(ID3D11ShaderResourceView* tex)   { DiffuseMap->SetResource(tex); }
 	void SetCubeMap(ID3D11ShaderResourceView* tex)      { CubeMap->SetResource(tex); }
 	void SetNormalMap(ID3D11ShaderResourceView* tex)    { NormalMap->SetResource(tex); }
@@ -312,6 +315,9 @@ public:
 	ID3DX11EffectScalarVariable* MinTessDistance;
 	ID3DX11EffectScalarVariable* MinTessFactor;
 	ID3DX11EffectScalarVariable* MaxTessFactor;
+
+	ID3DX11EffectScalarVariable* planetRadius;
+	ID3DX11EffectVectorVariable* planetPosW;
  
 	ID3DX11EffectShaderResourceVariable* DiffuseMap;
 	ID3DX11EffectShaderResourceVariable* CubeMap;

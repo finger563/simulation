@@ -266,6 +266,9 @@ DisplacementMapEffect::DisplacementMapEffect(ID3D11Device* device, const std::ws
 	DiffuseMap        = mFX->GetVariableByName("gDiffuseMap")->AsShaderResource();
 	CubeMap           = mFX->GetVariableByName("gCubeMap")->AsShaderResource();
 	NormalMap         = mFX->GetVariableByName("gNormalMap")->AsShaderResource();
+
+	planetRadius	  = mFX->GetVariableByName("gPlanetRadius")->AsScalar();
+	planetPosW		  = mFX->GetVariableByName("gPlanetPosW")->AsVector();
 }
 
 DisplacementMapEffect::~DisplacementMapEffect()

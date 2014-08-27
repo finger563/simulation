@@ -114,16 +114,16 @@ void Renderer::UpdateScene(float dt)
 
 	// Camera control:
 	if (GetAsyncKeyState('W') & 0x8000)
-		control.get_Camera().Walk(dt*(radius-control.get_earthRadius()));
+		control.get_Camera().Walk(dt*control.get_Speed());
 	
 	if (GetAsyncKeyState('S') & 0x8000)
-		control.get_Camera().Walk(-dt*(radius-control.get_earthRadius()));
+		control.get_Camera().Walk(-dt*control.get_Speed());
 
 	if (GetAsyncKeyState('A') & 0x8000)
-		control.get_Camera().Strafe(-dt*(radius-control.get_earthRadius()));
+		control.get_Camera().Strafe(-dt*control.get_Speed());
 
 	if (GetAsyncKeyState('D') & 0x8000)
-		control.get_Camera().Strafe(dt*(radius-control.get_earthRadius()));
+		control.get_Camera().Strafe(dt*control.get_Speed());
 	
 	//
 	// Switch the rendering effect based on key presses.
@@ -167,9 +167,12 @@ void Renderer::DrawScene()
 	// These properties could be set per object if needed.
 	Effects::DisplacementMapFX->SetHeightScale(1000.0f);
 	Effects::DisplacementMapFX->SetMaxTessDistance(1.0f);
-	Effects::DisplacementMapFX->SetMinTessDistance(1000.0f);
+	Effects::DisplacementMapFX->SetMinTessDistance(10000.0f);
 	Effects::DisplacementMapFX->SetMinTessFactor(1.0f);
-	Effects::DisplacementMapFX->SetMaxTessFactor(8.0f);
+	Effects::DisplacementMapFX->SetMaxTessFactor(5.0f);
+
+	Effects::DisplacementMapFX->SetPlanetPosW(control.get_earthPosW());
+	Effects::DisplacementMapFX->SetPlanetRadius(control.get_earthRadius());
  
 	ID3DX11EffectTechnique* activeTech       = Effects::DisplacementMapFX->Light3TexTech;
 	switch(mRenderOptions)
@@ -265,7 +268,7 @@ void Renderer::BuildGeometryBuffers()
 	GeometryGenerator geoGen;
 
 	geoGen.CreateGeosphere(control.get_earthRadius(),600.0f,box);
-
+	
 	// Cache the vertex offsets to each object in the concatenated vertex buffer.
 	mBoxVertexOffset      = 0;
 
@@ -289,7 +292,11 @@ void Renderer::BuildGeometryBuffers()
 	UINT k = 0;
 	for(size_t i = 0; i < box.Vertices.size(); ++i, ++k)
 	{
-		vertices[k].Pos			= box.Vertices[i].Position;
+		XMVECTOR epos = (XMVECTOR)XMLoadFloat3(&control.get_earthPosW());
+		XMVECTOR pos = XMLoadFloat3(&box.Vertices[i].Position);
+		XMVECTOR result = epos + pos;
+		XMStoreFloat3(&vertices[k].Pos, result);
+		//vertices[k].Pos			= box.Vertices[i].Position;
 		vertices[k].Normal		= box.Vertices[i].Normal;
 		vertices[k].Tex			= box.Vertices[i].TexC;
 		vertices[k].TangentU	= box.Vertices[i].TangentU;

@@ -28,6 +28,9 @@ cbuffer cbPerObject
 	float4x4 gWorldViewProj;
 	float4x4 gTexTransform;
 	Material gMaterial;
+
+	float	gPlanetRadius;
+	float3	gPlanetPosW;
 }; 
 
 // Nonnumeric values cannot be added to a cbuffer.
@@ -71,6 +74,9 @@ VertexOut VS(VertexIn vin)
 	// Output vertex attributes for interpolation across triangle.
 	vout.Tex = mul(float4(vin.Tex, 0.0f, 1.0f), gTexTransform).xy;
 	
+	float3 dir = normalize(gEyePosW-gPlanetPosW);
+	//float d = distance(gPlanetPosW + gPlanetRadius*dir, gEyePosW);
+
 	float d = distance(vout.PosW, gEyePosW);
 
 	// Normalized tessellation factor. 
@@ -156,6 +162,7 @@ DomainOut DS(PatchTess patchTess,
 	DomainOut dout;
 	
 	// Interpolate patch attributes to generated vertices.
+	//dout.PosW     = gPlanetRadius*normalize(bary.x*tri[0].PosW     + bary.y*tri[1].PosW     + bary.z*tri[2].PosW) + gPlanetPosW;
 	dout.PosW     = bary.x*tri[0].PosW     + bary.y*tri[1].PosW     + bary.z*tri[2].PosW;
 	dout.NormalW  = bary.x*tri[0].NormalW  + bary.y*tri[1].NormalW  + bary.z*tri[2].NormalW;
 	dout.TangentW = bary.x*tri[0].TangentW + bary.y*tri[1].TangentW + bary.z*tri[2].TangentW;
