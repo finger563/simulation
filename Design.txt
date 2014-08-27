@@ -2,6 +2,17 @@ Questions:
 ----------
 * How to properly handle different scales?
   * framebuffer (distance buffer) issues w/ FP precision
+* How to do collision detection with dynamically generated meshes (i.e. terrain)
+* How to stream high-res texture/data-maps for *parts* of objects
+  * like how outerra only streams the data for the part you are at in earth
+* Handle frustum culling *AND* distance scales:
+  * Binary space partitioning:
+    * each objects world position : [0,1] --> relative to space partition position
+      * useful for fixing depth buffer issue?
+    * each space partition has an integer position pointing to one of its corners
+    * Each partition has list of objects inside
+      * may have subpartitions?
+    * Use the partition cubes for frustum culling 
 
 Goals:
 ------
@@ -38,12 +49,56 @@ Goals:
 
 Next Steps:
 -----------
-* Camera that can fly around freely: better movement than the current controls
 * Multiple objects:
   * Earth
   * Moon
   * Sun
+  * Create object management system which contains info for each object:
+    * space partition it's in?
+    * local partition position
+    * bounding object (sphere,box,etc.)
+    * Sub objects/meshes:
+      * mesh data
+      * relevant effects
+      * configuration functions? (i.e. what data must be passed to effect)
+    * Physical data?
+      * mass
+      * speed
+      * local partition position
+* Binary Space Partitioning:
+  * Configure:
+    * partition depth
+    * partition size (at each depth layer)
+    * total space size?
+      * or do we just create space as we need based on object creation?
+  * Information contained:
+    * position
+    * list of objects (objects may just be sub-partitions)
+    * bounding object (cube)
+  * Load objects into 
 * View Frustum Culling
+  * Use binary space partitioning
+* Stream data (like outerra) instead of loading all at once?
+  * really means split data for sending to GPU based on need:
+    * don't need to send full earth texture/height-maps since can't see all of it at once
+* Water Layer for earth:
+  * sphere mesh at sea level
+  * with some sort of reflection effect?
+  * Effects:
+    * Wave tessellation
+    * above surface: reflection and refraction
+    * below surface: color, etc.?
+* Atmosphere for earth:
+  * sphere mesh(s) at atmo level
+  * effects:
+    * above atmo: blur and shadows and scattering
+    * in atmo: blur and color and scattering
+* Terrain Generation 2:
+  * generate based on biome data instead of heightmap (similar terrain as found in GPU gems)
+
+Done:
+-----
+* Camera that can fly around freely: better movement than the current controls
 * Terrain tessellation 
   * currently, project just creates a huge sphere statically depending on the predefined size
   * Instead, do the poly generation (tessellation) in the geometry shader
@@ -52,5 +107,3 @@ Next Steps:
 * Terrain Generation:
   * after tesselation, we have control over poly placement in shader
   * do real terrain generation based on heightmap
-* Terrain Generation 2:
-  * generate based on biome data instead of heightmap (similar terrain as found in GPU gems)
