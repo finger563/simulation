@@ -49,6 +49,13 @@ Goals:
 
 Next Steps:
 -----------
+* Change earth representation to actual mesh
+  * each set of triangles on the mesh should correspsond to sub textures
+    * this allows us to only load textures into memory which may actually be displayed
+    * solves:
+      * large texture size issue
+      * texture streaming issue
+      * wasted resource issue (1/2 of texture is not visible currently) 
 * Multiple objects:
   * Earth
   * Moon
@@ -59,6 +66,10 @@ Next Steps:
     * bounding object (sphere,box,etc.)
     * Sub objects/meshes:
       * mesh data
+      * texture file
+        * each sub mesh can then have more accurate texture files
+        * distance can determine mesh to use?
+        * this is how we save the dynamically generated meshes?
       * relevant effects
       * configuration functions? (i.e. what data must be passed to effect)
     * Physical data?
