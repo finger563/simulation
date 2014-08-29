@@ -36,7 +36,6 @@ cbuffer cbPerObject
 // Nonnumeric values cannot be added to a cbuffer.
 Texture2D gDiffuseMap;
 Texture2D gNormalMap;
-TextureCube gCubeMap;
 
 SamplerState samLinear
 {
@@ -184,7 +183,7 @@ DomainOut DS(PatchTess patchTess,
 	float h = gNormalMap.SampleLevel(samLinear, dout.Tex, mipLevel).a;
 	
 	// Offset vertex along normal.
-	dout.PosW += (gHeightScale*(h-1.0))*dout.NormalW;
+	dout.PosW += (gHeightScale*h)*dout.NormalW;
 	
 	// Project to homogeneous clip space.
 	dout.PosH = mul(float4(dout.PosW, 1.0f), gViewProj);
@@ -265,7 +264,7 @@ float4 PS(DomainOut pin,
 		{
 			float3 incident = -toEye;
 			float3 reflectionVector = reflect(incident, bumpedNormalW);
-			float4 reflectionColor  = gCubeMap.Sample(samLinear, reflectionVector);
+			float4 reflectionColor  = float4(0,0,0,0);//gCubeMap.Sample(samLinear, reflectionVector);
 
 			litColor += gMaterial.Reflect*reflectionColor;
 		}

@@ -282,7 +282,15 @@ SkyEffect::SkyEffect(ID3D11Device* device, const std::wstring& filename)
 {
 	SkyTech       = mFX->GetTechniqueByName("SkyTech");
 	WorldViewProj = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
-	CubeMap       = mFX->GetVariableByName("gCubeMap")->AsShaderResource();
+	WorldViewProj     = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
+	World             = mFX->GetVariableByName("gWorld")->AsMatrix();
+	WorldInvTranspose = mFX->GetVariableByName("gWorldInvTranspose")->AsMatrix();
+	EyePosW           = mFX->GetVariableByName("gEyePosW")->AsVector();
+	FogColor          = mFX->GetVariableByName("gFogColor")->AsVector();
+	FogStart          = mFX->GetVariableByName("gFogStart")->AsScalar();
+	FogRange          = mFX->GetVariableByName("gFogRange")->AsScalar();
+	DirLights         = mFX->GetVariableByName("gDirLights");
+	Mat               = mFX->GetVariableByName("gMaterial");
 }
 
 SkyEffect::~SkyEffect()

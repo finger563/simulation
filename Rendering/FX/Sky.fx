@@ -4,62 +4,69 @@
 // Effect used to shade sky dome.
 //=============================================================================
 
+#include "LightHelper.fx"
+
 cbuffer cbPerFrame
 {
-	float4x4 gWorldViewProj;
+	DirectionalLight gDirLights[3];
+	float3 gEyePosW;
+
+	float  gFogStart;
+	float  gFogRange;
+	float4 gFogColor; 
 };
+
+cbuffer cbPerObject
+{
+	float4x4 gWorld;
+	float4x4 gWorldInvTranspose;
+	float4x4 gWorldViewProj;
+	Material gMaterial;
+}; 
  
 // Nonnumeric values cannot be added to a cbuffer.
-TextureCube gCubeMap;
  
-SamplerState samTriLinearSam
+SamplerState samLinear
 {
 	Filter = MIN_MAG_MIP_LINEAR;
-	AddressU = Wrap;
-	AddressV = Wrap;
+	AddressU = WRAP;
+	AddressV = WRAP;
 };
 
 struct VertexIn
 {
-	float3 PosL : POSITION;
+	float3 PosL     : POSITION;
+	float3 NormalL  : NORMAL;
+	float2 Tex      : TEXCOORD;
+	float3 TangentL : TANGENT;
 };
 
 struct VertexOut
 {
-	float4 PosH : SV_POSITION;
-    float3 PosL : POSITION;
+    float3 PosW       : POSITION;
+    float3 NormalW    : NORMAL;
+	float3 TangentW   : TANGENT;
+	float2 Tex        : TEXCOORD;
+	float  TessFactor : TESS;
 };
  
 VertexOut VS(VertexIn vin)
 {
 	VertexOut vout;
 	
-	// Set z = w so that z/w = 1 (i.e., skydome always on far plane).
-	vout.PosH = mul(float4(vin.PosL, 1.0f), gWorldViewProj).xyww;
-	
-	// Use local vertex position as cubemap lookup vector.
-	vout.PosL = vin.PosL;
-	
+	// Transform to world space space.
+	vout.PosW    = mul(float4(vin.PosL, 1.0f), gWorld).xyz;
+		
+	// Transform to homogeneous clip space.
+	vout.PosH = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
+			
 	return vout;
 }
 
 float4 PS(VertexOut pin) : SV_Target
 {
-	return gCubeMap.Sample(samTriLinearSam, pin.PosL);
+	return float4(0,0,1,0.1);
 }
-
-RasterizerState NoCull
-{
-    CullMode = None;
-};
-
-DepthStencilState LessEqualDSS
-{
-	// Make sure the depth function is LESS_EQUAL and not just LESS.  
-	// Otherwise, the normalized depth values at z = 1 (NDC) will 
-	// fail the depth test if the depth buffer was cleared to 1.
-    DepthFunc = LESS_EQUAL;
-};
 
 technique11 SkyTech
 {
@@ -68,8 +75,5 @@ technique11 SkyTech
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
         SetGeometryShader( NULL );
         SetPixelShader( CompileShader( ps_5_0, PS() ) );
-        
-        SetRasterizerState(NoCull);
-        SetDepthStencilState(LessEqualDSS, 0);
     }
 }

@@ -5,12 +5,12 @@ Controller::Controller(HINSTANCE hInstance) : D3DApp(hInstance) {}
 
 bool Controller::Init() 
 {
-	earthRadius = 6500.0f;
+	earthRadius = 6378.1370f;
 	earthPosW = XMFLOAT3(0,0,earthRadius);
 	maxRadius = earthRadius*100.0f;
 	farClipPlaneDist = earthRadius*1000.0f;
 
-	speed = 100.0f;
+	speed = 1000.0f;
 	minSpeed = 1.0f;
 	maxSpeed = 100000.0f;
 

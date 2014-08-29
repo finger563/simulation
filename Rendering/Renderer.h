@@ -40,25 +40,28 @@ private:
 	void BuildGeometryBuffers();
 
 private:
-	Sky* mSky;
-
-	ID3D11Buffer* mBoxVB;
-	ID3D11Buffer* mBoxIB;
+	ID3D11Buffer* mVB;
+	ID3D11Buffer* mIB;
 
 	ID3D11ShaderResourceView* mDiffuseMapSRV;
 	ID3D11ShaderResourceView* mEarthNormalTexSRV;
 
 	DirectionalLight mDirLights[3];
-	Material mBoxMat;
+	Material mEarthMat;
 
 	XMFLOAT4X4 mTexTransform;
-	XMFLOAT4X4 mBoxWorld;
+	XMFLOAT4X4 mEarthWorld;
+	XMFLOAT4X4 mSkyWorld;
 
 	XMFLOAT4X4 mProj;
 
-	int mBoxVertexOffset;
-	UINT mBoxIndexOffset;
-	UINT mBoxIndexCount;
+	int mEarthVertexOffset;
+	UINT mEarthIndexOffset;
+	UINT mEarthIndexCount;
+	
+	int mSkyVertexOffset;
+	UINT mSkyIndexOffset;
+	UINT mSkyIndexCount;
 
 	RenderOptions mRenderOptions;
 

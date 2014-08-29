@@ -78,7 +78,6 @@ void Sky::Draw(ID3D11DeviceContext* dc, const Camera& camera)
 	XMMATRIX WVP = XMMatrixMultiply(T, camera.ViewProj());
 
 	Effects::SkyFX->SetWorldViewProj(WVP);
-	Effects::SkyFX->SetCubeMap(mCubeMapSRV);
 
 
 	UINT stride = sizeof(XMFLOAT3);

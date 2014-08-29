@@ -28,12 +28,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
  
 
 Renderer::Renderer(HINSTANCE hInstance)
-: D3DApp(hInstance), mSky(0), mBoxVB(0), mBoxIB(0), mDiffuseMapSRV(0), mEarthNormalTexSRV(0), control(hInstance),  mRenderOptions(RenderOptionsNormalMap)
+: D3DApp(hInstance), mVB(0), mIB(0), mDiffuseMapSRV(0), mEarthNormalTexSRV(0), control(hInstance),  mRenderOptions(RenderOptionsNormalMap)
 {
 	mMainWndCaption = L"Crate Demo";
 	
 	XMMATRIX I = XMMatrixIdentity();
-	XMStoreFloat4x4(&mBoxWorld, I);
+	XMStoreFloat4x4(&mEarthWorld, I);
 	XMStoreFloat4x4(&mTexTransform, I);
 	XMStoreFloat4x4(&mProj, I);
 	
@@ -49,21 +49,19 @@ Renderer::Renderer(HINSTANCE hInstance)
 
 	mDirLights[2].Ambient  = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	mDirLights[2].Diffuse  = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	mDirLights[2].Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	mDirLights[2].Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 2.0f);
 	mDirLights[2].Direction = XMFLOAT3(-0.57735f, -0.57735f, -0.57735f);
 
-	mBoxMat.Ambient  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	mBoxMat.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	mBoxMat.Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
-	mBoxMat.Reflect  = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	mEarthMat.Ambient  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	mEarthMat.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	mEarthMat.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	mEarthMat.Reflect  = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 Renderer::~Renderer()
 {
-	SafeDelete(mSky);
-
-	ReleaseCOM(mBoxVB);
-	ReleaseCOM(mBoxIB);
+	ReleaseCOM(mVB);
+	ReleaseCOM(mIB);
 	ReleaseCOM(mDiffuseMapSRV);
 	ReleaseCOM(mEarthNormalTexSRV);
 
@@ -82,9 +80,7 @@ bool Renderer::Init()
 	Effects::InitAll(md3dDevice);
 	InputLayouts::InitAll(md3dDevice);
 	RenderStates::InitAll(md3dDevice);
-
-	mSky = new Sky(md3dDevice, L"Textures/snowcube1024.dds", 10.0f);
-	
+		
 	HR(D3DX11CreateShaderResourceViewFromFile(md3dDevice, 
 		L"Textures/earthmap.dds",0, 0, &mDiffuseMapSRV, 0 ));
  
@@ -105,12 +101,14 @@ void Renderer::OnResize()
 
 void Renderer::UpdateScene(float dt)
 {
+	/*
 	XMVECTOR vRadius = XMVector3Length(control.get_Camera().GetPositionXM());
 	XMFLOAT3 fRadius;
 	XMStoreFloat3(&fRadius,vRadius);
 	float radius = fRadius.x;
 	// Restrict the radius.
 	radius = MathHelper::Clamp(radius, control.get_earthRadius(), control.get_maxRadius());
+	*/
 
 	// Camera control:
 	if (GetAsyncKeyState('W') & 0x8000)
@@ -140,7 +138,7 @@ void Renderer::UpdateScene(float dt)
 
 void Renderer::DrawScene()
 {
-	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::LightSteelBlue));
+	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Black));
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
 	  
 	control.get_Camera().UpdateViewMatrix();
@@ -153,23 +151,23 @@ void Renderer::DrawScene()
 	// Set per frame constants.
 	Effects::BasicFX->SetDirLights(mDirLights);
 	Effects::BasicFX->SetEyePosW(control.get_Camera().GetPosition());
-	Effects::BasicFX->SetCubeMap(mSky->CubeMapSRV());
 
+	Effects::SkyFX->SetDirLights(mDirLights);
+	Effects::SkyFX->SetEyePosW(control.get_Camera().GetPosition());
+	
 	Effects::NormalMapFX->SetDirLights(mDirLights);
 	Effects::NormalMapFX->SetEyePosW(control.get_Camera().GetPosition());
-	Effects::NormalMapFX->SetCubeMap(mSky->CubeMapSRV());
 
 	// Set per frame constants.
 	Effects::DisplacementMapFX->SetDirLights(mDirLights);
 	Effects::DisplacementMapFX->SetEyePosW(control.get_Camera().GetPosition());
-	Effects::DisplacementMapFX->SetCubeMap(mSky->CubeMapSRV());
 
 	// These properties could be set per object if needed.
 	Effects::DisplacementMapFX->SetHeightScale(1000.0f);
-	Effects::DisplacementMapFX->SetMaxTessDistance(1.0f);
+	Effects::DisplacementMapFX->SetMaxTessDistance(0.001f);
 	Effects::DisplacementMapFX->SetMinTessDistance(10000.0f);
 	Effects::DisplacementMapFX->SetMinTessFactor(1.0f);
-	Effects::DisplacementMapFX->SetMaxTessFactor(5.0f);
+	Effects::DisplacementMapFX->SetMaxTessFactor(50.0f);
 
 	Effects::DisplacementMapFX->SetPlanetPosW(control.get_earthPosW());
 	Effects::DisplacementMapFX->SetPlanetRadius(control.get_earthRadius());
@@ -199,8 +197,8 @@ void Renderer::DrawScene()
     UINT offset = 0;
 
 	md3dImmediateContext->IASetInputLayout(InputLayouts::PosNormalTexTan);
-	md3dImmediateContext->IASetVertexBuffers(0, 1, &mBoxVB, &stride, &offset);
-	md3dImmediateContext->IASetIndexBuffer(mBoxIB, DXGI_FORMAT_R32_UINT, 0);
+	md3dImmediateContext->IASetVertexBuffers(0, 1, &mVB, &stride, &offset);
+	md3dImmediateContext->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
 
 	if( GetAsyncKeyState('1') & 0x8000 )
 		md3dImmediateContext->RSSetState(RenderStates::WireframeRS);
@@ -209,8 +207,8 @@ void Renderer::DrawScene()
 	activeTech->GetDesc( &techDesc );
     for(UINT p = 0; p < techDesc.Passes; ++p)
     {
-		// Draw the box.
-		world = XMLoadFloat4x4(&mBoxWorld);
+		// Draw the Earth.
+		world = XMLoadFloat4x4(&mEarthWorld);
 		worldInvTranspose = MathHelper::InverseTranspose(world);
 		worldViewProj = world*view*proj;
 
@@ -221,7 +219,7 @@ void Renderer::DrawScene()
 			Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
 			Effects::BasicFX->SetWorldViewProj(worldViewProj);
 			Effects::BasicFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
-			Effects::BasicFX->SetMaterial(mBoxMat);
+			Effects::BasicFX->SetMaterial(mEarthMat);
 			Effects::BasicFX->SetDiffuseMap(mDiffuseMapSRV);
 			break;
 		case RenderOptionsNormalMap:
@@ -229,7 +227,7 @@ void Renderer::DrawScene()
 			Effects::NormalMapFX->SetWorldInvTranspose(worldInvTranspose);
 			Effects::NormalMapFX->SetWorldViewProj(worldViewProj);
 			Effects::NormalMapFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
-			Effects::NormalMapFX->SetMaterial(mBoxMat);
+			Effects::NormalMapFX->SetMaterial(mEarthMat);
 			Effects::NormalMapFX->SetDiffuseMap(mDiffuseMapSRV);
 			Effects::NormalMapFX->SetNormalMap(mEarthNormalTexSRV);
 			break;
@@ -239,20 +237,41 @@ void Renderer::DrawScene()
 			Effects::DisplacementMapFX->SetViewProj(viewProj);
 			Effects::DisplacementMapFX->SetWorldViewProj(worldViewProj);
 			Effects::DisplacementMapFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
-			Effects::DisplacementMapFX->SetMaterial(mBoxMat);
+			Effects::DisplacementMapFX->SetMaterial(mEarthMat);
 			Effects::DisplacementMapFX->SetDiffuseMap(mDiffuseMapSRV);
 			Effects::DisplacementMapFX->SetNormalMap(mEarthNormalTexSRV);
 			break;
 		}
 		
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
-		md3dImmediateContext->DrawIndexed(mBoxIndexCount, mBoxIndexOffset, mBoxVertexOffset);
+		md3dImmediateContext->DrawIndexed(mEarthIndexCount, mEarthIndexOffset, mEarthVertexOffset);
     }
-
+	
 	// FX sets tessellation stages, but it does not disable them.  So do that here
 	// to turn off tessellation.
 	md3dImmediateContext->HSSetShader(0, 0, 0);
 	md3dImmediateContext->DSSetShader(0, 0, 0);
+	
+	activeTech = Effects::SkyFX->SkyTech;
+	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	
+	activeTech->GetDesc( &techDesc );
+
+    for(UINT p = 0; p < techDesc.Passes; ++p)
+    {
+		// Draw the Earth.
+		//world = XMLoadFloat4x4(&mEarthWorld);
+		//worldInvTranspose = MathHelper::InverseTranspose(world);
+		//worldViewProj = world*view*proj;
+		
+		Effects::SkyFX->SetWorld(world);
+		Effects::SkyFX->SetWorldInvTranspose(worldInvTranspose);
+		Effects::SkyFX->SetWorldViewProj(worldViewProj);
+		Effects::SkyFX->SetMaterial(mEarthMat);
+				
+		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+		md3dImmediateContext->DrawIndexed(mSkyIndexCount, mSkyIndexOffset, mSkyVertexOffset);
+    }
 	
 	// restore default states, as the SkyFX changes them in the effect file.
 	md3dImmediateContext->RSSetState(0);
@@ -263,24 +282,29 @@ void Renderer::DrawScene()
 
 void Renderer::BuildGeometryBuffers()
 {
-	GeometryGenerator::MeshData box;
+	GeometryGenerator::MeshData earthMesh;
+
+	GeometryGenerator::MeshData skyMesh;
 
 	GeometryGenerator geoGen;
 
-	geoGen.CreateGeosphere(control.get_earthRadius(),600.0f,box);
+	geoGen.CreateGeosphere(control.get_earthRadius(),600.0f,earthMesh);
+
+	geoGen.CreateGeosphere(control.get_earthRadius() + 100.0f, 600.0f, skyMesh);
 	
 	// Cache the vertex offsets to each object in the concatenated vertex buffer.
-	mBoxVertexOffset      = 0;
+	mEarthVertexOffset      = 0;
 
 	// Cache the index count of each object.
-	mBoxIndexCount      = box.Indices.size();
+	mEarthIndexCount      = earthMesh.Indices.size();
+	mSkyIndexCount		  = skyMesh.Indices.size();
 
 	// Cache the starting index for each object in the concatenated index buffer.
-	mBoxIndexOffset      = 0;
+	mEarthIndexOffset      = 0;
 	
-	UINT totalVertexCount = box.Vertices.size();
+	UINT totalVertexCount = earthMesh.Vertices.size() + skyMesh.Vertices.size();
 
-	UINT totalIndexCount = mBoxIndexCount;
+	UINT totalIndexCount = mEarthIndexCount + mSkyIndexCount;
 
 	//
 	// Extract the vertex elements we are interested in and pack the
@@ -290,16 +314,29 @@ void Renderer::BuildGeometryBuffers()
 	std::vector<Vertex::PosNormalTexTan> vertices(totalVertexCount);
 
 	UINT k = 0;
-	for(size_t i = 0; i < box.Vertices.size(); ++i, ++k)
+	for(size_t i = 0; i < earthMesh.Vertices.size(); ++i, ++k)
 	{
 		XMVECTOR epos = (XMVECTOR)XMLoadFloat3(&control.get_earthPosW());
-		XMVECTOR pos = XMLoadFloat3(&box.Vertices[i].Position);
+		XMVECTOR pos = XMLoadFloat3(&earthMesh.Vertices[i].Position);
 		XMVECTOR result = epos + pos;
 		XMStoreFloat3(&vertices[k].Pos, result);
-		//vertices[k].Pos			= box.Vertices[i].Position;
-		vertices[k].Normal		= box.Vertices[i].Normal;
-		vertices[k].Tex			= box.Vertices[i].TexC;
-		vertices[k].TangentU	= box.Vertices[i].TangentU;
+		//vertices[k].Pos			= earthMesh.Vertices[i].Position;
+		vertices[k].Normal		= earthMesh.Vertices[i].Normal;
+		vertices[k].Tex			= earthMesh.Vertices[i].TexC;
+		vertices[k].TangentU	= earthMesh.Vertices[i].TangentU;
+	}
+	
+	mSkyVertexOffset = k;
+
+	for(size_t i = 0; i < skyMesh.Vertices.size(); ++i, ++k)
+	{
+		XMVECTOR epos = (XMVECTOR)XMLoadFloat3(&control.get_earthPosW());
+		XMVECTOR pos = XMLoadFloat3(&skyMesh.Vertices[i].Position);
+		XMVECTOR result = epos + pos;
+		XMStoreFloat3(&vertices[k].Pos, result);
+		vertices[k].Normal		= skyMesh.Vertices[i].Normal;
+		vertices[k].Tex			= skyMesh.Vertices[i].TexC;
+		vertices[k].TangentU	= skyMesh.Vertices[i].TangentU;
 	}
 
     D3D11_BUFFER_DESC vbd;
@@ -310,14 +347,16 @@ void Renderer::BuildGeometryBuffers()
     vbd.MiscFlags = 0;
     D3D11_SUBRESOURCE_DATA vinitData;
     vinitData.pSysMem = &vertices[0];
-    HR(md3dDevice->CreateBuffer(&vbd, &vinitData, &mBoxVB));
+    HR(md3dDevice->CreateBuffer(&vbd, &vinitData, &mVB));
 
 	//
 	// Pack the indices of all the meshes into one index buffer.
 	//
 
 	std::vector<UINT> indices;
-	indices.insert(indices.end(), box.Indices.begin(), box.Indices.end());
+	indices.insert(indices.end(), earthMesh.Indices.begin(), earthMesh.Indices.end());
+	mSkyIndexOffset = indices.size() - 1;
+	indices.insert(indices.end(), skyMesh.Indices.begin(), skyMesh.Indices.end());
 
 	D3D11_BUFFER_DESC ibd;
     ibd.Usage = D3D11_USAGE_IMMUTABLE;
@@ -327,6 +366,6 @@ void Renderer::BuildGeometryBuffers()
     ibd.MiscFlags = 0;
     D3D11_SUBRESOURCE_DATA iinitData;
     iinitData.pSysMem = &indices[0];
-    HR(md3dDevice->CreateBuffer(&ibd, &iinitData, &mBoxIB));
+    HR(md3dDevice->CreateBuffer(&ibd, &iinitData, &mIB));
 }
  

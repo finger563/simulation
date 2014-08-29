@@ -26,7 +26,6 @@ cbuffer cbPerObject
 // Nonnumeric values cannot be added to a cbuffer.
 Texture2D gDiffuseMap;
 Texture2D gNormalMap;
-TextureCube gCubeMap;
 
 SamplerState samLinear
 {
@@ -143,7 +142,7 @@ float4 PS(VertexOut pin,
 		{
 			float3 incident = -toEye;
 			float3 reflectionVector = reflect(incident, bumpedNormalW);
-			float4 reflectionColor  = gCubeMap.Sample(samLinear, reflectionVector);
+			float4 reflectionColor  = float4(0,0,0,0);//gCubeMap.Sample(samLinear, reflectionVector);
 
 			litColor += gMaterial.Reflect*reflectionColor;
 		}
