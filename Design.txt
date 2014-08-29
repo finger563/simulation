@@ -118,3 +118,63 @@ Done:
 * Terrain Generation:
   * after tesselation, we have control over poly placement in shader
   * do real terrain generation based on heightmap
+
+
+  Batman:
+  ------
+
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MM.:  .:'   `:::  .:`MMMMMMMMMMM|`MMM'|MMMMMMMMMMM':  .:'   `:::  .:'.MM
+MMMM.     :          `MMMMMMMMMM  :*'  MMMMMMMMMM'        :        .MMMM
+MMMMM.    ::    .     `MMMMMMMM'  ::   `MMMMMMMM'   .     ::   .  .MMMMM
+MMMMMM. :   :: ::'  :   :: ::'  :   :: ::'      :: ::'  :   :: ::.MMMMMM
+MMMMMMM    ;::         ;::         ;::         ;::         ;::   MMMMMMM
+MMMMMMM .:'   `:::  .:'   `:::  .:'   `:::  .:'   `:::  .:'   `::MMMMMMM
+MMMMMM'     :           :           :           :           :    `MMMMMM
+MMMMM'______::____      ::    .     ::    .     ::     ___._::____`MMMMM
+MMMMMMMMMMMMMMMMMMM`---._ :: ::'  :   :: ::'  _.--::MMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMMMMMM::.         ::  .--MMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM-.     ;::-MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM. .:' .M:F_P:MMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM.   .MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM\ /MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMVMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+
+
+                     Tb.          Tb.                                
+                     :$$b.        $$$b.                              
+                     :$$$$b.      :$$$$b.                            
+                     :$$$$$$b     :$$$$$$b                           
+                      $$$$$$$b     $$$$$$$b                          
+                      $$$$$$$$b    :$$$$$$$b                         
+                      :$$$$$$$$b---^$$$$$$$$b                        
+                      :$$$$$$$$$b        ""^Tb                       
+                       $$$$$$$$$$b    __...__`.                      
+                       $$$$$$$$$$$b.g$$$$$$$$$pb                     
+                       $$$$$$$$$$$$$$$$$$$$$$$$$b                    
+                       $$$$$$$$$$$$$$$$$$$$$$$$$$b                   
+                       :$$$$$$$$$$$$$$$$$$$$$$$$$$;                  
+                       :$$$$$$$$$$$$$^T$$$$$$$$$$P;                  
+                       :$$$$$$$$$$$$$b  "^T$$$$P' :                  
+                       :$$$$$$$$$$$$$$b._.g$$$$$p.db                 
+                       :$$$$$$$$$$$$$$$$$$$$$$$$$$$$;                
+                       :$$$$$$$$"""^^T$$$$$$$$$$$$P^;                
+                       :$$$$$$$$       ""^^T$$$P^'  ;                
+                       :$$$$$$$$    .'       `"     ;                
+                       $$$$$$$$;   /                :                
+                       $$$$$$$$;           .----,   :                
+                       $$$$$$$$;         ,"          ;               
+                       $$$$$$$$$p.                   |               
+                      :$$$$$$$$$$$$p.                :               
+                      :$$$$$$$$$$$$$$$p.            .'               
+                      :$$$$$$$$$$$$$$$$$$p...___..-"                 
+                      $$$$$$$$$$$$$$$$$$$$$$$$$;                     
+   .db.          bug  $$$$$$$$$$$$$$$$$$$$$$$$$$                     
+  d$$$$bp.            $$$$$$$$$$$$$$$$$$$$$$$$$$;                    
+ d$$$$$$$$$$pp..__..gg$$$$$$$$$$$$$$$$$$$$$$$$$$$                    
+d$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$p._            .gp. 
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$p._.ggp._.d$$$$b
