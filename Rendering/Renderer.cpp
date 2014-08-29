@@ -269,6 +269,7 @@ void Renderer::DrawScene()
 		Effects::SkyFX->SetWorldViewProj(worldViewProj);
 		Effects::SkyFX->SetMaterial(mEarthMat);
 				
+		md3dImmediateContext->OMSetBlendState(RenderStates::TransparentBS, blendFactor, 0xffffffff);
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(mSkyIndexCount, mSkyIndexOffset, mSkyVertexOffset);
     }
@@ -287,10 +288,9 @@ void Renderer::BuildGeometryBuffers()
 	GeometryGenerator::MeshData skyMesh;
 
 	GeometryGenerator geoGen;
-
-	geoGen.CreateGeosphere(control.get_earthRadius(),600.0f,earthMesh);
-
-	geoGen.CreateGeosphere(control.get_earthRadius() + 100.0f, 600.0f, skyMesh);
+	
+	geoGen.CreateGeosphere(control.get_earthRadius() + 100.0f, 5.0f, skyMesh);
+	geoGen.CreateGeosphere(control.get_earthRadius(),60.0f,earthMesh);
 	
 	// Cache the vertex offsets to each object in the concatenated vertex buffer.
 	mEarthVertexOffset      = 0;
@@ -355,7 +355,7 @@ void Renderer::BuildGeometryBuffers()
 
 	std::vector<UINT> indices;
 	indices.insert(indices.end(), earthMesh.Indices.begin(), earthMesh.Indices.end());
-	mSkyIndexOffset = indices.size() - 1;
+	mSkyIndexOffset = indices.size();
 	indices.insert(indices.end(), skyMesh.Indices.begin(), skyMesh.Indices.end());
 
 	D3D11_BUFFER_DESC ibd;

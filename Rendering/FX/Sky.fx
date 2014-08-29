@@ -43,11 +43,9 @@ struct VertexIn
 
 struct VertexOut
 {
+	float4 PosH		  : SV_POSITION;
     float3 PosW       : POSITION;
     float3 NormalW    : NORMAL;
-	float3 TangentW   : TANGENT;
-	float2 Tex        : TEXCOORD;
-	float  TessFactor : TESS;
 };
  
 VertexOut VS(VertexIn vin)
@@ -56,6 +54,7 @@ VertexOut VS(VertexIn vin)
 	
 	// Transform to world space space.
 	vout.PosW    = mul(float4(vin.PosL, 1.0f), gWorld).xyz;
+	vout.NormalW = mul(vin.NormalL, (float3x3)gWorldInvTranspose);
 		
 	// Transform to homogeneous clip space.
 	vout.PosH = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
@@ -65,8 +64,13 @@ VertexOut VS(VertexIn vin)
 
 float4 PS(VertexOut pin) : SV_Target
 {
-	return float4(0,0,1,0.1);
+	return float4(0,0,1,0.5);
 }
+
+BlendState blend
+{
+
+};
 
 technique11 SkyTech
 {
