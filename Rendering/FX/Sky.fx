@@ -280,7 +280,7 @@ BlendState blend
 
 };
 
-technique11 SkyFromSpaceTech
+technique11 SkyFromSpace
 {
     pass P0
     {
@@ -291,7 +291,7 @@ technique11 SkyFromSpaceTech
 }
 
 
-technique11 SkyFromAtmoTech
+technique11 SkyFromAtmo
 {
     pass P0
     {
