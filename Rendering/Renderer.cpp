@@ -101,15 +101,6 @@ void Renderer::OnResize()
 
 void Renderer::UpdateScene(float dt)
 {
-	/*
-	XMVECTOR vRadius = XMVector3Length(control.get_Camera().GetPositionXM());
-	XMFLOAT3 fRadius;
-	XMStoreFloat3(&fRadius,vRadius);
-	float radius = fRadius.x;
-	// Restrict the radius.
-	radius = MathHelper::Clamp(radius, control.get_earthRadius(), control.get_maxRadius());
-	*/
-
 	// Camera control:
 	if (GetAsyncKeyState('W') & 0x8000)
 		control.get_Camera().Walk(dt*control.get_Speed());
