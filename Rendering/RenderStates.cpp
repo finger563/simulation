@@ -6,7 +6,7 @@
 
 ID3D11RasterizerState* RenderStates::WireframeRS = 0;
 ID3D11RasterizerState* RenderStates::NoCullRS    = 0;
-ID3D11RasterizerState* RenderStates::CullFront   = 0;
+ID3D11RasterizerState* RenderStates::CullFrontRS = 0;
 	 
 ID3D11BlendState*      RenderStates::AlphaToCoverageBS = 0;
 ID3D11BlendState*      RenderStates::TransparentBS     = 0;
@@ -43,11 +43,11 @@ void RenderStates::InitAll(ID3D11Device* device)
 	D3D11_RASTERIZER_DESC cullFrontDesc;
 	ZeroMemory(&cullFrontDesc, sizeof(D3D11_RASTERIZER_DESC));
 	cullFrontDesc.FillMode = D3D11_FILL_SOLID;
-	cullFrontDesc.CullMode = D3D11_CULL_NONE;
-	cullFrontDesc.FrontCounterClockwise = true;
+	cullFrontDesc.CullMode = D3D11_CULL_FRONT;
+	cullFrontDesc.FrontCounterClockwise = false;
 	cullFrontDesc.DepthClipEnable = true;
 
-	HR(device->CreateRasterizerState(&cullFrontDesc, &NoCullRS));
+	HR(device->CreateRasterizerState(&cullFrontDesc, &CullFrontRS));
 
 	//
 	// AlphaToCoverageBS
@@ -85,7 +85,7 @@ void RenderStates::DestroyAll()
 {
 	ReleaseCOM(WireframeRS);
 	ReleaseCOM(NoCullRS);
-	ReleaseCOM(CullFront);
+	ReleaseCOM(CullFrontRS);
 	ReleaseCOM(AlphaToCoverageBS);
 	ReleaseCOM(TransparentBS);
 }

@@ -37,7 +37,7 @@ Renderer::Renderer(HINSTANCE hInstance)
 	XMStoreFloat4x4(&mTexTransform, I);
 	XMStoreFloat4x4(&mProj, I);
 	
-	mDirLights[0].Ambient  = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	mDirLights[0].Ambient  = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	mDirLights[0].Diffuse  = XMFLOAT4(0.7f, 0.7f, 0.6f, 1.0f);
 	mDirLights[0].Specular = XMFLOAT4(0.8f, 0.8f, 0.7f, 1.0f);
 	mDirLights[0].Direction = XMFLOAT3(0.707f, 0.0f, 0.707f);
@@ -159,22 +159,23 @@ void Renderer::DrawScene()
 	XMFLOAT3 invWaveLength = XMFLOAT3( 1.0f/powf(wavelength[0],4.0f),
 									   1.0f/powf(wavelength[1],4.0f),
 									   1.0f/powf(wavelength[2],4.0f));
-	Effects::SkyFX->SetCameraPos(control.get_Camera().GetPosition());
-	Effects::SkyFX->SetLightPos(mDirLights[0].Direction);
-	Effects::SkyFX->SetInvWaveLength(invWaveLength);
 	float outerRadius = control.get_earthRadius() + control.get_skyAltitude();
 	float innerRadius = control.get_earthRadius();
 	
 	XMVECTOR vEye = XMLoadFloat3(&control.get_Camera().GetPosition());
 	XMVECTOR vPos = XMLoadFloat3(&control.get_earthPosW());
-	vPos = XMVector3Length( vEye - vPos );
+	vPos = XMVector3Length( vEye );
 	XMFLOAT3 fRadius;
 	XMStoreFloat3(&fRadius,vPos);
-	float height=fRadius.x;
+	float height=fRadius.y;
 	float Kr = 0.0025f;
 	float Km = 0.0010f;
-	float ESun = 1.0f;
+	float ESun = 20.0f;
 	float scale = 1.0f / ( outerRadius - innerRadius );
+
+	Effects::SkyFX->SetCameraPos(control.get_Camera().GetPosition());
+	Effects::SkyFX->SetLightPos(XMFLOAT3(-0.707f, 0.0f, -0.707f));
+	Effects::SkyFX->SetInvWaveLength(invWaveLength);
 	Effects::SkyFX->SetCameraHeight(height);
 	Effects::SkyFX->SetCameraHeight2(height*height);
 	Effects::SkyFX->SetOuterRadius(outerRadius);
@@ -186,15 +187,9 @@ void Renderer::DrawScene()
 	Effects::SkyFX->SetKr4PI(Kr * 4.0f * MathHelper::Pi);
 	Effects::SkyFX->SetKm4PI(Km * 4.0f * MathHelper::Pi);
 	Effects::SkyFX->SetScale( scale );
+	Effects::SkyFX->SetScaleOverScaleDepth( scale / 0.25f );
 	Effects::SkyFX->SetG(-0.990f);
 	Effects::SkyFX->SetG2((-0.990f)*(-0.990f));
-	
-	//m_nSamples = 3;		// Number of sample rays to use in integral equation
-	//m_g = -0.990f;		// The Mie phase asymmetry factor
-	//m_fExposure = 2.0f;
-	//m_fRayleighScaleDepth = 0.25f;
-	//m_fMieScaleDepth = 0.1f;
-	//m_pbOpticalDepth.MakeOpticalDepthBuffer(m_fInnerRadius, m_fOuterRadius, m_fRayleighScaleDepth, m_fMieScaleDepth);
 	
 	Effects::NormalMapFX->SetDirLights(mDirLights);
 	Effects::NormalMapFX->SetEyePosW(control.get_Camera().GetPosition());
@@ -204,7 +199,7 @@ void Renderer::DrawScene()
 	Effects::DisplacementMapFX->SetEyePosW(control.get_Camera().GetPosition());
 
 	// These properties could be set per object if needed.
-	Effects::DisplacementMapFX->SetHeightScale(1000.0f);
+	Effects::DisplacementMapFX->SetHeightScale(29.029f);
 	Effects::DisplacementMapFX->SetMaxTessDistance(0.001f);
 	Effects::DisplacementMapFX->SetMinTessDistance(10000.0f);
 	Effects::DisplacementMapFX->SetMinTessFactor(1.0f);
@@ -213,19 +208,19 @@ void Renderer::DrawScene()
 	Effects::DisplacementMapFX->SetPlanetPosW(control.get_earthPosW());
 	Effects::DisplacementMapFX->SetPlanetRadius(control.get_earthRadius());
  
-	ID3DX11EffectTechnique* activeTech       = Effects::DisplacementMapFX->Light3TexTech;
+	ID3DX11EffectTechnique* activeTech       = Effects::DisplacementMapFX->Light1TexTech;
 	switch(mRenderOptions)
 	{
 	case RenderOptionsBasic:
-		activeTech = Effects::BasicFX->Light3TexTech;
+		activeTech = Effects::BasicFX->Light1TexTech;
 		md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		break;
 	case RenderOptionsNormalMap:
-		activeTech = Effects::NormalMapFX->Light3TexTech;
+		activeTech = Effects::NormalMapFX->Light1TexTech;
 		md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		break;
 	case RenderOptionsDisplacementMap:
-		activeTech = Effects::DisplacementMapFX->Light3TexTech;
+		activeTech = Effects::DisplacementMapFX->Light1TexTech;
 		md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 		break;
 	}
@@ -299,7 +294,7 @@ void Renderer::DrawScene()
 	activeTech->GetDesc( &techDesc );
 	
 	md3dImmediateContext->OMSetBlendState(RenderStates::TransparentBS, blendFactor, 0xffffffff);
-	md3dImmediateContext->RSSetState(RenderStates::CullFront);
+	md3dImmediateContext->RSSetState(RenderStates::CullFrontRS);
 
     for(UINT p = 0; p < techDesc.Passes; ++p)
     {
@@ -332,18 +327,18 @@ void Renderer::BuildGeometryBuffers()
 
 	GeometryGenerator geoGen;
 	
-	geoGen.CreateGeosphere(control.get_earthRadius() + control.get_skyAltitude(), 600.0f, skyMesh);
-	geoGen.CreateGeosphere(control.get_earthRadius(),60.0f,earthMesh);
+	geoGen.CreateGeosphere(control.get_earthRadius() + control.get_skyAltitude(), 7.0f, skyMesh);
+	geoGen.CreateGeosphere(control.get_earthRadius(),5.0f,earthMesh);
 	
 	// Cache the vertex offsets to each object in the concatenated vertex buffer.
 	mEarthVertexOffset      = 0;
+	// Cache the starting index for each object in the concatenated index buffer.
+	mEarthIndexOffset      = 0;
 
 	// Cache the index count of each object.
 	mEarthIndexCount      = earthMesh.Indices.size();
 	mSkyIndexCount		  = skyMesh.Indices.size();
 
-	// Cache the starting index for each object in the concatenated index buffer.
-	mEarthIndexOffset      = 0;
 	
 	UINT totalVertexCount = earthMesh.Vertices.size() + skyMesh.Vertices.size();
 

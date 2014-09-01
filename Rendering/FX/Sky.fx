@@ -7,8 +7,8 @@
 #include "LightHelper.fx"
 
 // The number of sample points taken along the ray
-const int nSamples = 2;
-const float fSamples = 2.0;
+const int nSamples = 5;
+const float fSamples = 5.0;
 
 // The scale depth (the altitude at which the average atmospheric density is found)
 const float fScaleDepth = 0.25;
@@ -96,39 +96,58 @@ float getMiePhase(float fCos, float fCos2, float g, float g2)
 // Calculates the Rayleigh phase function
 float getRayleighPhase(float fCos2)
 {
-	return 1.0;
-	//return 0.75 + 0.75*fCos2;
+	//return 1.0;
+	return 0.75 + 0.75*fCos2;
 }
 
 // Returns the near intersection point of a line and a sphere
 float getNearIntersection(float3 v3Pos, float3 v3Ray, float fDistance2, float fRadius2)
 {
+#if 0
+	float A = dot(v3Ray,v3Ray);
 	float B = 2.0 * dot(v3Pos, v3Ray);
 	float C = fDistance2 - fRadius2;
 	float fDet = max(0.0, B*B - 4.0 * C);
 	return 0.5 * (-B - sqrt(fDet));
+#else
+	float3 dist = gEyePosW - gPlanetPosW;
+	float A = dot(v3Ray,v3Ray);
+	float B = 2*dot(dist,v3Ray);
+	float C = dot(dist,dist) - fRadius2;
+	float fDet = max(0.0, B*B - 4.0f * C * A);
+	float bac = sqrt(fDet);
+	float t0 = (-B + bac)/(2*A);
+	float t1 = (-B - bac)/(2*A);
+	if (t0 > t1)
+		return t1;
+	else
+		return t0;
+#endif
 }
 
 // Returns the far intersection point of a line and a sphere
 float getFarIntersection(float3 v3Pos, float3 v3Ray, float fDistance2, float fRadius2)
 {
-	//float B = 2.0 * dot(v3Pos, v3Ray);
-	//float C = fDistance2 - fRadius2;
-	//float fDet = max(0.0, B*B - 4.0 * C);
-	//return 0.5 * (-B + sqrt(fDet));
-	
-	float3 dist = v3CameraPos - gPlanetPosW;
+#if 0
+	float A = dot(v3Ray,v3Ray);
+	float B = 2.0 * dot(v3Pos, v3Ray);
+	float C = fDistance2 - fRadius2;
+	float fDet = max(0.0, B*B - 4.0 * C);
+	return 0.5 * (-B + sqrt(fDet));
+#else	
+	float3 dist = gEyePosW - gPlanetPosW;
 	float A = dot(v3Ray,v3Ray);
 	float B = 2*dot(dist,v3Ray);
-	float C = dot(dist,dist) - fOuterRadius2;
+	float C = dot(dist,dist) - fRadius2;
 	float fDet = max(0.0, B*B - 4.0f * C * A);
 	float bac = sqrt(fDet);
-	float t0 = (B + bac)/(2*A);
-	float t1 = (B - bac)/(2*A);
+	float t0 = (-B + bac)/(2*A);
+	float t1 = (-B - bac)/(2*A);
 	if (t0 < t1)
-		return t0;
-	else
 		return t1;
+	else
+		return t0;
+#endif
 }
 
 VertexOut VS(VertexIn vin)
@@ -142,9 +161,14 @@ VertexOut VS(VertexIn vin)
 	// Transform to homogeneous clip space.
 	vout.PosH = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
 
-	
+	return vout;
+}
+
+float4 PS(VertexOut pin) : SV_Target
+{
+	//return float4(0,0,1,0.5);
 	// Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)
-	float3 v3Pos = vout.PosW;
+	float3 v3Pos = pin.PosW;
 	float3 v3Ray = v3Pos - v3CameraPos;
 	float fFar = length(v3Ray);
 	v3Ray /= fFar;
@@ -180,75 +204,18 @@ VertexOut VS(VertexIn vin)
 	}
 
 	// Finally, scale the Mie and Rayleigh colors and set up the varying variables for the pixel shader
-	vout.c0.rgb = v3FrontColor * (v3InvWavelength * fKrESun);
-	vout.c1.rgb = v3FrontColor * fKmESun;
-	vout.Direction = v3CameraPos - v3Pos;
-	return vout;
+	float4 c0;
+	c0.rgb = v3FrontColor * (v3InvWavelength * fKrESun);
+	float4 c1;
+	c1.rgb = v3FrontColor * fKmESun;
+	float3 dir = v3CameraPos - v3Pos;
 
-	/*
-
-	// Get the ray from the camera to the vertex and its length
-	// (which is the far point of the ray passing thru the atmo)
-	float3 v3Ray = vout.PosW - gEyePosW;
-	float fFar = length(v3Ray);
-	v3Ray /= fFar;
-
-	// Calculate the closest intersection of the ray with
-	// the outer atmo (point A in Fig 16-3 GPU gems 2 ch 16)
-	//float fNear = getNearIntersection(gEyePosW, v3Ray, gEyeHeight2, gOuterRadius2);
-	float fNear;
-	float3 dist = gEyePosW - gPlanetPosW;
-	float A = dot(v3Ray,v3Ray);
-	float B = 2*dot(dist,v3Ray);
-	float C = dot(dist,dist) - gOuterRadius2;
-	float bac = sqrt(B*B - 4*A*C);
-	float t0 = (B + bac)/(2*A);
-	float t1 = (B - bac)/(2*A);
-	if ( t0 <= t1 )
-		fNear = t0;
-	else
-		fNear = t1;
-	// Calculate the ray's start and end positions in the atmo
-	// then calculate its scattering offset
-	float3 v3Start = gEyePosW + v3Ray * fNear;
-	fFar -= fNear;
-
-	float fStartAngle = dot(v3Ray, v3Start) / gOuterRadius;
-	float fStartDepth = exp(-gInvScaleDepth);
-	float fStartOffset = fStartDepth * scale(fStartAngle);
-	
-	// Initialize the scattering loop variables
-	float fSampleLength = fFar / gNSamples;
-	float fScaledLength = fSampleLength * gScale;
-	float v3SampleRay = v3Ray * fSampleLength;
-	float v3SamplePoint = v3Start + v3SampleRay * 0.5;
-
-	// Now Loop through the sample points
-	float v3FrontColor = float3(0.0,0.0,0.0);
-	for (int i=0; i<gNSamples; i++) {
-		float fHeight = length(v3SamplePoint);
-		float fDepth = exp(gScaleOverScaleDepth * ( gInnerRadius - fHeight ));
-		float fLightAngle = dot(gLightDir,v3SamplePoint) / fHeight;
-		float fCameraAngle = dot(v3Ray, v3SamplePoint) / fHeight;
-		float fScatter = (fStartOffset + fDepth  * (scale(fLightAngle) - scale(fCameraAngle)));
-		float v3Attenuate = exp(-fScatter * (gInvWaveLength * gKr4PI + gKm4PI));
-		v3FrontColor += v3Attenuate * (fDepth * fScaledLength);
-		v3SamplePoint += v3SampleRay;
-	}
-
-	vout.c0.rgb = v3FrontColor * (gInvWaveLength * gKrESun);
-	vout.c1.rgb = v3FrontColor * gKmESun;
-	
-	return vout;
-	*/	
-}
-
-float4 PS(VertexOut pin) : SV_Target
-{
-	//return float4(0,0,1,0.5);
-	float fCos = dot(v3LightPos, pin.Direction) / length(pin.Direction);
+	// originally the only part in the frag shader
+	float fCos = dot(v3LightPos, dir) / length(dir);
 	float fCos2 = fCos*fCos;
-	float4 color = getRayleighPhase(fCos2) * pin.c0 + getMiePhase(fCos, fCos2, g, g2) * pin.c1;
+	float4 color = 
+		getRayleighPhase(fCos2) * c0 + 
+		getMiePhase(fCos, fCos2, g, g2) * c1;
 	color.a = color.b;
 	return color;
 }
