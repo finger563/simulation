@@ -28,6 +28,7 @@ public:
 	float get_Speed();
 	Camera& get_Camera();
 	float get_earthRadius();
+	float get_skyAltitude();
 	XMFLOAT3 get_earthPosW();
 	float get_maxRadius();
 	float get_farClipPlaneDist();
@@ -50,6 +51,7 @@ private:
 	POINT mLastMousePos;
 
 	float earthRadius;	
+	float skyAltitude;
 
 	XMFLOAT3 earthPosW;
 

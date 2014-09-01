@@ -291,6 +291,24 @@ SkyEffect::SkyEffect(ID3D11Device* device, const std::wstring& filename)
 	FogRange          = mFX->GetVariableByName("gFogRange")->AsScalar();
 	DirLights         = mFX->GetVariableByName("gDirLights");
 	Mat               = mFX->GetVariableByName("gMaterial");
+	
+	CameraPos				= mFX->GetVariableByName("v3CameraPos")->AsVector();
+	LightPos				= mFX->GetVariableByName("v3LightPos")->AsVector();
+	InvWaveLength			= mFX->GetVariableByName("v3InvWavelength")->AsVector();
+	CameraHeight			= mFX->GetVariableByName("fCameraHeight")->AsScalar();
+	CameraHeight2			= mFX->GetVariableByName("fCameraHeight2")->AsScalar();
+	OuterRadius				= mFX->GetVariableByName("fOuterRadius")->AsScalar();
+	OuterRadius2			= mFX->GetVariableByName("fOuterRadius2")->AsScalar();
+	InnerRadius				= mFX->GetVariableByName("fInnerRadius")->AsScalar();
+	InnerRadius2			= mFX->GetVariableByName("fInnerRadius2")->AsScalar();
+	KrESun					= mFX->GetVariableByName("fKrESun")->AsScalar();
+	KmESun					= mFX->GetVariableByName("fKmESun")->AsScalar();
+	Kr4PI					= mFX->GetVariableByName("fKr4PI")->AsScalar();
+	Km4PI					= mFX->GetVariableByName("fKm4PI")->AsScalar();
+	Scale					= mFX->GetVariableByName("fScale")->AsScalar();
+	ScaleOverScaleDepth		= mFX->GetVariableByName("fScaleOverScaleDepth")->AsScalar();
+	G						= mFX->GetVariableByName("g")->AsScalar();
+	G2						= mFX->GetVariableByName("g2")->AsScalar();
 }
 
 SkyEffect::~SkyEffect()

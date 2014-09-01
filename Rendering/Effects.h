@@ -342,6 +342,24 @@ public:
 	void SetDirLights(const DirectionalLight* lights)   { DirLights->SetRawValue(lights, 0, 3*sizeof(DirectionalLight)); }
 	void SetMaterial(const Material& mat)               { Mat->SetRawValue(&mat, 0, sizeof(Material)); }
 
+	void SetCameraPos(const XMFLOAT3& v)				{ CameraPos->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
+	void SetLightPos(const XMFLOAT3& v)					{ LightPos->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
+	void SetInvWaveLength(const XMFLOAT3& v)			{ InvWaveLength->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
+	void SetCameraHeight(float f)                       { CameraHeight->SetFloat(f); }
+	void SetCameraHeight2(float f)                      { CameraHeight2->SetFloat(f); }
+	void SetOuterRadius(float f)                        { OuterRadius->SetFloat(f); }
+	void SetOuterRadius2(float f)                       { OuterRadius2->SetFloat(f); }
+	void SetInnerRadius(float f)                        { InnerRadius->SetFloat(f); }
+	void SetInnerRadius2(float f)                       { InnerRadius2->SetFloat(f); }
+	void SetKrESun(float f)								{ KrESun->SetFloat(f); }
+	void SetKmESun(float f)								{ KmESun->SetFloat(f); }
+	void SetKr4PI(float f)								{ Kr4PI->SetFloat(f); }
+	void SetKm4PI(float f)								{ Km4PI->SetFloat(f); }
+	void SetScale(float f)								{ Scale->SetFloat(f); }
+	void SetScaleOverScaleDepth(float f)				{ ScaleOverScaleDepth->SetFloat(f); }
+	void SetG(float f)									{ G->SetFloat(f); }
+	void SetG2(float f)									{ G2->SetFloat(f); }
+
 	ID3DX11EffectTechnique* SkyTech;
 
 	ID3DX11EffectMatrixVariable* WorldViewProj;
@@ -353,6 +371,24 @@ public:
 	ID3DX11EffectScalarVariable* FogRange;
 	ID3DX11EffectVariable* DirLights;
 	ID3DX11EffectVariable* Mat;
+
+	ID3DX11EffectVectorVariable* CameraPos;
+	ID3DX11EffectVectorVariable* LightPos;
+	ID3DX11EffectVectorVariable* InvWaveLength;
+	ID3DX11EffectScalarVariable* CameraHeight;
+	ID3DX11EffectScalarVariable* CameraHeight2;
+	ID3DX11EffectScalarVariable* OuterRadius;
+	ID3DX11EffectScalarVariable* OuterRadius2;
+	ID3DX11EffectScalarVariable* InnerRadius;
+	ID3DX11EffectScalarVariable* InnerRadius2;
+	ID3DX11EffectScalarVariable* KrESun;
+	ID3DX11EffectScalarVariable* KmESun;
+	ID3DX11EffectScalarVariable* Kr4PI;
+	ID3DX11EffectScalarVariable* Km4PI;
+	ID3DX11EffectScalarVariable* Scale;
+	ID3DX11EffectScalarVariable* ScaleOverScaleDepth;
+	ID3DX11EffectScalarVariable* G;
+	ID3DX11EffectScalarVariable* G2;
 };
 #pragma endregion
 

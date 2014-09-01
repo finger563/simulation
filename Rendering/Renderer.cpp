@@ -154,6 +154,47 @@ void Renderer::DrawScene()
 
 	Effects::SkyFX->SetDirLights(mDirLights);
 	Effects::SkyFX->SetEyePosW(control.get_Camera().GetPosition());
+
+	float wavelength[3] = {0.650f, 0.570f, 0.475f};
+	XMFLOAT3 invWaveLength = XMFLOAT3( 1.0f/powf(wavelength[0],4.0f),
+									   1.0f/powf(wavelength[1],4.0f),
+									   1.0f/powf(wavelength[2],4.0f));
+	Effects::SkyFX->SetCameraPos(control.get_Camera().GetPosition());
+	Effects::SkyFX->SetLightPos(mDirLights[0].Direction);
+	Effects::SkyFX->SetInvWaveLength(invWaveLength);
+	float outerRadius = control.get_earthRadius() + control.get_skyAltitude();
+	float innerRadius = control.get_earthRadius();
+	
+	XMVECTOR vEye = XMLoadFloat3(&control.get_Camera().GetPosition());
+	XMVECTOR vPos = XMLoadFloat3(&control.get_earthPosW());
+	vPos = XMVector3Length( vEye - vPos );
+	XMFLOAT3 fRadius;
+	XMStoreFloat3(&fRadius,vPos);
+	float height=fRadius.x;
+	float Kr = 0.0025f;
+	float Km = 0.0010f;
+	float ESun = 1.0f;
+	float scale = 1.0f / ( outerRadius - innerRadius );
+	Effects::SkyFX->SetCameraHeight(height);
+	Effects::SkyFX->SetCameraHeight2(height*height);
+	Effects::SkyFX->SetOuterRadius(outerRadius);
+	Effects::SkyFX->SetOuterRadius2(outerRadius * outerRadius);
+	Effects::SkyFX->SetInnerRadius(innerRadius);
+	Effects::SkyFX->SetInnerRadius2(innerRadius * innerRadius);
+	Effects::SkyFX->SetKrESun(Kr * ESun);
+	Effects::SkyFX->SetKmESun(Km * ESun);
+	Effects::SkyFX->SetKr4PI(Kr * 4.0f * MathHelper::Pi);
+	Effects::SkyFX->SetKm4PI(Km * 4.0f * MathHelper::Pi);
+	Effects::SkyFX->SetScale( scale );
+	Effects::SkyFX->SetG(-0.990f);
+	Effects::SkyFX->SetG2((-0.990f)*(-0.990f));
+	
+	//m_nSamples = 3;		// Number of sample rays to use in integral equation
+	//m_g = -0.990f;		// The Mie phase asymmetry factor
+	//m_fExposure = 2.0f;
+	//m_fRayleighScaleDepth = 0.25f;
+	//m_fMieScaleDepth = 0.1f;
+	//m_pbOpticalDepth.MakeOpticalDepthBuffer(m_fInnerRadius, m_fOuterRadius, m_fRayleighScaleDepth, m_fMieScaleDepth);
 	
 	Effects::NormalMapFX->SetDirLights(mDirLights);
 	Effects::NormalMapFX->SetEyePosW(control.get_Camera().GetPosition());
@@ -256,6 +297,9 @@ void Renderer::DrawScene()
 	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	
 	activeTech->GetDesc( &techDesc );
+	
+	md3dImmediateContext->OMSetBlendState(RenderStates::TransparentBS, blendFactor, 0xffffffff);
+	md3dImmediateContext->RSSetState(RenderStates::CullFront);
 
     for(UINT p = 0; p < techDesc.Passes; ++p)
     {
@@ -269,12 +313,11 @@ void Renderer::DrawScene()
 		Effects::SkyFX->SetWorldViewProj(worldViewProj);
 		Effects::SkyFX->SetMaterial(mEarthMat);
 				
-		md3dImmediateContext->OMSetBlendState(RenderStates::TransparentBS, blendFactor, 0xffffffff);
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(mSkyIndexCount, mSkyIndexOffset, mSkyVertexOffset);
     }
 	
-	// restore default states, as the SkyFX changes them in the effect file.
+	// restore default states, as the SkyFX changes them
 	md3dImmediateContext->RSSetState(0);
 	md3dImmediateContext->OMSetDepthStencilState(0, 0);
 
@@ -289,7 +332,7 @@ void Renderer::BuildGeometryBuffers()
 
 	GeometryGenerator geoGen;
 	
-	geoGen.CreateGeosphere(control.get_earthRadius() + 100.0f, 5.0f, skyMesh);
+	geoGen.CreateGeosphere(control.get_earthRadius() + control.get_skyAltitude(), 600.0f, skyMesh);
 	geoGen.CreateGeosphere(control.get_earthRadius(),60.0f,earthMesh);
 	
 	// Cache the vertex offsets to each object in the concatenated vertex buffer.
