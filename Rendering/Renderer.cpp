@@ -123,6 +123,11 @@ void Renderer::UpdateScene(float dt)
 	if (GetAsyncKeyState('D') & 0x8000)
 		control.get_Camera().Strafe(dt*control.get_Speed());
 	
+	if (GetAsyncKeyState('Q') & 0x8000)
+		control.get_Camera().RotateLook(dt);
+	if (GetAsyncKeyState('E') & 0x8000)
+		control.get_Camera().RotateLook(-dt);
+	
 	//
 	// Switch the rendering effect based on key presses.
 	//

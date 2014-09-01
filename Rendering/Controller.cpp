@@ -48,7 +48,7 @@ void Controller::OnMouseMove(WPARAM btnState, int x, int y)
 		float dy = XMConvertToRadians(0.25f*static_cast<float>(y - mLastMousePos.y));
 
 		mCam.Pitch(dy);
-		mCam.RotateY(dx);
+		mCam.RotateUp(dx);
 	}
 
 	mLastMousePos.x = x;
