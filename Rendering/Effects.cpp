@@ -269,6 +269,24 @@ DisplacementMapEffect::DisplacementMapEffect(ID3D11Device* device, const std::ws
 
 	planetRadius	  = mFX->GetVariableByName("gPlanetRadius")->AsScalar();
 	planetPosW		  = mFX->GetVariableByName("gPlanetPosW")->AsVector();
+	
+	CameraPos				= mFX->GetVariableByName("v3CameraPos")->AsVector();
+	LightPos				= mFX->GetVariableByName("v3LightPos")->AsVector();
+	InvWaveLength			= mFX->GetVariableByName("v3InvWavelength")->AsVector();
+	CameraHeight			= mFX->GetVariableByName("fCameraHeight")->AsScalar();
+	CameraHeight2			= mFX->GetVariableByName("fCameraHeight2")->AsScalar();
+	OuterRadius				= mFX->GetVariableByName("fOuterRadius")->AsScalar();
+	OuterRadius2			= mFX->GetVariableByName("fOuterRadius2")->AsScalar();
+	InnerRadius				= mFX->GetVariableByName("fInnerRadius")->AsScalar();
+	InnerRadius2			= mFX->GetVariableByName("fInnerRadius2")->AsScalar();
+	KrESun					= mFX->GetVariableByName("fKrESun")->AsScalar();
+	KmESun					= mFX->GetVariableByName("fKmESun")->AsScalar();
+	Kr4PI					= mFX->GetVariableByName("fKr4PI")->AsScalar();
+	Km4PI					= mFX->GetVariableByName("fKm4PI")->AsScalar();
+	Scale					= mFX->GetVariableByName("fScale")->AsScalar();
+	ScaleOverScaleDepth		= mFX->GetVariableByName("fScaleOverScaleDepth")->AsScalar();
+	G						= mFX->GetVariableByName("g")->AsScalar();
+	G2						= mFX->GetVariableByName("g2")->AsScalar();
 }
 
 DisplacementMapEffect::~DisplacementMapEffect()
@@ -317,12 +335,54 @@ SkyEffect::~SkyEffect()
 }
 #pragma endregion
 
+#pragma region SpaceEffect
+SpaceEffect::SpaceEffect(ID3D11Device* device, const std::wstring& filename)
+	: Effect(device, filename)
+{
+	SpaceFromSpaceTech       = mFX->GetTechniqueByName("SkyFromSpaceTech");
+	SpaceFromAtmoTech       = mFX->GetTechniqueByName("SkyFromAtmoTech");
+	WorldViewProj = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
+	WorldViewProj     = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
+	World             = mFX->GetVariableByName("gWorld")->AsMatrix();
+	WorldInvTranspose = mFX->GetVariableByName("gWorldInvTranspose")->AsMatrix();
+	EyePosW           = mFX->GetVariableByName("gEyePosW")->AsVector();
+	FogColor          = mFX->GetVariableByName("gFogColor")->AsVector();
+	FogStart          = mFX->GetVariableByName("gFogStart")->AsScalar();
+	FogRange          = mFX->GetVariableByName("gFogRange")->AsScalar();
+	DirLights         = mFX->GetVariableByName("gDirLights");
+	Mat               = mFX->GetVariableByName("gMaterial");
+	
+	CameraPos				= mFX->GetVariableByName("v3CameraPos")->AsVector();
+	LightPos				= mFX->GetVariableByName("v3LightPos")->AsVector();
+	InvWaveLength			= mFX->GetVariableByName("v3InvWavelength")->AsVector();
+	CameraHeight			= mFX->GetVariableByName("fCameraHeight")->AsScalar();
+	CameraHeight2			= mFX->GetVariableByName("fCameraHeight2")->AsScalar();
+	OuterRadius				= mFX->GetVariableByName("fOuterRadius")->AsScalar();
+	OuterRadius2			= mFX->GetVariableByName("fOuterRadius2")->AsScalar();
+	InnerRadius				= mFX->GetVariableByName("fInnerRadius")->AsScalar();
+	InnerRadius2			= mFX->GetVariableByName("fInnerRadius2")->AsScalar();
+	KrESun					= mFX->GetVariableByName("fKrESun")->AsScalar();
+	KmESun					= mFX->GetVariableByName("fKmESun")->AsScalar();
+	Kr4PI					= mFX->GetVariableByName("fKr4PI")->AsScalar();
+	Km4PI					= mFX->GetVariableByName("fKm4PI")->AsScalar();
+	Scale					= mFX->GetVariableByName("fScale")->AsScalar();
+	ScaleOverScaleDepth		= mFX->GetVariableByName("fScaleOverScaleDepth")->AsScalar();
+	G						= mFX->GetVariableByName("g")->AsScalar();
+	G2						= mFX->GetVariableByName("g2")->AsScalar();
+}
+
+SpaceEffect::~SpaceEffect()
+{
+}
+#pragma endregion
+
 #pragma region Effects
 
 BasicEffect*           Effects::BasicFX           = 0;
 NormalMapEffect*       Effects::NormalMapFX       = 0;
 DisplacementMapEffect* Effects::DisplacementMapFX = 0;
 SkyEffect*             Effects::SkyFX             = 0;
+SpaceEffect*           Effects::SpaceFX           = 0;
 
 void Effects::InitAll(ID3D11Device* device)
 {
@@ -330,6 +390,7 @@ void Effects::InitAll(ID3D11Device* device)
 	NormalMapFX       = new NormalMapEffect(device, L"FX/NormalMap.fxo");
 	DisplacementMapFX = new DisplacementMapEffect(device, L"FX/DisplacementMap.fxo");
 	SkyFX             = new SkyEffect(device, L"FX/Sky.fxo");
+	SpaceFX           = new SpaceEffect(device, L"FX/Space.fxo");
 }
 
 void Effects::DestroyAll()
@@ -338,6 +399,7 @@ void Effects::DestroyAll()
 	SafeDelete(NormalMapFX);
 	SafeDelete(DisplacementMapFX);
 	SafeDelete(SkyFX);
+	SafeDelete(SpaceFX);
 }
 
 #pragma endregion

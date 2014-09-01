@@ -118,6 +118,9 @@
     <CustomBuild Include="FX\NormalMap.fx">
       <Filter>FX</Filter>
     </CustomBuild>
+    <CustomBuild Include="FX\Space.fx">
+      <Filter>FX</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <None Include="FX\LightHelper.fx">

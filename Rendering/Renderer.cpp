@@ -191,6 +191,42 @@ void Renderer::DrawScene()
 	Effects::SkyFX->SetG(-0.990f);
 	Effects::SkyFX->SetG2((-0.990f)*(-0.990f));
 	
+	Effects::SpaceFX->SetCameraPos(control.get_Camera().GetPosition());
+	Effects::SpaceFX->SetLightPos(XMFLOAT3(-0.707f, 0.0f, -0.707f));
+	Effects::SpaceFX->SetInvWaveLength(invWaveLength);
+	Effects::SpaceFX->SetCameraHeight(height);
+	Effects::SpaceFX->SetCameraHeight2(height*height);
+	Effects::SpaceFX->SetOuterRadius(outerRadius);
+	Effects::SpaceFX->SetOuterRadius2(outerRadius * outerRadius);
+	Effects::SpaceFX->SetInnerRadius(innerRadius);
+	Effects::SpaceFX->SetInnerRadius2(innerRadius * innerRadius);
+	Effects::SpaceFX->SetKrESun(Kr * ESun);
+	Effects::SpaceFX->SetKmESun(Km * ESun);
+	Effects::SpaceFX->SetKr4PI(Kr * 4.0f * MathHelper::Pi);
+	Effects::SpaceFX->SetKm4PI(Km * 4.0f * MathHelper::Pi);
+	Effects::SpaceFX->SetScale( scale );
+	Effects::SpaceFX->SetScaleOverScaleDepth( scale / 0.25f );
+	Effects::SpaceFX->SetG(-0.990f);
+	Effects::SpaceFX->SetG2((-0.990f)*(-0.990f));
+	
+	Effects::DisplacementMapFX->SetCameraPos(control.get_Camera().GetPosition());
+	Effects::DisplacementMapFX->SetLightPos(XMFLOAT3(-0.707f, 0.0f, -0.707f));
+	Effects::DisplacementMapFX->SetInvWaveLength(invWaveLength);
+	Effects::DisplacementMapFX->SetCameraHeight(height);
+	Effects::DisplacementMapFX->SetCameraHeight2(height*height);
+	Effects::DisplacementMapFX->SetOuterRadius(outerRadius);
+	Effects::DisplacementMapFX->SetOuterRadius2(outerRadius * outerRadius);
+	Effects::DisplacementMapFX->SetInnerRadius(innerRadius);
+	Effects::DisplacementMapFX->SetInnerRadius2(innerRadius * innerRadius);
+	Effects::DisplacementMapFX->SetKrESun(Kr * ESun);
+	Effects::DisplacementMapFX->SetKmESun(Km * ESun);
+	Effects::DisplacementMapFX->SetKr4PI(Kr * 4.0f * MathHelper::Pi);
+	Effects::DisplacementMapFX->SetKm4PI(Km * 4.0f * MathHelper::Pi);
+	Effects::DisplacementMapFX->SetScale( scale );
+	Effects::DisplacementMapFX->SetScaleOverScaleDepth( scale / 0.25f );
+	Effects::DisplacementMapFX->SetG(-0.990f);
+	Effects::DisplacementMapFX->SetG2((-0.990f)*(-0.990f));
+	
 	Effects::NormalMapFX->SetDirLights(mDirLights);
 	Effects::NormalMapFX->SetEyePosW(control.get_Camera().GetPosition());
 

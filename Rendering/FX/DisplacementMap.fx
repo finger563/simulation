@@ -232,6 +232,8 @@ VertexOut VS(VertexIn vin)
 
 	vout.c0.rgb = v3FrontColor * (v3InvWavelength * fKrESun + fKmESun);
 	vout.c1.rgb = v3Attenuate;
+	vout.c1.a = 1;
+	vout.c0.a = 1;
 
 	return vout;
 }
@@ -266,6 +268,9 @@ struct HullOut
     float3 NormalW  : NORMAL;
 	float3 TangentW : TANGENT;
 	float2 Tex      : TEXCOORD;
+	
+	float4 c0		  : COLOR0;
+	float4 c1		  : COLOR1;
 };
 
 [domain("tri")]
@@ -284,7 +289,9 @@ HullOut HS(InputPatch<VertexOut,3> p,
 	hout.NormalW  = p[i].NormalW;
 	hout.TangentW = p[i].TangentW;
 	hout.Tex      = p[i].Tex;
-	
+
+	hout.c0		  = p[i].c0;
+	hout.c1		  = p[i].c1;
 	return hout;
 }
 
@@ -295,6 +302,9 @@ struct DomainOut
     float3 NormalW  : NORMAL;
 	float3 TangentW : TANGENT;
 	float2 Tex      : TEXCOORD;
+	
+	float4 c0		  : COLOR0;
+	float4 c1		  : COLOR1;
 };
 
 // The domain shader is called for every vertex created by the tessellator.  
@@ -312,6 +322,9 @@ DomainOut DS(PatchTess patchTess,
 	dout.NormalW  = bary.x*tri[0].NormalW  + bary.y*tri[1].NormalW  + bary.z*tri[2].NormalW;
 	dout.TangentW = bary.x*tri[0].TangentW + bary.y*tri[1].TangentW + bary.z*tri[2].TangentW;
 	dout.Tex      = bary.x*tri[0].Tex      + bary.y*tri[1].Tex      + bary.z*tri[2].Tex;
+	
+	dout.c0      = bary.x*tri[0].c0      + bary.y*tri[1].c0      + bary.z*tri[2].c0;
+	dout.c1      = bary.x*tri[0].c1      + bary.y*tri[1].c1      + bary.z*tri[2].c1;
 	
 	// Interpolating normal can unnormalize it, so normalize it.
 	dout.NormalW = normalize(dout.NormalW);
@@ -405,27 +418,9 @@ float4 PS(DomainOut pin,
 		}
 
 		litColor = texColor*(ambient + diffuse) + spec;
+		litColor = litColor * pin.c1;
+		litColor += pin.c0;
 
-		if( gReflectionEnabled )
-		{
-			float3 incident = -toEye;
-			float3 reflectionVector = reflect(incident, bumpedNormalW);
-			float4 reflectionColor  = float4(0,0,0,0);//gCubeMap.Sample(samLinear, reflectionVector);
-
-			litColor += gMaterial.Reflect*reflectionColor;
-		}
-	}
- 
-	//
-	// Fogging
-	//
-
-	if( gFogEnabled )
-	{
-		float fogLerp = saturate( (distToEye - gFogStart) / gFogRange ); 
-
-		// Blend the fog color and the lit color.
-		litColor = lerp(litColor, gFogColor, fogLerp);
 	}
 
 	// Common to take alpha from diffuse material and texture.
