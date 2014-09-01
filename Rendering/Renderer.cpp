@@ -28,7 +28,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
  
 
 Renderer::Renderer(HINSTANCE hInstance)
-: D3DApp(hInstance), mVB(0), mIB(0), mDiffuseMapSRV(0), mEarthNormalTexSRV(0), control(hInstance),  mRenderOptions(RenderOptionsNormalMap)
+: D3DApp(hInstance), mVB(0), mIB(0), mDiffuseMapSRV(0), mEarthNormalTexSRV(0), control(hInstance),  mRenderOptions(RenderOptionsDisplacementMap)
 {
 	mMainWndCaption = L"Crate Demo";
 	
@@ -244,7 +244,11 @@ void Renderer::DrawScene()
 	Effects::DisplacementMapFX->SetPlanetPosW(control.get_earthPosW());
 	Effects::DisplacementMapFX->SetPlanetRadius(control.get_earthRadius());
  
-	ID3DX11EffectTechnique* activeTech       = Effects::DisplacementMapFX->Light1TexTech;
+	ID3DX11EffectTechnique* activeTech;
+	if ( height > outerRadius )
+		activeTech = Effects::DisplacementMapFX->PlanetFromSpaceTech;
+	else
+		activeTech = Effects::DisplacementMapFX->PlanetFromAtmoTech;
 	switch(mRenderOptions)
 	{
 	case RenderOptionsBasic:
@@ -256,7 +260,10 @@ void Renderer::DrawScene()
 		md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		break;
 	case RenderOptionsDisplacementMap:
-		activeTech = Effects::DisplacementMapFX->Light1TexTech;
+		if ( height > outerRadius )
+			activeTech = Effects::DisplacementMapFX->PlanetFromSpaceTech;
+		else
+			activeTech = Effects::DisplacementMapFX->PlanetFromAtmoTech;
 		md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 		break;
 	}
