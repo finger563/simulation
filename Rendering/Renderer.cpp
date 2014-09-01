@@ -167,7 +167,7 @@ void Renderer::DrawScene()
 	vPos = XMVector3Length( vEye );
 	XMFLOAT3 fRadius;
 	XMStoreFloat3(&fRadius,vPos);
-	float height=fRadius.y;
+	float height = fRadius.y;
 	float Kr = 0.0025f;
 	float Km = 0.0010f;
 	float ESun = 20.0f;
@@ -288,7 +288,12 @@ void Renderer::DrawScene()
 	md3dImmediateContext->HSSetShader(0, 0, 0);
 	md3dImmediateContext->DSSetShader(0, 0, 0);
 	
-	activeTech = Effects::SkyFX->SkyTech;
+	if ( height > outerRadius ) {
+		activeTech = Effects::SkyFX->SkyFromSpaceTech;
+	}
+	else {
+		activeTech = Effects::SkyFX->SkyFromAtmoTech;
+	}
 	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	
 	activeTech->GetDesc( &techDesc );

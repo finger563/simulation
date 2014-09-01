@@ -103,7 +103,6 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Effects.cpp" />
     <ClCompile Include="RenderStates.cpp" />
-    <ClCompile Include="Sky.cpp" />
     <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -120,7 +119,6 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="RenderStates.h" />
-    <ClInclude Include="Sky.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>

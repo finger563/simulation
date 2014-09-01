@@ -6,7 +6,6 @@
 #define RENDERER_H
 
 #include "d3dApp.h"
-#include "Sky.h"
 #include "RenderStates.h"
 #include "Controller.h"
 

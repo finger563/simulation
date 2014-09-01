@@ -150,7 +150,7 @@ float getFarIntersection(float3 v3Pos, float3 v3Ray, float fDistance2, float fRa
 #endif
 }
 
-VertexOut VS(VertexIn vin)
+VertexOut VS_SkyFromSpace(VertexIn vin)
 {
 	VertexOut vout;
 	
@@ -210,6 +210,58 @@ VertexOut VS(VertexIn vin)
 	return vout;
 }
 
+VertexOut VS_SkyFromAtmo(VertexIn vin)
+{
+	VertexOut vout;
+	
+	// Transform to world space space.
+	vout.PosW    = mul(float4(vin.PosL, 1.0f), gWorld).xyz;
+	vout.NormalW = mul(vin.NormalL, (float3x3)gWorldInvTranspose);
+		
+	// Transform to homogeneous clip space.
+	vout.PosH = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
+	
+	// Get the ray from the camera to the vertex, and its length (which is the far point of the ray passing through the atmosphere)
+	float3 v3Pos = vout.PosW.xyz;
+	float3 v3Ray = v3Pos - v3CameraPos;
+	float fFar = length(v3Ray);
+	v3Ray /= fFar;
+
+	// Calculate the ray's starting position, then calculate its scattering offset
+	float3 v3Start = v3CameraPos;
+	float fHeight = length(v3Start);
+	float fDepth = exp(fScaleOverScaleDepth * (fInnerRadius - fCameraHeight));
+	float fStartAngle = dot(v3Ray, v3Start) / fHeight;
+	float fStartOffset = fDepth*scale(fStartAngle);
+
+	// Initialize the scattering loop variables
+	float fSampleLength = fFar / fSamples;
+	float fScaledLength = fSampleLength * fScale;
+	float3 v3SampleRay = v3Ray * fSampleLength;
+	float3 v3SamplePoint = v3Start + v3SampleRay * 0.5;
+
+	// Now loop through the sample rays
+	float3 v3FrontColor = float3(0.0, 0.0, 0.0);
+	for(int i=0; i<nSamples; i++)
+	{
+		float fHeight = length(v3SamplePoint);
+		float fDepth = exp(fScaleOverScaleDepth * (fInnerRadius - fHeight));
+		float fLightAngle = dot(v3LightPos, v3SamplePoint) / fHeight;
+		float fCameraAngle = dot(v3Ray, v3SamplePoint) / fHeight;
+		float fScatter = (fStartOffset + fDepth*(scale(fLightAngle) - scale(fCameraAngle)));
+		float3 v3Attenuate = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI));
+		v3FrontColor += v3Attenuate * (fDepth * fScaledLength);
+		v3SamplePoint += v3SampleRay;
+	}
+
+	// Finally, scale the Mie and Rayleigh colors and set up the varying variables for the pixel shader
+	vout.c0.rgb = v3FrontColor * (v3InvWavelength * fKrESun);
+	vout.c1.rgb = v3FrontColor * fKmESun;
+	vout.NormalW = v3CameraPos - v3Pos;
+
+	return vout;
+}
+
 float4 PS(VertexOut pin) : SV_Target
 {
 
@@ -228,11 +280,22 @@ BlendState blend
 
 };
 
-technique11 SkyTech
+technique11 SkyFromSpaceTech
 {
     pass P0
     {
-        SetVertexShader( CompileShader( vs_5_0, VS() ) );
+        SetVertexShader( CompileShader( vs_5_0, VS_SkyFromSpace() ) );
+        SetGeometryShader( NULL );
+        SetPixelShader( CompileShader( ps_5_0, PS() ) );
+    }
+}
+
+
+technique11 SkyFromAtmoTech
+{
+    pass P0
+    {
+        SetVertexShader( CompileShader( vs_5_0, VS_SkyFromAtmo() ) );
         SetGeometryShader( NULL );
         SetPixelShader( CompileShader( ps_5_0, PS() ) );
     }

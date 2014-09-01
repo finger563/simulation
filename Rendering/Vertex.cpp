@@ -39,7 +39,11 @@ void InputLayouts::InitAll(ID3D11Device* device)
 	// Pos
 	//
 	
-	Effects::SkyFX->SkyTech->GetPassByIndex(0)->GetDesc(&passDesc);
+	Effects::SkyFX->SkyFromSpaceTech->GetPassByIndex(0)->GetDesc(&passDesc);
+	HR(device->CreateInputLayout(InputLayoutDesc::PosNormalTexTan, 4, passDesc.pIAInputSignature, 
+		passDesc.IAInputSignatureSize, &PosNormalTexTan));
+	
+	Effects::SkyFX->SkyFromAtmoTech->GetPassByIndex(0)->GetDesc(&passDesc);
 	HR(device->CreateInputLayout(InputLayoutDesc::PosNormalTexTan, 4, passDesc.pIAInputSignature, 
 		passDesc.IAInputSignatureSize, &PosNormalTexTan));
 

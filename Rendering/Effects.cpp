@@ -280,7 +280,8 @@ DisplacementMapEffect::~DisplacementMapEffect()
 SkyEffect::SkyEffect(ID3D11Device* device, const std::wstring& filename)
 	: Effect(device, filename)
 {
-	SkyTech       = mFX->GetTechniqueByName("SkyTech");
+	SkyFromSpaceTech       = mFX->GetTechniqueByName("SkyFromSpaceTech");
+	SkyFromAtmoTech       = mFX->GetTechniqueByName("SkyFromAtmoTech");
 	WorldViewProj = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
 	WorldViewProj     = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
 	World             = mFX->GetVariableByName("gWorld")->AsMatrix();

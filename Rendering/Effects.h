@@ -360,7 +360,8 @@ public:
 	void SetG(float f)									{ G->SetFloat(f); }
 	void SetG2(float f)									{ G2->SetFloat(f); }
 
-	ID3DX11EffectTechnique* SkyTech;
+	ID3DX11EffectTechnique* SkyFromSpaceTech;
+	ID3DX11EffectTechnique* SkyFromAtmoTech;
 
 	ID3DX11EffectMatrixVariable* WorldViewProj;
 	ID3DX11EffectMatrixVariable* World;
