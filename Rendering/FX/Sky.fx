@@ -161,14 +161,8 @@ VertexOut VS(VertexIn vin)
 	// Transform to homogeneous clip space.
 	vout.PosH = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
 
-	return vout;
-}
-
-float4 PS(VertexOut pin) : SV_Target
-{
-	//return float4(0,0,1,0.5);
 	// Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)
-	float3 v3Pos = pin.PosW;
+	float3 v3Pos = vout.PosW;
 	float3 v3Ray = v3Pos - v3CameraPos;
 	float fFar = length(v3Ray);
 	v3Ray /= fFar;
@@ -209,13 +203,22 @@ float4 PS(VertexOut pin) : SV_Target
 	float4 c1;
 	c1.rgb = v3FrontColor * fKmESun;
 	float3 dir = v3CameraPos - v3Pos;
+	vout.NormalW = dir;
+	vout.c0 = c0;
+	vout.c1 = c1;
+
+	return vout;
+}
+
+float4 PS(VertexOut pin) : SV_Target
+{
 
 	// originally the only part in the frag shader
-	float fCos = dot(v3LightPos, dir) / length(dir);
+	float fCos = dot(v3LightPos, pin.NormalW) / length(pin.NormalW);
 	float fCos2 = fCos*fCos;
 	float4 color = 
-		getRayleighPhase(fCos2) * c0 + 
-		getMiePhase(fCos, fCos2, g, g2) * c1;
+		getRayleighPhase(fCos2) * pin.c0 + 
+		getMiePhase(fCos, fCos2, g, g2) * pin.c1;
 	color.a = color.b;
 	return color;
 }
