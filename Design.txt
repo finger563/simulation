@@ -92,6 +92,11 @@ Next Steps:
 * Stream data (like outerra) instead of loading all at once?
   * really means split data for sending to GPU based on need:
     * don't need to send full earth texture/height-maps since can't see all of it at once
+* HDR (High dynamic range) Rendering:
+  * render to FP texture
+  * Get max value
+  * Scale so all values are [0,1] based on max value
+  * render quad to screen with texture from FP texture
 * Water Layer for earth:
   * sphere mesh at sea level
   * with some sort of reflection effect?
@@ -99,25 +104,36 @@ Next Steps:
     * Wave tessellation
     * above surface: reflection and refraction
     * below surface: color, etc.?
-* Atmosphere for earth:
-  * sphere mesh(s) at atmo level
-  * effects:
-    * above atmo: blur and shadows and scattering
-    * in atmo: blur and color and scattering
 * Terrain Generation 2:
   * generate based on biome data instead of heightmap (similar terrain as found in GPU gems)
+* Clouds 1:
+  * Cloud texture over earth
+  * moves
+  * works w/ atmosphere
+  * Rendered from above and below
+* Atmosphere 2:
+  * More realistic scattering, better effects (sky not exactly right color yet)
+* Sun Rendering 1:
+  * Render light source (sun) as object viewable outside atmosphere
+* Clouds 2:
+  * First implementation of volumetric clouds based on cloud texture as seed data
 
 Done:
 -----
 * Camera that can fly around freely: better movement than the current controls
-* Terrain tessellation 
+* Terrain tessellation 1: 
   * currently, project just creates a huge sphere statically depending on the predefined size
   * Instead, do the poly generation (tessellation) in the geometry shader
     * based on distance to eye and position of eye vs sphere
     * know: radius of sphere, position of sphere, position of eye, direction of eye
-* Terrain Generation:
+* Terrain Generation 1:
   * after tesselation, we have control over poly placement in shader
   * do real terrain generation based on heightmap
+* Atmosphere for earth 1:
+  * sphere mesh(s) at atmo level
+  * effects:
+    * above atmo: blur and shadows and scattering
+    * in atmo: blur and color and scattering
 
 
   Batman:
