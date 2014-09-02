@@ -344,7 +344,15 @@ void Renderer::DrawScene()
     }
 	
 	// DRAW THE CLOUDS
-	activeTech = Effects::BasicFX->Light1TexTech;
+	if ( height > outerRadius )
+		activeTech = Effects::DisplacementMapFX->PlanetFromSpaceTech;
+	else
+		activeTech = Effects::DisplacementMapFX->PlanetFromAtmoTech;
+	Effects::DisplacementMapFX->SetHeightScale(control.get_skyAltitude()/2.0f);
+	Effects::DisplacementMapFX->SetMaxTessDistance(1.0f);
+	Effects::DisplacementMapFX->SetMinTessDistance(1000.0f);
+	Effects::DisplacementMapFX->SetMinTessFactor(1.0f);
+	Effects::DisplacementMapFX->SetMaxTessFactor(1.0f);
 	md3dImmediateContext->OMSetBlendState(RenderStates::TransparentBS, blendFactor, 0xffffffff);
 	activeTech->GetDesc( &techDesc );
     for(UINT p = 0; p < techDesc.Passes; ++p)
