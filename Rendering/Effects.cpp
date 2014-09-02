@@ -210,6 +210,8 @@ DisplacementMapEffect::DisplacementMapEffect(ID3D11Device* device, const std::ws
 	CubeMap           = mFX->GetVariableByName("gCubeMap")->AsShaderResource();
 	NormalMap         = mFX->GetVariableByName("gNormalMap")->AsShaderResource();
 	
+	EyePos				= mFX->GetVariableByName("gEyePosW")->AsVector();
+	
 	CameraPos				= mFX->GetVariableByName("v3CameraPos")->AsVector();
 	LightPos				= mFX->GetVariableByName("v3LightPos")->AsVector();
 	InvWaveLength			= mFX->GetVariableByName("v3InvWavelength")->AsVector();

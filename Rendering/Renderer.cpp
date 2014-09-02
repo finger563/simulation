@@ -237,6 +237,7 @@ void Renderer::DrawScene()
 	Effects::SpaceFX->SetG2((-0.990f)*(-0.990f));
 	
 	// DISPLACEMENT MAPPING EFFECTS
+	Effects::DisplacementMapFX->SetEyePos(control.get_Camera().GetPosition());
 	Effects::DisplacementMapFX->SetCameraPos(cameraPos);
 	Effects::DisplacementMapFX->SetLightPos(sunPos);
 	Effects::DisplacementMapFX->SetInvWaveLength(invWaveLength);

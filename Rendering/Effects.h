@@ -236,6 +236,8 @@ public:
 	void SetCubeMap(ID3D11ShaderResourceView* tex)      { CubeMap->SetResource(tex); }
 	void SetNormalMap(ID3D11ShaderResourceView* tex)    { NormalMap->SetResource(tex); }
 
+	void SetEyePos(const XMFLOAT3& v)					{ EyePos->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
+
 	void SetCameraPos(const XMFLOAT3& v)				{ CameraPos->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
 	void SetLightPos(const XMFLOAT3& v)					{ LightPos->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
 	void SetInvWaveLength(const XMFLOAT3& v)			{ InvWaveLength->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
@@ -269,9 +271,8 @@ public:
 	ID3DX11EffectScalarVariable* MinTessDistance;
 	ID3DX11EffectScalarVariable* MinTessFactor;
 	ID3DX11EffectScalarVariable* MaxTessFactor;
-
-	ID3DX11EffectScalarVariable* planetRadius;
-	ID3DX11EffectVectorVariable* planetPos;
+	
+	ID3DX11EffectVectorVariable* EyePos;
  
 	ID3DX11EffectShaderResourceVariable* DiffuseMap;
 	ID3DX11EffectShaderResourceVariable* CubeMap;
