@@ -7,14 +7,16 @@ bool Controller::Init()
 {
 	earthRadius = 6378.140f;
 	skyAltitude = earthRadius * 0.025f;
-	earthPosW = XMFLOAT3(0,0,0);
+	earthPosW = XMFLOAT3(0,0,-earthRadius*2.0f);
 	farClipPlaneDist = earthRadius*1000.0f;
 
 	speed = earthRadius;
 	minSpeed = 1.0f;
 	maxSpeed = 100000.0f;
 
-	mCam.SetPosition(0,0,-earthRadius*1.1);
+	mCam.LookAt(XMFLOAT3(0,0,0),
+				earthPosW,
+				XMFLOAT3(0,1,0));
 
 	mLastMousePos.x = 0;
 	mLastMousePos.y = 0;

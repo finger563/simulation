@@ -17,13 +17,8 @@ const float fInvScaleDepth = 4.0;
 cbuffer cbPerFrame
 {
 	DirectionalLight gDirLights[3];
-	float3 gEyePosW;
-	float3 gPlanetPosW;
-
-	float g;
-	float g2;
 	
-	float3 v3CameraPos;		// The camera's current position
+	float3 v3CameraPos;		// The camera's current position relative to center of planet
 	float3 v3LightPos;		// The direction vector to the light source
 	float3 v3InvWavelength;	// 1 / pow(wavelength, 4) for the red, green, and blue channels
 	float fCameraHeight;	// The camera's current height
@@ -39,9 +34,8 @@ cbuffer cbPerFrame
 	float fScale;			// 1 / (fOuterRadius - fInnerRadius)
 	float fScaleOverScaleDepth;	// fScale / fScaleDepth
 
-	float  gFogStart;
-	float  gFogRange;
-	float4 gFogColor; 
+	float g;
+	float g2;
 };
 
 cbuffer cbPerObject
@@ -103,14 +97,14 @@ float getRayleighPhase(float fCos2)
 // Returns the near intersection point of a line and a sphere
 float getNearIntersection(float3 v3Pos, float3 v3Ray, float fDistance2, float fRadius2)
 {
-#if 0
+#if 1
 	float A = dot(v3Ray,v3Ray);
 	float B = 2.0 * dot(v3Pos, v3Ray);
 	float C = fDistance2 - fRadius2;
 	float fDet = max(0.0, B*B - 4.0 * C);
 	return 0.5 * (-B - sqrt(fDet));
 #else
-	float3 dist = gEyePosW - gPlanetPosW;
+	float3 dist = v3CameraPos - gPlanetPosW;
 	float A = dot(v3Ray,v3Ray);
 	float B = 2*dot(dist,v3Ray);
 	float C = dot(dist,dist) - fRadius2;
@@ -128,14 +122,14 @@ float getNearIntersection(float3 v3Pos, float3 v3Ray, float fDistance2, float fR
 // Returns the far intersection point of a line and a sphere
 float getFarIntersection(float3 v3Pos, float3 v3Ray, float fDistance2, float fRadius2)
 {
-#if 0
+#if 1
 	float A = dot(v3Ray,v3Ray);
 	float B = 2.0 * dot(v3Pos, v3Ray);
 	float C = fDistance2 - fRadius2;
 	float fDet = max(0.0, B*B - 4.0 * C);
 	return 0.5 * (-B + sqrt(fDet));
 #else	
-	float3 dist = gEyePosW - gPlanetPosW;
+	float3 dist = v3CameraPos - gPlanetPosW;
 	float A = dot(v3Ray,v3Ray);
 	float B = 2*dot(dist,v3Ray);
 	float C = dot(dist,dist) - fRadius2;
@@ -162,7 +156,7 @@ VertexOut VS_SkyFromSpace(VertexIn vin)
 	vout.PosH = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
 
 	// Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)
-	float3 v3Pos = vout.PosW;
+	float3 v3Pos = vin.PosL;
 	float3 v3Ray = v3Pos - v3CameraPos;
 	float fFar = length(v3Ray);
 	v3Ray /= fFar;
@@ -222,7 +216,7 @@ VertexOut VS_SkyFromAtmo(VertexIn vin)
 	vout.PosH = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
 	
 	// Get the ray from the camera to the vertex, and its length (which is the far point of the ray passing through the atmosphere)
-	float3 v3Pos = vout.PosW.xyz;
+	float3 v3Pos = vin.PosL.xyz;
 	float3 v3Ray = v3Pos - v3CameraPos;
 	float fFar = length(v3Ray);
 	v3Ray /= fFar;
@@ -264,8 +258,6 @@ VertexOut VS_SkyFromAtmo(VertexIn vin)
 
 float4 PS(VertexOut pin) : SV_Target
 {
-
-	// originally the only part in the frag shader
 	float fCos = dot(v3LightPos, pin.NormalW) / length(pin.NormalW);
 	float fCos2 = fCos*fCos;
 	float4 color = 
@@ -289,7 +281,6 @@ technique11 SkyFromSpace
         SetPixelShader( CompileShader( ps_5_0, PS() ) );
     }
 }
-
 
 technique11 SkyFromAtmo
 {

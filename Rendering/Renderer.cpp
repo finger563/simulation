@@ -28,12 +28,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
  
 
 Renderer::Renderer(HINSTANCE hInstance)
-: D3DApp(hInstance), mVB(0), mIB(0), mDiffuseMapSRV(0), mEarthNormalTexSRV(0), control(hInstance),  mRenderOptions(RenderOptionsDisplacementMap)
+: D3DApp(hInstance), mVB(0), mIB(0), mEarthDiffuseMapSRV(0), mEarthNormalTexSRV(0), control(hInstance),  mRenderOptions(RenderOptionsDisplacementMap)
 {
 	mMainWndCaption = L"Crate Demo";
+	control.Init();
 	
 	XMMATRIX I = XMMatrixIdentity();
-	XMStoreFloat4x4(&mEarthWorld, I);
+
+	XMVECTOR trans = XMLoadFloat3(&control.get_earthPosW());
+	XMMATRIX T = XMMatrixTranslationFromVector(trans);
+	
+	XMStoreFloat4x4(&mEarthWorld, T);
+
 	XMStoreFloat4x4(&mTexTransform, I);
 	XMStoreFloat4x4(&mProj, I);
 	
@@ -62,8 +68,9 @@ Renderer::~Renderer()
 {
 	ReleaseCOM(mVB);
 	ReleaseCOM(mIB);
-	ReleaseCOM(mDiffuseMapSRV);
+	ReleaseCOM(mEarthDiffuseMapSRV);
 	ReleaseCOM(mEarthNormalTexSRV);
+	ReleaseCOM(mCloudsDiffuseMapSRV);
 
 	Effects::DestroyAll();
 	InputLayouts::DestroyAll();
@@ -72,7 +79,6 @@ Renderer::~Renderer()
 
 bool Renderer::Init()
 {
-	control.Init();
 	if(!D3DApp::Init())
 		return false;
 
@@ -82,10 +88,15 @@ bool Renderer::Init()
 	RenderStates::InitAll(md3dDevice);
 		
 	HR(D3DX11CreateShaderResourceViewFromFile(md3dDevice, 
-		L"Textures/earthmap.dds",0, 0, &mDiffuseMapSRV, 0 ));
+		L"Textures/earthmap.dds",0, 0, &mEarthDiffuseMapSRV, 0 ));
  
 	HR(D3DX11CreateShaderResourceViewFromFile(md3dDevice, 
 		L"Textures/earth_nmap.dds", 0, 0, &mEarthNormalTexSRV, 0 ));
+	
+	HR(D3DX11CreateShaderResourceViewFromFile(md3dDevice, 
+		L"Textures/clouds.dds",0, 0, &mCloudsDiffuseMapSRV, 0 ));
+	HR(D3DX11CreateShaderResourceViewFromFile(md3dDevice, 
+		L"Textures/clouds-normal.dds",0, 0, &mCloudsNormalTexSRV, 0 ));
 
 	BuildGeometryBuffers();
 
@@ -118,6 +129,15 @@ void Renderer::UpdateScene(float dt)
 		control.get_Camera().RotateLook(dt);
 	if (GetAsyncKeyState('E') & 0x8000)
 		control.get_Camera().RotateLook(-dt);
+
+	if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+		control.get_Camera().RotateUp(dt);
+	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+		control.get_Camera().RotateUp(-dt);
+	if (GetAsyncKeyState(VK_UP) & 0x8000)
+		control.get_Camera().Pitch(dt);
+	if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+		control.get_Camera().Pitch(-dt);
 	
 	//
 	// Switch the rendering effect based on key presses.
@@ -147,30 +167,40 @@ void Renderer::DrawScene()
 	// Set per frame constants.
 	Effects::BasicFX->SetDirLights(mDirLights);
 	Effects::BasicFX->SetEyePosW(control.get_Camera().GetPosition());
-
-	Effects::SkyFX->SetDirLights(mDirLights);
-	Effects::SkyFX->SetEyePosW(control.get_Camera().GetPosition());
-
+	
+	Effects::NormalMapFX->SetDirLights(mDirLights);
+	Effects::NormalMapFX->SetEyePosW(control.get_Camera().GetPosition());
+	
 	float wavelength[3] = {0.650f, 0.570f, 0.475f};
 	XMFLOAT3 invWaveLength = XMFLOAT3( 1.0f/powf(wavelength[0],4.0f),
 									   1.0f/powf(wavelength[1],4.0f),
 									   1.0f/powf(wavelength[2],4.0f));
+
 	float outerRadius = control.get_earthRadius() + control.get_skyAltitude();
 	float innerRadius = control.get_earthRadius();
 	
+	XMVECTOR vPlanet = XMLoadFloat3(&control.get_earthPosW());
+
 	XMVECTOR vEye = XMLoadFloat3(&control.get_Camera().GetPosition());
-	XMVECTOR vPos = XMLoadFloat3(&control.get_earthPosW());
-	vPos = XMVector3Length( vEye );
+	XMVECTOR relPos = vEye - vPlanet;
+	XMFLOAT3 cameraPos;
+	XMStoreFloat3(&cameraPos,relPos);
 	XMFLOAT3 fRadius;
-	XMStoreFloat3(&fRadius,vPos);
+	XMStoreFloat3(&fRadius, XMVector3Length(relPos));
 	float height = fRadius.y;
 	float Kr = 0.0025f;
 	float Km = 0.0010f;
 	float ESun = 20.0f;
 	float scale = 1.0f / ( outerRadius - innerRadius );
 
-	Effects::SkyFX->SetCameraPos(control.get_Camera().GetPosition());
-	Effects::SkyFX->SetLightPos(XMFLOAT3(-0.707f, 0.0f, -0.707f));
+	XMVECTOR light = XMLoadFloat3(&mDirLights[0].Direction);
+	XMFLOAT3 sunPos;
+	XMStoreFloat3(&sunPos,-light);
+	
+	// SKY EFFECTS
+	Effects::SkyFX->SetDirLights(mDirLights);
+	Effects::SkyFX->SetCameraPos(cameraPos);
+	Effects::SkyFX->SetLightPos(sunPos);
 	Effects::SkyFX->SetInvWaveLength(invWaveLength);
 	Effects::SkyFX->SetCameraHeight(height);
 	Effects::SkyFX->SetCameraHeight2(height*height);
@@ -187,8 +217,9 @@ void Renderer::DrawScene()
 	Effects::SkyFX->SetG(-0.990f);
 	Effects::SkyFX->SetG2((-0.990f)*(-0.990f));
 	
-	Effects::SpaceFX->SetCameraPos(control.get_Camera().GetPosition());
-	Effects::SpaceFX->SetLightPos(XMFLOAT3(-0.707f, 0.0f, -0.707f));
+	// SPACE EFFECTS
+	Effects::SpaceFX->SetCameraPos(cameraPos);
+	Effects::SpaceFX->SetLightPos(sunPos);
 	Effects::SpaceFX->SetInvWaveLength(invWaveLength);
 	Effects::SpaceFX->SetCameraHeight(height);
 	Effects::SpaceFX->SetCameraHeight2(height*height);
@@ -205,8 +236,9 @@ void Renderer::DrawScene()
 	Effects::SpaceFX->SetG(-0.990f);
 	Effects::SpaceFX->SetG2((-0.990f)*(-0.990f));
 	
-	Effects::DisplacementMapFX->SetCameraPos(control.get_Camera().GetPosition());
-	Effects::DisplacementMapFX->SetLightPos(XMFLOAT3(-0.707f, 0.0f, -0.707f));
+	// DISPLACEMENT MAPPING EFFECTS
+	Effects::DisplacementMapFX->SetCameraPos(cameraPos);
+	Effects::DisplacementMapFX->SetLightPos(sunPos);
 	Effects::DisplacementMapFX->SetInvWaveLength(invWaveLength);
 	Effects::DisplacementMapFX->SetCameraHeight(height);
 	Effects::DisplacementMapFX->SetCameraHeight2(height*height);
@@ -222,24 +254,13 @@ void Renderer::DrawScene()
 	Effects::DisplacementMapFX->SetScaleOverScaleDepth( scale / 0.25f );
 	Effects::DisplacementMapFX->SetG(-0.990f);
 	Effects::DisplacementMapFX->SetG2((-0.990f)*(-0.990f));
-	
-	Effects::NormalMapFX->SetDirLights(mDirLights);
-	Effects::NormalMapFX->SetEyePosW(control.get_Camera().GetPosition());
-
-	// Set per frame constants.
 	Effects::DisplacementMapFX->SetDirLights(mDirLights);
-	Effects::DisplacementMapFX->SetEyePosW(control.get_Camera().GetPosition());
-
-	// These properties could be set per object if needed.
 	Effects::DisplacementMapFX->SetHeightScale(29.029f);
-	Effects::DisplacementMapFX->SetMaxTessDistance(0.001f);
-	Effects::DisplacementMapFX->SetMinTessDistance(10000.0f);
+	Effects::DisplacementMapFX->SetMaxTessDistance(0.10f);
+	Effects::DisplacementMapFX->SetMinTessDistance(1000.0f);
 	Effects::DisplacementMapFX->SetMinTessFactor(1.0f);
-	Effects::DisplacementMapFX->SetMaxTessFactor(50.0f);
-
-	Effects::DisplacementMapFX->SetPlanetPosW(control.get_earthPosW());
-	Effects::DisplacementMapFX->SetPlanetRadius(control.get_earthRadius());
- 
+	Effects::DisplacementMapFX->SetMaxTessFactor(100.0f);
+	 
 	ID3DX11EffectTechnique* activeTech;
 	if ( height > outerRadius )
 		activeTech = Effects::DisplacementMapFX->PlanetFromSpaceTech;
@@ -277,16 +298,15 @@ void Renderer::DrawScene()
 
 	if( GetAsyncKeyState('1') & 0x8000 )
 		md3dImmediateContext->RSSetState(RenderStates::WireframeRS);
-
+	
+	// DRAW THE EARTH
     D3DX11_TECHNIQUE_DESC techDesc;
 	activeTech->GetDesc( &techDesc );
+	world = XMLoadFloat4x4(&mEarthWorld);
+	worldInvTranspose = MathHelper::InverseTranspose(world);
+	worldViewProj = world*view*proj;
     for(UINT p = 0; p < techDesc.Passes; ++p)
     {
-		// Draw the Earth.
-		world = XMLoadFloat4x4(&mEarthWorld);
-		worldInvTranspose = MathHelper::InverseTranspose(world);
-		worldViewProj = world*view*proj;
-
 		switch(mRenderOptions)
 		{
 		case RenderOptionsBasic:
@@ -295,7 +315,7 @@ void Renderer::DrawScene()
 			Effects::BasicFX->SetWorldViewProj(worldViewProj);
 			Effects::BasicFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
 			Effects::BasicFX->SetMaterial(mEarthMat);
-			Effects::BasicFX->SetDiffuseMap(mDiffuseMapSRV);
+			Effects::BasicFX->SetDiffuseMap(mEarthDiffuseMapSRV);
 			break;
 		case RenderOptionsNormalMap:
 			Effects::NormalMapFX->SetWorld(world);
@@ -303,7 +323,7 @@ void Renderer::DrawScene()
 			Effects::NormalMapFX->SetWorldViewProj(worldViewProj);
 			Effects::NormalMapFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
 			Effects::NormalMapFX->SetMaterial(mEarthMat);
-			Effects::NormalMapFX->SetDiffuseMap(mDiffuseMapSRV);
+			Effects::NormalMapFX->SetDiffuseMap(mEarthDiffuseMapSRV);
 			Effects::NormalMapFX->SetNormalMap(mEarthNormalTexSRV);
 			break;
 		case RenderOptionsDisplacementMap:
@@ -313,7 +333,7 @@ void Renderer::DrawScene()
 			Effects::DisplacementMapFX->SetWorldViewProj(worldViewProj);
 			Effects::DisplacementMapFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
 			Effects::DisplacementMapFX->SetMaterial(mEarthMat);
-			Effects::DisplacementMapFX->SetDiffuseMap(mDiffuseMapSRV);
+			Effects::DisplacementMapFX->SetDiffuseMap(mEarthDiffuseMapSRV);
 			Effects::DisplacementMapFX->SetNormalMap(mEarthNormalTexSRV);
 			break;
 		}
@@ -322,11 +342,54 @@ void Renderer::DrawScene()
 		md3dImmediateContext->DrawIndexed(mEarthIndexCount, mEarthIndexOffset, mEarthVertexOffset);
     }
 	
+	// DRAW THE CLOUDS
+	activeTech = Effects::BasicFX->Light1TexTech;
+	md3dImmediateContext->OMSetBlendState(RenderStates::TransparentBS, blendFactor, 0xffffffff);
+	activeTech->GetDesc( &techDesc );
+    for(UINT p = 0; p < techDesc.Passes; ++p)
+    {
+		switch(mRenderOptions)
+		{
+		case RenderOptionsBasic:
+			Effects::BasicFX->SetWorld(world);
+			Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
+			Effects::BasicFX->SetWorldViewProj(worldViewProj);
+			Effects::BasicFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
+			Effects::BasicFX->SetMaterial(mEarthMat);
+			Effects::BasicFX->SetDiffuseMap(mCloudsDiffuseMapSRV);
+			break;
+		case RenderOptionsNormalMap:
+			Effects::NormalMapFX->SetWorld(world);
+			Effects::NormalMapFX->SetWorldInvTranspose(worldInvTranspose);
+			Effects::NormalMapFX->SetWorldViewProj(worldViewProj);
+			Effects::NormalMapFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
+			Effects::NormalMapFX->SetMaterial(mEarthMat);
+			Effects::NormalMapFX->SetDiffuseMap(mCloudsDiffuseMapSRV);
+			Effects::NormalMapFX->SetNormalMap(mCloudsNormalTexSRV);
+			break;
+		case RenderOptionsDisplacementMap:
+			Effects::DisplacementMapFX->SetWorld(world);
+			Effects::DisplacementMapFX->SetWorldInvTranspose(worldInvTranspose);
+			Effects::DisplacementMapFX->SetViewProj(viewProj);
+			Effects::DisplacementMapFX->SetWorldViewProj(worldViewProj);
+			Effects::DisplacementMapFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
+			Effects::DisplacementMapFX->SetMaterial(mEarthMat);
+			Effects::DisplacementMapFX->SetDiffuseMap(mCloudsDiffuseMapSRV);
+			Effects::DisplacementMapFX->SetNormalMap(mCloudsNormalTexSRV);
+			break;
+		}
+		
+		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+		//md3dImmediateContext->DrawIndexed(mCloudsIndexCount, mCloudsIndexOffset, mCloudsVertexOffset);
+    }
+	
 	// FX sets tessellation stages, but it does not disable them.  So do that here
 	// to turn off tessellation.
 	md3dImmediateContext->HSSetShader(0, 0, 0);
-	md3dImmediateContext->DSSetShader(0, 0, 0);
-	
+	md3dImmediateContext->DSSetShader(0, 0, 0);	
+
+	// DRAW THE SKY
+	//md3dImmediateContext->OMSetDepthStencilState(RenderStates::disableDepthDSS,0);
 	if ( height > outerRadius ) {
 		activeTech = Effects::SkyFX->SkyFromSpaceTech;
 	}
@@ -337,16 +400,10 @@ void Renderer::DrawScene()
 	
 	activeTech->GetDesc( &techDesc );
 	
-	md3dImmediateContext->OMSetBlendState(RenderStates::TransparentBS, blendFactor, 0xffffffff);
 	md3dImmediateContext->RSSetState(RenderStates::CullFrontRS);
 
     for(UINT p = 0; p < techDesc.Passes; ++p)
-    {
-		// Draw the Earth.
-		//world = XMLoadFloat4x4(&mEarthWorld);
-		//worldInvTranspose = MathHelper::InverseTranspose(world);
-		//worldViewProj = world*view*proj;
-		
+    {		
 		Effects::SkyFX->SetWorld(world);
 		Effects::SkyFX->SetWorldInvTranspose(worldInvTranspose);
 		Effects::SkyFX->SetWorldViewProj(worldViewProj);
@@ -366,12 +423,13 @@ void Renderer::DrawScene()
 void Renderer::BuildGeometryBuffers()
 {
 	GeometryGenerator::MeshData earthMesh;
-
 	GeometryGenerator::MeshData skyMesh;
+	GeometryGenerator::MeshData cloudMesh;
 
 	GeometryGenerator geoGen;
 	
 	geoGen.CreateGeosphere(control.get_earthRadius() + control.get_skyAltitude(), 7.0f, skyMesh);
+	geoGen.CreateGeosphere(control.get_earthRadius(), 7.0f, cloudMesh);
 	geoGen.CreateGeosphere(control.get_earthRadius(),5.0f,earthMesh);
 	
 	// Cache the vertex offsets to each object in the concatenated vertex buffer.
@@ -382,11 +440,11 @@ void Renderer::BuildGeometryBuffers()
 	// Cache the index count of each object.
 	mEarthIndexCount      = earthMesh.Indices.size();
 	mSkyIndexCount		  = skyMesh.Indices.size();
-
+	mCloudsIndexCount	  = cloudMesh.Indices.size();
 	
-	UINT totalVertexCount = earthMesh.Vertices.size() + skyMesh.Vertices.size();
+	UINT totalVertexCount = earthMesh.Vertices.size() + skyMesh.Vertices.size() + cloudMesh.Indices.size();
 
-	UINT totalIndexCount = mEarthIndexCount + mSkyIndexCount;
+	UINT totalIndexCount = mEarthIndexCount + mSkyIndexCount + mCloudsIndexCount;
 
 	//
 	// Extract the vertex elements we are interested in and pack the
@@ -398,11 +456,7 @@ void Renderer::BuildGeometryBuffers()
 	UINT k = 0;
 	for(size_t i = 0; i < earthMesh.Vertices.size(); ++i, ++k)
 	{
-		XMVECTOR epos = (XMVECTOR)XMLoadFloat3(&control.get_earthPosW());
-		XMVECTOR pos = XMLoadFloat3(&earthMesh.Vertices[i].Position);
-		XMVECTOR result = epos + pos;
-		XMStoreFloat3(&vertices[k].Pos, result);
-		//vertices[k].Pos			= earthMesh.Vertices[i].Position;
+		vertices[k].Pos			= earthMesh.Vertices[i].Position;
 		vertices[k].Normal		= earthMesh.Vertices[i].Normal;
 		vertices[k].Tex			= earthMesh.Vertices[i].TexC;
 		vertices[k].TangentU	= earthMesh.Vertices[i].TangentU;
@@ -412,13 +466,20 @@ void Renderer::BuildGeometryBuffers()
 
 	for(size_t i = 0; i < skyMesh.Vertices.size(); ++i, ++k)
 	{
-		XMVECTOR epos = (XMVECTOR)XMLoadFloat3(&control.get_earthPosW());
-		XMVECTOR pos = XMLoadFloat3(&skyMesh.Vertices[i].Position);
-		XMVECTOR result = epos + pos;
-		XMStoreFloat3(&vertices[k].Pos, result);
+		vertices[k].Pos			= skyMesh.Vertices[i].Position;
 		vertices[k].Normal		= skyMesh.Vertices[i].Normal;
 		vertices[k].Tex			= skyMesh.Vertices[i].TexC;
 		vertices[k].TangentU	= skyMesh.Vertices[i].TangentU;
+	}
+
+	mCloudsVertexOffset = k;
+
+	for(size_t i = 0; i < cloudMesh.Vertices.size(); ++i, ++k)
+	{
+		vertices[k].Pos			= cloudMesh.Vertices[i].Position;
+		vertices[k].Normal		= cloudMesh.Vertices[i].Normal;
+		vertices[k].Tex			= cloudMesh.Vertices[i].TexC;
+		vertices[k].TangentU	= cloudMesh.Vertices[i].TangentU;
 	}
 
     D3D11_BUFFER_DESC vbd;
@@ -439,6 +500,8 @@ void Renderer::BuildGeometryBuffers()
 	indices.insert(indices.end(), earthMesh.Indices.begin(), earthMesh.Indices.end());
 	mSkyIndexOffset = indices.size();
 	indices.insert(indices.end(), skyMesh.Indices.begin(), skyMesh.Indices.end());
+	mCloudsIndexOffset = indices.size();
+	indices.insert(indices.end(), cloudMesh.Indices.begin(), cloudMesh.Indices.end());
 
 	D3D11_BUFFER_DESC ibd;
     ibd.Usage = D3D11_USAGE_IMMUTABLE;

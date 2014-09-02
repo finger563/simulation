@@ -55,9 +55,6 @@ cbuffer cbPerObject
 	float4x4 gWorldViewProj;
 	float4x4 gTexTransform;
 	Material gMaterial;
-
-	float	gPlanetRadius;
-	float3	gPlanetPosW;
 }; 
 
 // Nonnumeric values cannot be added to a cbuffer.
@@ -94,14 +91,14 @@ float getRayleighPhase(float fCos2)
 // Returns the near intersection point of a line and a sphere
 float getNearIntersection(float3 v3Pos, float3 v3Ray, float fDistance2, float fRadius2)
 {
-#if 0
+#if 1
 	float A = dot(v3Ray,v3Ray);
 	float B = 2.0 * dot(v3Pos, v3Ray);
 	float C = fDistance2 - fRadius2;
 	float fDet = max(0.0, B*B - 4.0 * C);
 	return 0.5 * (-B - sqrt(fDet));
 #else
-	float3 dist = gEyePosW - gPlanetPosW;
+	float3 dist = v3Pos - gPlanetPosW;
 	float A = dot(v3Ray,v3Ray);
 	float B = 2*dot(dist,v3Ray);
 	float C = dot(dist,dist) - fRadius2;
@@ -119,14 +116,14 @@ float getNearIntersection(float3 v3Pos, float3 v3Ray, float fDistance2, float fR
 // Returns the far intersection point of a line and a sphere
 float getFarIntersection(float3 v3Pos, float3 v3Ray, float fDistance2, float fRadius2)
 {
-#if 0
+#if 1
 	float A = dot(v3Ray,v3Ray);
 	float B = 2.0 * dot(v3Pos, v3Ray);
 	float C = fDistance2 - fRadius2;
 	float fDet = max(0.0, B*B - 4.0 * C);
 	return 0.5 * (-B + sqrt(fDet));
 #else	
-	float3 dist = gEyePosW - gPlanetPosW;
+	float3 dist = v3Pos - gPlanetPosW;
 	float A = dot(v3Ray,v3Ray);
 	float B = 2*dot(dist,v3Ray);
 	float C = dot(dist,dist) - fRadius2;
@@ -172,9 +169,6 @@ VertexOut VS_PlanetFromSpace(VertexIn vin)
 
 	// Output vertex attributes for interpolation across triangle.
 	vout.Tex = mul(float4(vin.Tex, 0.0f, 1.0f), gTexTransform).xy;
-	
-	float3 dir = normalize(gEyePosW-gPlanetPosW);
-	//float d = distance(gPlanetPosW + gPlanetRadius*dir, gEyePosW);
 
 	float d = distance(vout.PosW, gEyePosW);
 
@@ -187,8 +181,7 @@ VertexOut VS_PlanetFromSpace(VertexIn vin)
 	// Rescale [0,1] --> [gMinTessFactor, gMaxTessFactor].
 	vout.TessFactor = gMinTessFactor + tess*(gMaxTessFactor-gMinTessFactor);
 
-	
-	float3 v3Pos = vout.PosW.xyz;
+	float3 v3Pos = vin.PosL.xyz;
 	float3 v3Ray = v3Pos - v3CameraPos;
 	v3Pos = normalize(v3Pos);
 	float fFar = length(v3Ray);
@@ -247,9 +240,6 @@ VertexOut VS_PlanetFromAtmo(VertexIn vin)
 
 	// Output vertex attributes for interpolation across triangle.
 	vout.Tex = mul(float4(vin.Tex, 0.0f, 1.0f), gTexTransform).xy;
-	
-	float3 dir = normalize(gEyePosW-gPlanetPosW);
-	//float d = distance(gPlanetPosW + gPlanetRadius*dir, gEyePosW);
 
 	float d = distance(vout.PosW, gEyePosW);
 
@@ -263,7 +253,7 @@ VertexOut VS_PlanetFromAtmo(VertexIn vin)
 	vout.TessFactor = gMinTessFactor + tess*(gMaxTessFactor-gMinTessFactor);
 	
 	// Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)
-	float3 v3Pos = vout.PosW.xyz;
+	float3 v3Pos = vin.PosL.xyz;
 	float3 v3Ray = v3Pos - v3CameraPos;
 	v3Pos = normalize(v3Pos);
 	float fFar = length(v3Ray);
@@ -386,7 +376,6 @@ DomainOut DS(PatchTess patchTess,
 	DomainOut dout;
 	
 	// Interpolate patch attributes to generated vertices.
-	//dout.PosW     = gPlanetRadius*normalize(bary.x*tri[0].PosW     + bary.y*tri[1].PosW     + bary.z*tri[2].PosW) + gPlanetPosW;
 	dout.PosW     = bary.x*tri[0].PosW     + bary.y*tri[1].PosW     + bary.z*tri[2].PosW;
 	dout.NormalW  = bary.x*tri[0].NormalW  + bary.y*tri[1].NormalW  + bary.z*tri[2].NormalW;
 	dout.TangentW = bary.x*tri[0].TangentW + bary.y*tri[1].TangentW + bary.z*tri[2].TangentW;

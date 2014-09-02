@@ -11,6 +11,8 @@ ID3D11RasterizerState* RenderStates::CullFrontRS = 0;
 ID3D11BlendState*      RenderStates::AlphaToCoverageBS = 0;
 ID3D11BlendState*      RenderStates::TransparentBS     = 0;
 
+ID3D11DepthStencilState* RenderStates::disableDepthDSS = 0;
+
 void RenderStates::InitAll(ID3D11Device* device)
 {
 	//
@@ -79,6 +81,15 @@ void RenderStates::InitAll(ID3D11Device* device)
 	transparentDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
 	HR(device->CreateBlendState(&transparentDesc, &TransparentBS));
+
+	//
+	// DisableDepthDSS
+	//
+
+	D3D11_DEPTH_STENCIL_DESC disableDepthDesc = {0};
+	disableDepthDesc.DepthEnable = false;
+
+	HR(device->CreateDepthStencilState(&disableDepthDesc, &disableDepthDSS));
 }
 
 void RenderStates::DestroyAll()

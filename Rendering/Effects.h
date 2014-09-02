@@ -224,10 +224,6 @@ public:
 	void SetWorld(CXMMATRIX M)                          { World->SetMatrix(reinterpret_cast<const float*>(&M)); }
 	void SetWorldInvTranspose(CXMMATRIX M)              { WorldInvTranspose->SetMatrix(reinterpret_cast<const float*>(&M)); }
 	void SetTexTransform(CXMMATRIX M)                   { TexTransform->SetMatrix(reinterpret_cast<const float*>(&M)); }
-	void SetEyePosW(const XMFLOAT3& v)                  { EyePosW->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
-	void SetFogColor(const FXMVECTOR v)                 { FogColor->SetFloatVector(reinterpret_cast<const float*>(&v)); }
-	void SetFogStart(float f)                           { FogStart->SetFloat(f); }
-	void SetFogRange(float f)                           { FogRange->SetFloat(f); }
 	void SetDirLights(const DirectionalLight* lights)   { DirLights->SetRawValue(lights, 0, 3*sizeof(DirectionalLight)); }
 	void SetMaterial(const Material& mat)               { Mat->SetRawValue(&mat, 0, sizeof(Material)); }
 	void SetHeightScale(float f)                        { HeightScale->SetFloat(f); }
@@ -235,9 +231,6 @@ public:
 	void SetMinTessDistance(float f)                    { MinTessDistance->SetFloat(f); }
 	void SetMinTessFactor(float f)                      { MinTessFactor->SetFloat(f); }
 	void SetMaxTessFactor(float f)                      { MaxTessFactor->SetFloat(f); }
-
-	void SetPlanetRadius(float f)						{ planetRadius->SetFloat(f); }
-	void SetPlanetPosW(const XMFLOAT3& v)				{ planetPosW->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
 
 	void SetDiffuseMap(ID3D11ShaderResourceView* tex)   { DiffuseMap->SetResource(tex); }
 	void SetCubeMap(ID3D11ShaderResourceView* tex)      { CubeMap->SetResource(tex); }
@@ -260,19 +253,15 @@ public:
 	void SetScaleOverScaleDepth(float f)				{ ScaleOverScaleDepth->SetFloat(f); }
 	void SetG(float f)									{ G->SetFloat(f); }
 	void SetG2(float f)									{ G2->SetFloat(f); }
-
+	
 	ID3DX11EffectTechnique* PlanetFromSpaceTech;
 	ID3DX11EffectTechnique* PlanetFromAtmoTech;
-
+	
 	ID3DX11EffectMatrixVariable* ViewProj;
 	ID3DX11EffectMatrixVariable* WorldViewProj;
 	ID3DX11EffectMatrixVariable* World;
 	ID3DX11EffectMatrixVariable* WorldInvTranspose;
 	ID3DX11EffectMatrixVariable* TexTransform;
-	ID3DX11EffectVectorVariable* EyePosW;
-	ID3DX11EffectVectorVariable* FogColor;
-	ID3DX11EffectScalarVariable* FogStart;
-	ID3DX11EffectScalarVariable* FogRange;
 	ID3DX11EffectVariable* DirLights;
 	ID3DX11EffectVariable* Mat;
 	ID3DX11EffectScalarVariable* HeightScale;
@@ -282,7 +271,7 @@ public:
 	ID3DX11EffectScalarVariable* MaxTessFactor;
 
 	ID3DX11EffectScalarVariable* planetRadius;
-	ID3DX11EffectVectorVariable* planetPosW;
+	ID3DX11EffectVectorVariable* planetPos;
  
 	ID3DX11EffectShaderResourceVariable* DiffuseMap;
 	ID3DX11EffectShaderResourceVariable* CubeMap;
@@ -318,10 +307,6 @@ public:
 	void SetWorldViewProj(CXMMATRIX M)                  { WorldViewProj->SetMatrix(reinterpret_cast<const float*>(&M)); }
 	void SetWorld(CXMMATRIX M)                          { World->SetMatrix(reinterpret_cast<const float*>(&M)); }
 	void SetWorldInvTranspose(CXMMATRIX M)              { WorldInvTranspose->SetMatrix(reinterpret_cast<const float*>(&M)); }
-	void SetEyePosW(const XMFLOAT3& v)                  { EyePosW->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
-	void SetFogColor(const FXMVECTOR v)                 { FogColor->SetFloatVector(reinterpret_cast<const float*>(&v)); }
-	void SetFogStart(float f)                           { FogStart->SetFloat(f); }
-	void SetFogRange(float f)                           { FogRange->SetFloat(f); }
 	void SetDirLights(const DirectionalLight* lights)   { DirLights->SetRawValue(lights, 0, 3*sizeof(DirectionalLight)); }
 	void SetMaterial(const Material& mat)               { Mat->SetRawValue(&mat, 0, sizeof(Material)); }
 
@@ -349,10 +334,6 @@ public:
 	ID3DX11EffectMatrixVariable* WorldViewProj;
 	ID3DX11EffectMatrixVariable* World;
 	ID3DX11EffectMatrixVariable* WorldInvTranspose;
-	ID3DX11EffectVectorVariable* EyePosW;
-	ID3DX11EffectVectorVariable* FogColor;
-	ID3DX11EffectScalarVariable* FogStart;
-	ID3DX11EffectScalarVariable* FogRange;
 	ID3DX11EffectVariable* DirLights;
 	ID3DX11EffectVariable* Mat;
 

@@ -199,10 +199,6 @@ DisplacementMapEffect::DisplacementMapEffect(ID3D11Device* device, const std::ws
 	World             = mFX->GetVariableByName("gWorld")->AsMatrix();
 	WorldInvTranspose = mFX->GetVariableByName("gWorldInvTranspose")->AsMatrix();
 	TexTransform      = mFX->GetVariableByName("gTexTransform")->AsMatrix();
-	EyePosW           = mFX->GetVariableByName("gEyePosW")->AsVector();
-	FogColor          = mFX->GetVariableByName("gFogColor")->AsVector();
-	FogStart          = mFX->GetVariableByName("gFogStart")->AsScalar();
-	FogRange          = mFX->GetVariableByName("gFogRange")->AsScalar();
 	DirLights         = mFX->GetVariableByName("gDirLights");
 	Mat               = mFX->GetVariableByName("gMaterial");
 	HeightScale       = mFX->GetVariableByName("gHeightScale")->AsScalar();
@@ -213,9 +209,6 @@ DisplacementMapEffect::DisplacementMapEffect(ID3D11Device* device, const std::ws
 	DiffuseMap        = mFX->GetVariableByName("gDiffuseMap")->AsShaderResource();
 	CubeMap           = mFX->GetVariableByName("gCubeMap")->AsShaderResource();
 	NormalMap         = mFX->GetVariableByName("gNormalMap")->AsShaderResource();
-
-	planetRadius	  = mFX->GetVariableByName("gPlanetRadius")->AsScalar();
-	planetPosW		  = mFX->GetVariableByName("gPlanetPosW")->AsVector();
 	
 	CameraPos				= mFX->GetVariableByName("v3CameraPos")->AsVector();
 	LightPos				= mFX->GetVariableByName("v3LightPos")->AsVector();
@@ -252,10 +245,6 @@ SkyEffect::SkyEffect(ID3D11Device* device, const std::wstring& filename)
 	WorldViewProj     = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
 	World             = mFX->GetVariableByName("gWorld")->AsMatrix();
 	WorldInvTranspose = mFX->GetVariableByName("gWorldInvTranspose")->AsMatrix();
-	EyePosW           = mFX->GetVariableByName("gEyePosW")->AsVector();
-	FogColor          = mFX->GetVariableByName("gFogColor")->AsVector();
-	FogStart          = mFX->GetVariableByName("gFogStart")->AsScalar();
-	FogRange          = mFX->GetVariableByName("gFogRange")->AsScalar();
 	DirLights         = mFX->GetVariableByName("gDirLights");
 	Mat               = mFX->GetVariableByName("gMaterial");
 	

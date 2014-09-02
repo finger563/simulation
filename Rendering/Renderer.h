@@ -42,15 +42,17 @@ private:
 	ID3D11Buffer* mVB;
 	ID3D11Buffer* mIB;
 
-	ID3D11ShaderResourceView* mDiffuseMapSRV;
+	ID3D11ShaderResourceView* mEarthDiffuseMapSRV;
 	ID3D11ShaderResourceView* mEarthNormalTexSRV;
+	
+	ID3D11ShaderResourceView* mCloudsDiffuseMapSRV;
+	ID3D11ShaderResourceView* mCloudsNormalTexSRV;
 
 	DirectionalLight mDirLights[3];
 	Material mEarthMat;
 
 	XMFLOAT4X4 mTexTransform;
 	XMFLOAT4X4 mEarthWorld;
-	XMFLOAT4X4 mSkyWorld;
 
 	XMFLOAT4X4 mProj;
 
@@ -61,6 +63,10 @@ private:
 	int mSkyVertexOffset;
 	UINT mSkyIndexOffset;
 	UINT mSkyIndexCount;
+	
+	int mCloudsVertexOffset;
+	UINT mCloudsIndexOffset;
+	UINT mCloudsIndexCount;
 
 	RenderOptions mRenderOptions;
 
