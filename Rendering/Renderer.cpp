@@ -344,10 +344,14 @@ void Renderer::DrawScene()
     }
 	
 	// DRAW THE CLOUDS
+	md3dImmediateContext->OMSetDepthStencilState(RenderStates::DontWriteDepthDSS,0);
 	if ( height > outerRadius )
 		activeTech = Effects::DisplacementMapFX->PlanetFromSpaceTech;
 	else
 		activeTech = Effects::DisplacementMapFX->PlanetFromAtmoTech;
+	if ( height < control.get_skyAltitude() ) {
+		md3dImmediateContext->RSSetState(RenderStates::CullFrontRS);
+	}
 	Effects::DisplacementMapFX->SetHeightScale(control.get_skyAltitude()/2.0f);
 	Effects::DisplacementMapFX->SetMaxTessDistance(1.0f);
 	Effects::DisplacementMapFX->SetMinTessDistance(1000.0f);
@@ -389,8 +393,11 @@ void Renderer::DrawScene()
 		}
 		
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
-		//md3dImmediateContext->DrawIndexed(mCloudsIndexCount, mCloudsIndexOffset, mCloudsVertexOffset);
+		md3dImmediateContext->DrawIndexed(mCloudsIndexCount, mCloudsIndexOffset, mCloudsVertexOffset);
     }
+	// restore default states
+	md3dImmediateContext->RSSetState(0);
+	md3dImmediateContext->OMSetDepthStencilState(0, 0);
 	
 	// FX sets tessellation stages, but it does not disable them.  So do that here
 	// to turn off tessellation.
@@ -398,7 +405,6 @@ void Renderer::DrawScene()
 	md3dImmediateContext->DSSetShader(0, 0, 0);	
 
 	// DRAW THE SKY
-	//md3dImmediateContext->OMSetDepthStencilState(RenderStates::disableDepthDSS,0);
 	if ( height > outerRadius ) {
 		activeTech = Effects::SkyFX->SkyFromSpaceTech;
 	}
@@ -410,6 +416,7 @@ void Renderer::DrawScene()
 	activeTech->GetDesc( &techDesc );
 	
 	md3dImmediateContext->RSSetState(RenderStates::CullFrontRS);
+	//md3dImmediateContext->OMSetDepthStencilState(RenderStates::disableDepthDSS,0);
 
     for(UINT p = 0; p < techDesc.Passes; ++p)
     {		
@@ -421,8 +428,7 @@ void Renderer::DrawScene()
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(mSkyIndexCount, mSkyIndexOffset, mSkyVertexOffset);
     }
-	
-	// restore default states, as the SkyFX changes them
+	// restore default states
 	md3dImmediateContext->RSSetState(0);
 	md3dImmediateContext->OMSetDepthStencilState(0, 0);
 

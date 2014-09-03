@@ -19,11 +19,13 @@ public:
 	static ID3D11RasterizerState* NoCullRS;
 
 	static ID3D11RasterizerState* CullFrontRS;
+	static ID3D11RasterizerState* ReverseWindingRS;
 	 
 	static ID3D11BlendState* AlphaToCoverageBS;
 	static ID3D11BlendState* TransparentBS;
 
-	static ID3D11DepthStencilState* disableDepthDSS;
+	static ID3D11DepthStencilState* DisableDepthDSS;
+	static ID3D11DepthStencilState* DontWriteDepthDSS;
 };
 
 #endif // RENDERSTATES_H

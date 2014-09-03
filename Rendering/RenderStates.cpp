@@ -7,11 +7,13 @@
 ID3D11RasterizerState* RenderStates::WireframeRS = 0;
 ID3D11RasterizerState* RenderStates::NoCullRS    = 0;
 ID3D11RasterizerState* RenderStates::CullFrontRS = 0;
+ID3D11RasterizerState* RenderStates::ReverseWindingRS = 0;
 	 
 ID3D11BlendState*      RenderStates::AlphaToCoverageBS = 0;
 ID3D11BlendState*      RenderStates::TransparentBS     = 0;
 
-ID3D11DepthStencilState* RenderStates::disableDepthDSS = 0;
+ID3D11DepthStencilState* RenderStates::DisableDepthDSS = 0;
+ID3D11DepthStencilState* RenderStates::DontWriteDepthDSS = 0;
 
 void RenderStates::InitAll(ID3D11Device* device)
 {
@@ -52,6 +54,18 @@ void RenderStates::InitAll(ID3D11Device* device)
 	HR(device->CreateRasterizerState(&cullFrontDesc, &CullFrontRS));
 
 	//
+	// ReverseWinding
+	//
+	D3D11_RASTERIZER_DESC reverseWindingDesc;
+	ZeroMemory(&reverseWindingDesc, sizeof(D3D11_RASTERIZER_DESC));
+	reverseWindingDesc.FillMode = D3D11_FILL_SOLID;
+	reverseWindingDesc.CullMode = D3D11_CULL_BACK;
+	reverseWindingDesc.FrontCounterClockwise = true;
+	reverseWindingDesc.DepthClipEnable = true;
+
+	HR(device->CreateRasterizerState(&reverseWindingDesc, &ReverseWindingRS));
+
+	//
 	// AlphaToCoverageBS
 	//
 
@@ -87,9 +101,20 @@ void RenderStates::InitAll(ID3D11Device* device)
 	//
 
 	D3D11_DEPTH_STENCIL_DESC disableDepthDesc = {0};
-	disableDepthDesc.DepthEnable = false;
+	disableDepthDesc.DepthEnable = true;
+	disableDepthDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
 
-	HR(device->CreateDepthStencilState(&disableDepthDesc, &disableDepthDSS));
+	HR(device->CreateDepthStencilState(&disableDepthDesc, &DisableDepthDSS));
+
+	//
+	// DontWriteDepthDSS
+	//
+
+	D3D11_DEPTH_STENCIL_DESC dontWriteDepthDesc = {0};
+	dontWriteDepthDesc.DepthEnable = false;
+	dontWriteDepthDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+
+	HR(device->CreateDepthStencilState(&dontWriteDepthDesc, &DontWriteDepthDSS));
 }
 
 void RenderStates::DestroyAll()
