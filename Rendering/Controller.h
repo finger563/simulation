@@ -26,12 +26,18 @@ public:
 	 * Accessor Functions
 	 */
 	float get_Speed();
+
 	Camera& get_Camera();
+
 	float get_earthRadius();
 	float get_skyAltitude();
 	XMFLOAT3 get_earthPosW();
-	float get_maxRadius();
+
 	float get_farClipPlaneDist();
+	void set_farClipPlaneDist(float f);
+	float get_nearClipPlaneDist();
+	void set_nearClipPlaneDist(float n);
+
 	POINT get_mLastMousePos();
 
 	/*
@@ -55,8 +61,8 @@ private:
 
 	XMFLOAT3 earthPosW;
 
-	float maxRadius;
 	float farClipPlaneDist;
+	float nearClipPlaneDist;
 };
 
 #endif

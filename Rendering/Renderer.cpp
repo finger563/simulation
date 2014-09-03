@@ -107,7 +107,7 @@ void Renderer::OnResize()
 {
 	D3DApp::OnResize();
 
-	control.get_Camera().SetLens(0.25f*MathHelper::Pi, AspectRatio(), 1.0f, control.get_farClipPlaneDist());
+	control.get_Camera().SetLens(0.25f*MathHelper::Pi, AspectRatio(), control.get_nearClipPlaneDist(), control.get_farClipPlaneDist());
 }
 
 void Renderer::UpdateScene(float dt)
@@ -256,11 +256,6 @@ void Renderer::DrawScene()
 	Effects::DisplacementMapFX->SetG(-0.990f);
 	Effects::DisplacementMapFX->SetG2((-0.990f)*(-0.990f));
 	Effects::DisplacementMapFX->SetDirLights(mDirLights);
-	Effects::DisplacementMapFX->SetHeightScale(29.029f);
-	Effects::DisplacementMapFX->SetMaxTessDistance(0.10f);
-	Effects::DisplacementMapFX->SetMinTessDistance(1000.0f);
-	Effects::DisplacementMapFX->SetMinTessFactor(1.0f);
-	Effects::DisplacementMapFX->SetMaxTessFactor(100.0f);
 	 
 	ID3DX11EffectTechnique* activeTech;
 	if ( height > outerRadius )
@@ -301,6 +296,11 @@ void Renderer::DrawScene()
 		md3dImmediateContext->RSSetState(RenderStates::WireframeRS);
 	
 	// DRAW THE EARTH
+	Effects::DisplacementMapFX->SetHeightScale(29.029f);
+	Effects::DisplacementMapFX->SetMaxTessDistance(0.10f);
+	Effects::DisplacementMapFX->SetMinTessDistance(1000.0f);
+	Effects::DisplacementMapFX->SetMinTessFactor(1.0f);
+	Effects::DisplacementMapFX->SetMaxTessFactor(100.0f);
     D3DX11_TECHNIQUE_DESC techDesc;
 	activeTech->GetDesc( &techDesc );
 	world = XMLoadFloat4x4(&mEarthWorld);
@@ -349,8 +349,9 @@ void Renderer::DrawScene()
 		activeTech = Effects::DisplacementMapFX->PlanetFromSpaceTech;
 	else
 		activeTech = Effects::DisplacementMapFX->PlanetFromAtmoTech;
+
 	if ( height < control.get_skyAltitude() ) {
-		md3dImmediateContext->RSSetState(RenderStates::CullFrontRS);
+		md3dImmediateContext->RSSetState(RenderStates::ReverseWindingRS);
 	}
 	Effects::DisplacementMapFX->SetHeightScale(control.get_skyAltitude()/2.0f);
 	Effects::DisplacementMapFX->SetMaxTessDistance(1.0f);
@@ -444,7 +445,7 @@ void Renderer::BuildGeometryBuffers()
 	GeometryGenerator geoGen;
 	
 	geoGen.CreateGeosphere(control.get_earthRadius() + control.get_skyAltitude(), 7.0f, skyMesh);
-	geoGen.CreateGeosphere(control.get_earthRadius(), 7.0f, cloudMesh);
+	geoGen.CreateGeosphere(control.get_earthRadius(), 4.0f, cloudMesh);
 	geoGen.CreateGeosphere(control.get_earthRadius(),5.0f,earthMesh);
 	
 	// Cache the vertex offsets to each object in the concatenated vertex buffer.
