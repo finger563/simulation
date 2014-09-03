@@ -112,6 +112,26 @@ void Renderer::OnResize()
 
 void Renderer::UpdateScene(float dt)
 {
+
+	if (GetAsyncKeyState('R') & 0x8000) {
+		float angle = control.get_earthAngle() + dt;
+		control.set_earthAngle( MathHelper::Clamp(angle,0.0f,2*MathHelper::Pi + 0.01f));
+		XMVECTOR trans = XMLoadFloat3(&control.get_earthPosW());
+		XMMATRIX T = XMMatrixTranslationFromVector(trans);
+		XMMATRIX R = XMMatrixRotationY(control.get_earthAngle());
+	
+		XMStoreFloat4x4(&mEarthWorld, R*T);
+	}
+
+	if (GetAsyncKeyState(VK_LCONTROL) & 0x8000)
+		control.set_Speed(control.get_Speed()*0.9f);
+	if (GetAsyncKeyState(VK_TAB) & 0x8000)
+		control.set_Speed(control.get_Speed()*1.1f);
+	
+	float original_speed = control.get_Speed();
+	if (GetAsyncKeyState(VK_LSHIFT) & 0x8000)
+		control.set_Speed(control.get_Speed() * 100.0f);
+
 	// Camera control:
 	if (GetAsyncKeyState('W') & 0x8000)
 		control.get_Camera().Walk(dt*control.get_Speed());
@@ -124,6 +144,8 @@ void Renderer::UpdateScene(float dt)
 
 	if (GetAsyncKeyState('D') & 0x8000)
 		control.get_Camera().Strafe(dt*control.get_Speed());
+	
+	control.set_Speed(original_speed);
 	
 	if (GetAsyncKeyState('Q') & 0x8000)
 		control.get_Camera().RotateLook(dt);
@@ -237,7 +259,7 @@ void Renderer::DrawScene()
 	Effects::SpaceFX->SetG2((-0.990f)*(-0.990f));
 	
 	// DISPLACEMENT MAPPING EFFECTS
-	Effects::DisplacementMapFX->SetEyePos(control.get_Camera().GetPosition());
+	Effects::DisplacementMapFX->SetEyePosW(control.get_Camera().GetPosition());
 	Effects::DisplacementMapFX->SetCameraPos(cameraPos);
 	Effects::DisplacementMapFX->SetLightPos(sunPos);
 	Effects::DisplacementMapFX->SetInvWaveLength(invWaveLength);

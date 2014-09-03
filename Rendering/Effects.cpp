@@ -28,6 +28,37 @@ Effect::~Effect()
 }
 #pragma endregion
 
+#pragma region PlanetEffect
+PlanetEffect::PlanetEffect(ID3D11Device* device, const std::wstring& filename)
+	: Effect(device, filename)
+{
+	EyePosW				= mFX->GetVariableByName("gEyePosW")->AsVector();
+	PlanetPosW			= mFX->GetVariableByName("gPlanetPosW")->AsVector();
+	
+	CameraPos				= mFX->GetVariableByName("v3CameraPos")->AsVector();
+	LightPos				= mFX->GetVariableByName("v3LightPos")->AsVector();
+	InvWaveLength			= mFX->GetVariableByName("v3InvWavelength")->AsVector();
+	CameraHeight			= mFX->GetVariableByName("fCameraHeight")->AsScalar();
+	CameraHeight2			= mFX->GetVariableByName("fCameraHeight2")->AsScalar();
+	OuterRadius				= mFX->GetVariableByName("fOuterRadius")->AsScalar();
+	OuterRadius2			= mFX->GetVariableByName("fOuterRadius2")->AsScalar();
+	InnerRadius				= mFX->GetVariableByName("fInnerRadius")->AsScalar();
+	InnerRadius2			= mFX->GetVariableByName("fInnerRadius2")->AsScalar();
+	KrESun					= mFX->GetVariableByName("fKrESun")->AsScalar();
+	KmESun					= mFX->GetVariableByName("fKmESun")->AsScalar();
+	Kr4PI					= mFX->GetVariableByName("fKr4PI")->AsScalar();
+	Km4PI					= mFX->GetVariableByName("fKm4PI")->AsScalar();
+	Scale					= mFX->GetVariableByName("fScale")->AsScalar();
+	ScaleOverScaleDepth		= mFX->GetVariableByName("fScaleOverScaleDepth")->AsScalar();
+	G						= mFX->GetVariableByName("g")->AsScalar();
+	G2						= mFX->GetVariableByName("g2")->AsScalar();
+}
+
+PlanetEffect::~PlanetEffect()
+{
+}
+#pragma endregion
+
 #pragma region BasicEffect
 BasicEffect::BasicEffect(ID3D11Device* device, const std::wstring& filename)
 	: Effect(device, filename)
@@ -189,7 +220,7 @@ NormalMapEffect::~NormalMapEffect()
 
 #pragma region DisplacementMapEffect
 DisplacementMapEffect::DisplacementMapEffect(ID3D11Device* device, const std::wstring& filename)
-	: Effect(device, filename)
+	: PlanetEffect(device, filename)
 {
 	PlanetFromSpaceTech = mFX->GetTechniqueByName("PlanetFromSpace");
 	PlanetFromAtmoTech = mFX->GetTechniqueByName("PlanetFromAtmo");
@@ -209,26 +240,6 @@ DisplacementMapEffect::DisplacementMapEffect(ID3D11Device* device, const std::ws
 	DiffuseMap        = mFX->GetVariableByName("gDiffuseMap")->AsShaderResource();
 	CubeMap           = mFX->GetVariableByName("gCubeMap")->AsShaderResource();
 	NormalMap         = mFX->GetVariableByName("gNormalMap")->AsShaderResource();
-	
-	EyePos				= mFX->GetVariableByName("gEyePosW")->AsVector();
-	
-	CameraPos				= mFX->GetVariableByName("v3CameraPos")->AsVector();
-	LightPos				= mFX->GetVariableByName("v3LightPos")->AsVector();
-	InvWaveLength			= mFX->GetVariableByName("v3InvWavelength")->AsVector();
-	CameraHeight			= mFX->GetVariableByName("fCameraHeight")->AsScalar();
-	CameraHeight2			= mFX->GetVariableByName("fCameraHeight2")->AsScalar();
-	OuterRadius				= mFX->GetVariableByName("fOuterRadius")->AsScalar();
-	OuterRadius2			= mFX->GetVariableByName("fOuterRadius2")->AsScalar();
-	InnerRadius				= mFX->GetVariableByName("fInnerRadius")->AsScalar();
-	InnerRadius2			= mFX->GetVariableByName("fInnerRadius2")->AsScalar();
-	KrESun					= mFX->GetVariableByName("fKrESun")->AsScalar();
-	KmESun					= mFX->GetVariableByName("fKmESun")->AsScalar();
-	Kr4PI					= mFX->GetVariableByName("fKr4PI")->AsScalar();
-	Km4PI					= mFX->GetVariableByName("fKm4PI")->AsScalar();
-	Scale					= mFX->GetVariableByName("fScale")->AsScalar();
-	ScaleOverScaleDepth		= mFX->GetVariableByName("fScaleOverScaleDepth")->AsScalar();
-	G						= mFX->GetVariableByName("g")->AsScalar();
-	G2						= mFX->GetVariableByName("g2")->AsScalar();
 }
 
 DisplacementMapEffect::~DisplacementMapEffect()
@@ -238,7 +249,7 @@ DisplacementMapEffect::~DisplacementMapEffect()
 
 #pragma region SkyEffect
 SkyEffect::SkyEffect(ID3D11Device* device, const std::wstring& filename)
-	: Effect(device, filename)
+	: PlanetEffect(device, filename)
 {
 	SkyFromSpaceTech       = mFX->GetTechniqueByName("SkyFromSpace");
 	SkyFromAtmoTech       = mFX->GetTechniqueByName("SkyFromAtmo");
@@ -249,24 +260,6 @@ SkyEffect::SkyEffect(ID3D11Device* device, const std::wstring& filename)
 	WorldInvTranspose = mFX->GetVariableByName("gWorldInvTranspose")->AsMatrix();
 	DirLights         = mFX->GetVariableByName("gDirLights");
 	Mat               = mFX->GetVariableByName("gMaterial");
-	
-	CameraPos				= mFX->GetVariableByName("v3CameraPos")->AsVector();
-	LightPos				= mFX->GetVariableByName("v3LightPos")->AsVector();
-	InvWaveLength			= mFX->GetVariableByName("v3InvWavelength")->AsVector();
-	CameraHeight			= mFX->GetVariableByName("fCameraHeight")->AsScalar();
-	CameraHeight2			= mFX->GetVariableByName("fCameraHeight2")->AsScalar();
-	OuterRadius				= mFX->GetVariableByName("fOuterRadius")->AsScalar();
-	OuterRadius2			= mFX->GetVariableByName("fOuterRadius2")->AsScalar();
-	InnerRadius				= mFX->GetVariableByName("fInnerRadius")->AsScalar();
-	InnerRadius2			= mFX->GetVariableByName("fInnerRadius2")->AsScalar();
-	KrESun					= mFX->GetVariableByName("fKrESun")->AsScalar();
-	KmESun					= mFX->GetVariableByName("fKmESun")->AsScalar();
-	Kr4PI					= mFX->GetVariableByName("fKr4PI")->AsScalar();
-	Km4PI					= mFX->GetVariableByName("fKm4PI")->AsScalar();
-	Scale					= mFX->GetVariableByName("fScale")->AsScalar();
-	ScaleOverScaleDepth		= mFX->GetVariableByName("fScaleOverScaleDepth")->AsScalar();
-	G						= mFX->GetVariableByName("g")->AsScalar();
-	G2						= mFX->GetVariableByName("g2")->AsScalar();
 }
 
 SkyEffect::~SkyEffect()
@@ -276,7 +269,7 @@ SkyEffect::~SkyEffect()
 
 #pragma region SpaceEffect
 SpaceEffect::SpaceEffect(ID3D11Device* device, const std::wstring& filename)
-	: Effect(device, filename)
+	: PlanetEffect(device, filename)
 {
 	SpaceFromSpaceTech       = mFX->GetTechniqueByName("SkyFromSpaceTech");
 	SpaceFromAtmoTech       = mFX->GetTechniqueByName("SkyFromAtmoTech");
@@ -290,24 +283,6 @@ SpaceEffect::SpaceEffect(ID3D11Device* device, const std::wstring& filename)
 	FogRange          = mFX->GetVariableByName("gFogRange")->AsScalar();
 	DirLights         = mFX->GetVariableByName("gDirLights");
 	Mat               = mFX->GetVariableByName("gMaterial");
-	
-	CameraPos				= mFX->GetVariableByName("v3CameraPos")->AsVector();
-	LightPos				= mFX->GetVariableByName("v3LightPos")->AsVector();
-	InvWaveLength			= mFX->GetVariableByName("v3InvWavelength")->AsVector();
-	CameraHeight			= mFX->GetVariableByName("fCameraHeight")->AsScalar();
-	CameraHeight2			= mFX->GetVariableByName("fCameraHeight2")->AsScalar();
-	OuterRadius				= mFX->GetVariableByName("fOuterRadius")->AsScalar();
-	OuterRadius2			= mFX->GetVariableByName("fOuterRadius2")->AsScalar();
-	InnerRadius				= mFX->GetVariableByName("fInnerRadius")->AsScalar();
-	InnerRadius2			= mFX->GetVariableByName("fInnerRadius2")->AsScalar();
-	KrESun					= mFX->GetVariableByName("fKrESun")->AsScalar();
-	KmESun					= mFX->GetVariableByName("fKmESun")->AsScalar();
-	Kr4PI					= mFX->GetVariableByName("fKr4PI")->AsScalar();
-	Km4PI					= mFX->GetVariableByName("fKm4PI")->AsScalar();
-	Scale					= mFX->GetVariableByName("fScale")->AsScalar();
-	ScaleOverScaleDepth		= mFX->GetVariableByName("fScaleOverScaleDepth")->AsScalar();
-	G						= mFX->GetVariableByName("g")->AsScalar();
-	G2						= mFX->GetVariableByName("g2")->AsScalar();
 }
 
 SpaceEffect::~SpaceEffect()
@@ -318,6 +293,7 @@ SpaceEffect::~SpaceEffect()
 #pragma region Effects
 
 BasicEffect*           Effects::BasicFX           = 0;
+PlanetEffect*          Effects::PlanetFX          = 0;
 NormalMapEffect*       Effects::NormalMapFX       = 0;
 DisplacementMapEffect* Effects::DisplacementMapFX = 0;
 SkyEffect*             Effects::SkyFX             = 0;

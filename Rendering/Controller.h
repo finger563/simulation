@@ -25,20 +25,24 @@ public:
 	/*
 	 * Accessor Functions
 	 */
-	float get_Speed();
+	float	get_Speed();
+	void	set_Speed(float s);
 
 	Camera& get_Camera();
 
-	float get_earthRadius();
-	float get_skyAltitude();
-	XMFLOAT3 get_earthPosW();
+	float		get_earthRadius();
+	float		get_skyAltitude();
+	XMFLOAT3	get_earthPosW();
 
-	float get_farClipPlaneDist();
-	void set_farClipPlaneDist(float f);
-	float get_nearClipPlaneDist();
-	void set_nearClipPlaneDist(float n);
+	float	get_earthAngle();
+	void	set_earthAngle(float a);
 
-	POINT get_mLastMousePos();
+	float	get_farClipPlaneDist();
+	void	set_farClipPlaneDist(float f);
+	float	get_nearClipPlaneDist();
+	void	set_nearClipPlaneDist(float n);
+
+	POINT	get_mLastMousePos();
 
 	/*
 	 *  Mouse Control
@@ -56,10 +60,11 @@ private:
 
 	POINT mLastMousePos;
 
-	float earthRadius;	
+	float earthRadius;
 	float skyAltitude;
 
 	XMFLOAT3 earthPosW;
+	float earthAngle;
 
 	float farClipPlaneDist;
 	float nearClipPlaneDist;

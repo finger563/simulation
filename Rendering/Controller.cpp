@@ -8,6 +8,7 @@ bool Controller::Init()
 	earthRadius = 6378.140f;
 	skyAltitude = earthRadius * 0.025f;
 	earthPosW = XMFLOAT3(0,0,-earthRadius*2.0f);
+	earthAngle = 0;
 
 	farClipPlaneDist = earthRadius*1000.0f;
 	nearClipPlaneDist = 1.0f;
@@ -73,6 +74,12 @@ float Controller::get_Speed()
 	return speed;
 }
 
+void Controller::set_Speed(float s) 
+{
+	speed = s;
+	speed = MathHelper::Clamp(speed, minSpeed, maxSpeed);
+}
+
 float Controller::get_earthRadius() 
 {
 	return earthRadius;
@@ -86,6 +93,16 @@ float Controller::get_skyAltitude()
 XMFLOAT3 Controller::get_earthPosW() 
 {
 	return earthPosW;
+}
+
+float Controller::get_earthAngle() 
+{
+	return earthAngle;
+}
+
+void Controller::set_earthAngle(float a) 
+{
+	earthAngle = a;
 }
 
 float Controller::get_farClipPlaneDist() 

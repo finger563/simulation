@@ -26,6 +26,57 @@ protected:
 };
 #pragma endregion
 
+#pragma region PlanetEffect
+class PlanetEffect : public Effect
+{
+public:
+	PlanetEffect(ID3D11Device* device, const std::wstring& filename);
+	~PlanetEffect();
+	
+	void SetEyePosW(const XMFLOAT3& v)					{ EyePosW->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
+	void SetPlanetPosW(const XMFLOAT3& v)					{ PlanetPosW->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
+
+	void SetCameraPos(const XMFLOAT3& v)				{ CameraPos->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
+	void SetLightPos(const XMFLOAT3& v)					{ LightPos->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
+	void SetInvWaveLength(const XMFLOAT3& v)			{ InvWaveLength->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
+	void SetCameraHeight(float f)                       { CameraHeight->SetFloat(f); }
+	void SetCameraHeight2(float f)                      { CameraHeight2->SetFloat(f); }
+	void SetOuterRadius(float f)                        { OuterRadius->SetFloat(f); }
+	void SetOuterRadius2(float f)                       { OuterRadius2->SetFloat(f); }
+	void SetInnerRadius(float f)                        { InnerRadius->SetFloat(f); }
+	void SetInnerRadius2(float f)                       { InnerRadius2->SetFloat(f); }
+	void SetKrESun(float f)								{ KrESun->SetFloat(f); }
+	void SetKmESun(float f)								{ KmESun->SetFloat(f); }
+	void SetKr4PI(float f)								{ Kr4PI->SetFloat(f); }
+	void SetKm4PI(float f)								{ Km4PI->SetFloat(f); }
+	void SetScale(float f)								{ Scale->SetFloat(f); }
+	void SetScaleOverScaleDepth(float f)				{ ScaleOverScaleDepth->SetFloat(f); }
+	void SetG(float f)									{ G->SetFloat(f); }
+	void SetG2(float f)									{ G2->SetFloat(f); }
+		
+	ID3DX11EffectVectorVariable* EyePosW;
+	ID3DX11EffectVectorVariable* PlanetPosW;
+	
+	ID3DX11EffectVectorVariable* CameraPos;
+	ID3DX11EffectVectorVariable* LightPos;
+	ID3DX11EffectVectorVariable* InvWaveLength;
+	ID3DX11EffectScalarVariable* CameraHeight;
+	ID3DX11EffectScalarVariable* CameraHeight2;
+	ID3DX11EffectScalarVariable* OuterRadius;
+	ID3DX11EffectScalarVariable* OuterRadius2;
+	ID3DX11EffectScalarVariable* InnerRadius;
+	ID3DX11EffectScalarVariable* InnerRadius2;
+	ID3DX11EffectScalarVariable* KrESun;
+	ID3DX11EffectScalarVariable* KmESun;
+	ID3DX11EffectScalarVariable* Kr4PI;
+	ID3DX11EffectScalarVariable* Km4PI;
+	ID3DX11EffectScalarVariable* Scale;
+	ID3DX11EffectScalarVariable* ScaleOverScaleDepth;
+	ID3DX11EffectScalarVariable* G;
+	ID3DX11EffectScalarVariable* G2;
+};
+#pragma endregion
+
 #pragma region BasicEffect
 class BasicEffect : public Effect
 {
@@ -213,7 +264,7 @@ public:
 #pragma endregion
 
 #pragma region DisplacementMapEffect
-class DisplacementMapEffect : public Effect
+class DisplacementMapEffect : public PlanetEffect
 {
 public:
 	DisplacementMapEffect(ID3D11Device* device, const std::wstring& filename);
@@ -235,26 +286,6 @@ public:
 	void SetDiffuseMap(ID3D11ShaderResourceView* tex)   { DiffuseMap->SetResource(tex); }
 	void SetCubeMap(ID3D11ShaderResourceView* tex)      { CubeMap->SetResource(tex); }
 	void SetNormalMap(ID3D11ShaderResourceView* tex)    { NormalMap->SetResource(tex); }
-
-	void SetEyePos(const XMFLOAT3& v)					{ EyePos->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
-
-	void SetCameraPos(const XMFLOAT3& v)				{ CameraPos->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
-	void SetLightPos(const XMFLOAT3& v)					{ LightPos->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
-	void SetInvWaveLength(const XMFLOAT3& v)			{ InvWaveLength->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
-	void SetCameraHeight(float f)                       { CameraHeight->SetFloat(f); }
-	void SetCameraHeight2(float f)                      { CameraHeight2->SetFloat(f); }
-	void SetOuterRadius(float f)                        { OuterRadius->SetFloat(f); }
-	void SetOuterRadius2(float f)                       { OuterRadius2->SetFloat(f); }
-	void SetInnerRadius(float f)                        { InnerRadius->SetFloat(f); }
-	void SetInnerRadius2(float f)                       { InnerRadius2->SetFloat(f); }
-	void SetKrESun(float f)								{ KrESun->SetFloat(f); }
-	void SetKmESun(float f)								{ KmESun->SetFloat(f); }
-	void SetKr4PI(float f)								{ Kr4PI->SetFloat(f); }
-	void SetKm4PI(float f)								{ Km4PI->SetFloat(f); }
-	void SetScale(float f)								{ Scale->SetFloat(f); }
-	void SetScaleOverScaleDepth(float f)				{ ScaleOverScaleDepth->SetFloat(f); }
-	void SetG(float f)									{ G->SetFloat(f); }
-	void SetG2(float f)									{ G2->SetFloat(f); }
 	
 	ID3DX11EffectTechnique* PlanetFromSpaceTech;
 	ID3DX11EffectTechnique* PlanetFromAtmoTech;
@@ -271,35 +302,15 @@ public:
 	ID3DX11EffectScalarVariable* MinTessDistance;
 	ID3DX11EffectScalarVariable* MinTessFactor;
 	ID3DX11EffectScalarVariable* MaxTessFactor;
-	
-	ID3DX11EffectVectorVariable* EyePos;
  
 	ID3DX11EffectShaderResourceVariable* DiffuseMap;
 	ID3DX11EffectShaderResourceVariable* CubeMap;
 	ID3DX11EffectShaderResourceVariable* NormalMap;
-	
-	ID3DX11EffectVectorVariable* CameraPos;
-	ID3DX11EffectVectorVariable* LightPos;
-	ID3DX11EffectVectorVariable* InvWaveLength;
-	ID3DX11EffectScalarVariable* CameraHeight;
-	ID3DX11EffectScalarVariable* CameraHeight2;
-	ID3DX11EffectScalarVariable* OuterRadius;
-	ID3DX11EffectScalarVariable* OuterRadius2;
-	ID3DX11EffectScalarVariable* InnerRadius;
-	ID3DX11EffectScalarVariable* InnerRadius2;
-	ID3DX11EffectScalarVariable* KrESun;
-	ID3DX11EffectScalarVariable* KmESun;
-	ID3DX11EffectScalarVariable* Kr4PI;
-	ID3DX11EffectScalarVariable* Km4PI;
-	ID3DX11EffectScalarVariable* Scale;
-	ID3DX11EffectScalarVariable* ScaleOverScaleDepth;
-	ID3DX11EffectScalarVariable* G;
-	ID3DX11EffectScalarVariable* G2;
 };
 #pragma endregion
 
 #pragma region SkyEffect
-class SkyEffect : public Effect
+class SkyEffect : public PlanetEffect
 {
 public:
 	SkyEffect(ID3D11Device* device, const std::wstring& filename);
@@ -311,24 +322,6 @@ public:
 	void SetDirLights(const DirectionalLight* lights)   { DirLights->SetRawValue(lights, 0, 3*sizeof(DirectionalLight)); }
 	void SetMaterial(const Material& mat)               { Mat->SetRawValue(&mat, 0, sizeof(Material)); }
 
-	void SetCameraPos(const XMFLOAT3& v)				{ CameraPos->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
-	void SetLightPos(const XMFLOAT3& v)					{ LightPos->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
-	void SetInvWaveLength(const XMFLOAT3& v)			{ InvWaveLength->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
-	void SetCameraHeight(float f)                       { CameraHeight->SetFloat(f); }
-	void SetCameraHeight2(float f)                      { CameraHeight2->SetFloat(f); }
-	void SetOuterRadius(float f)                        { OuterRadius->SetFloat(f); }
-	void SetOuterRadius2(float f)                       { OuterRadius2->SetFloat(f); }
-	void SetInnerRadius(float f)                        { InnerRadius->SetFloat(f); }
-	void SetInnerRadius2(float f)                       { InnerRadius2->SetFloat(f); }
-	void SetKrESun(float f)								{ KrESun->SetFloat(f); }
-	void SetKmESun(float f)								{ KmESun->SetFloat(f); }
-	void SetKr4PI(float f)								{ Kr4PI->SetFloat(f); }
-	void SetKm4PI(float f)								{ Km4PI->SetFloat(f); }
-	void SetScale(float f)								{ Scale->SetFloat(f); }
-	void SetScaleOverScaleDepth(float f)				{ ScaleOverScaleDepth->SetFloat(f); }
-	void SetG(float f)									{ G->SetFloat(f); }
-	void SetG2(float f)									{ G2->SetFloat(f); }
-
 	ID3DX11EffectTechnique* SkyFromSpaceTech;
 	ID3DX11EffectTechnique* SkyFromAtmoTech;
 
@@ -337,29 +330,11 @@ public:
 	ID3DX11EffectMatrixVariable* WorldInvTranspose;
 	ID3DX11EffectVariable* DirLights;
 	ID3DX11EffectVariable* Mat;
-
-	ID3DX11EffectVectorVariable* CameraPos;
-	ID3DX11EffectVectorVariable* LightPos;
-	ID3DX11EffectVectorVariable* InvWaveLength;
-	ID3DX11EffectScalarVariable* CameraHeight;
-	ID3DX11EffectScalarVariable* CameraHeight2;
-	ID3DX11EffectScalarVariable* OuterRadius;
-	ID3DX11EffectScalarVariable* OuterRadius2;
-	ID3DX11EffectScalarVariable* InnerRadius;
-	ID3DX11EffectScalarVariable* InnerRadius2;
-	ID3DX11EffectScalarVariable* KrESun;
-	ID3DX11EffectScalarVariable* KmESun;
-	ID3DX11EffectScalarVariable* Kr4PI;
-	ID3DX11EffectScalarVariable* Km4PI;
-	ID3DX11EffectScalarVariable* Scale;
-	ID3DX11EffectScalarVariable* ScaleOverScaleDepth;
-	ID3DX11EffectScalarVariable* G;
-	ID3DX11EffectScalarVariable* G2;
 };
 #pragma endregion
 
 #pragma region SpaceEffect
-class SpaceEffect : public Effect
+class SpaceEffect : public PlanetEffect
 {
 public:
 	SpaceEffect(ID3D11Device* device, const std::wstring& filename);
@@ -375,24 +350,6 @@ public:
 	void SetDirLights(const DirectionalLight* lights)   { DirLights->SetRawValue(lights, 0, 3*sizeof(DirectionalLight)); }
 	void SetMaterial(const Material& mat)               { Mat->SetRawValue(&mat, 0, sizeof(Material)); }
 
-	void SetCameraPos(const XMFLOAT3& v)				{ CameraPos->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
-	void SetLightPos(const XMFLOAT3& v)					{ LightPos->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
-	void SetInvWaveLength(const XMFLOAT3& v)			{ InvWaveLength->SetRawValue(&v, 0, sizeof(XMFLOAT3)); }
-	void SetCameraHeight(float f)                       { CameraHeight->SetFloat(f); }
-	void SetCameraHeight2(float f)                      { CameraHeight2->SetFloat(f); }
-	void SetOuterRadius(float f)                        { OuterRadius->SetFloat(f); }
-	void SetOuterRadius2(float f)                       { OuterRadius2->SetFloat(f); }
-	void SetInnerRadius(float f)                        { InnerRadius->SetFloat(f); }
-	void SetInnerRadius2(float f)                       { InnerRadius2->SetFloat(f); }
-	void SetKrESun(float f)								{ KrESun->SetFloat(f); }
-	void SetKmESun(float f)								{ KmESun->SetFloat(f); }
-	void SetKr4PI(float f)								{ Kr4PI->SetFloat(f); }
-	void SetKm4PI(float f)								{ Km4PI->SetFloat(f); }
-	void SetScale(float f)								{ Scale->SetFloat(f); }
-	void SetScaleOverScaleDepth(float f)				{ ScaleOverScaleDepth->SetFloat(f); }
-	void SetG(float f)									{ G->SetFloat(f); }
-	void SetG2(float f)									{ G2->SetFloat(f); }
-
 	ID3DX11EffectTechnique* SpaceFromSpaceTech;
 	ID3DX11EffectTechnique* SpaceFromAtmoTech;
 
@@ -405,24 +362,6 @@ public:
 	ID3DX11EffectScalarVariable* FogRange;
 	ID3DX11EffectVariable* DirLights;
 	ID3DX11EffectVariable* Mat;
-
-	ID3DX11EffectVectorVariable* CameraPos;
-	ID3DX11EffectVectorVariable* LightPos;
-	ID3DX11EffectVectorVariable* InvWaveLength;
-	ID3DX11EffectScalarVariable* CameraHeight;
-	ID3DX11EffectScalarVariable* CameraHeight2;
-	ID3DX11EffectScalarVariable* OuterRadius;
-	ID3DX11EffectScalarVariable* OuterRadius2;
-	ID3DX11EffectScalarVariable* InnerRadius;
-	ID3DX11EffectScalarVariable* InnerRadius2;
-	ID3DX11EffectScalarVariable* KrESun;
-	ID3DX11EffectScalarVariable* KmESun;
-	ID3DX11EffectScalarVariable* Kr4PI;
-	ID3DX11EffectScalarVariable* Km4PI;
-	ID3DX11EffectScalarVariable* Scale;
-	ID3DX11EffectScalarVariable* ScaleOverScaleDepth;
-	ID3DX11EffectScalarVariable* G;
-	ID3DX11EffectScalarVariable* G2;
 };
 #pragma endregion
 
@@ -435,6 +374,7 @@ public:
 	static void DestroyAll();
 
 	static BasicEffect* BasicFX;
+	static PlanetEffect* PlanetFX;
 	static NormalMapEffect* NormalMapFX;
 	static DisplacementMapEffect* DisplacementMapFX;
 	static SkyEffect* SkyFX;
