@@ -85,7 +85,7 @@ VertexOut VS_SkyFromSpace(VertexIn vin)
 	vout.PosH = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
 
 	// Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)
-	float3 v3Pos = vout.PosW;
+	float3 v3Pos = vout.PosW - gPlanetPosW;
 	float3 v3Ray = v3Pos - v3CameraPos;
 	float fFar = length(v3Ray);
 	v3Ray /= fFar;
@@ -145,7 +145,7 @@ VertexOut VS_SkyFromAtmo(VertexIn vin)
 	vout.PosH = mul(float4(vin.PosL, 1.0f), gWorldViewProj);
 	
 	// Get the ray from the camera to the vertex, and its length (which is the far point of the ray passing through the atmosphere)
-	float3 v3Pos = vout.PosW.xyz;
+	float3 v3Pos = vout.PosW - gPlanetPosW;
 	float3 v3Ray = v3Pos - v3CameraPos;
 	float fFar = length(v3Ray);
 	v3Ray /= fFar;
