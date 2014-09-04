@@ -379,7 +379,6 @@ void Renderer::DrawScene()
 		activeTech = Effects::CloudsFX->CloudsFromSpaceTech;
 	}
 	else {
-		//md3dImmediateContext->OMSetDepthStencilState(RenderStates::DepthMaskOffDSS,0);
 		md3dImmediateContext->OMSetDepthStencilState(RenderStates::CloudDSS,0);
 		md3dImmediateContext->RSSetState(RenderStates::ReverseWindingRS);
 		activeTech = Effects::CloudsFX->CloudsFromAtmoTech;
