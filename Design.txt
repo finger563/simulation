@@ -92,9 +92,6 @@ Next Steps:
 * Stream data (like outerra) instead of loading all at once?
   * really means split data for sending to GPU based on need:
     * don't need to send full earth texture/height-maps since can't see all of it at once
-* Planet Rotation 
-  * To work with atmospheric rendering
-  * As a function of time
 * HDR (High dynamic range) Rendering:
   * render to FP texture
   * Get max value
@@ -107,6 +104,7 @@ Next Steps:
     * Wave tessellation
     * above surface: reflection and refraction
     * below surface: color, etc.?
+* Collision Detection & interaction
 * Terrain Generation 2:
   * generate based on biome data instead of heightmap (similar terrain as found in GPU gems)
 * Atmosphere 2:
@@ -114,7 +112,17 @@ Next Steps:
 * Sun Rendering 1:
   * Render light source (sun) as object viewable outside atmosphere
 * Clouds 2:
+  * moves
   * First implementation of volumetric clouds based on cloud texture as seed data
+* Planets 2:
+  * Simulation: motion (planetary bodies)
+  * gravity
+  * collision
+* Physics:
+  * Gravity (n-body)
+  * Aero (JSBSim)
+  * fluid mechanics (water, air?)
+  * modular engine
 
 Done:
 -----
@@ -134,9 +142,10 @@ Done:
     * in atmo: blur and color and scattering
 * Clouds 1:
   * Cloud texture over earth
-  * moves
   * works w/ atmosphere
   * Rendered from above and below
+* Planet Rotation 
+  * To work with atmospheric rendering
 
 
   Batman:
