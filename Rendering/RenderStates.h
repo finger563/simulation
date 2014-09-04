@@ -26,6 +26,11 @@ public:
 
 	static ID3D11DepthStencilState* DisableDepthDSS;
 	static ID3D11DepthStencilState* DontWriteDepthDSS;
+	static ID3D11DepthStencilState* DepthMaskOffDSS;
+	static ID3D11DepthStencilState* DepthMaskOnDSS;
+
+	static ID3D11DepthStencilState* PlanetDSS;
+	static ID3D11DepthStencilState* CloudDSS;
 };
 
 #endif // RENDERSTATES_H

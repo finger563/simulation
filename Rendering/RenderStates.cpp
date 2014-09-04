@@ -14,6 +14,11 @@ ID3D11BlendState*      RenderStates::TransparentBS     = 0;
 
 ID3D11DepthStencilState* RenderStates::DisableDepthDSS = 0;
 ID3D11DepthStencilState* RenderStates::DontWriteDepthDSS = 0;
+ID3D11DepthStencilState* RenderStates::DepthMaskOffDSS = 0;
+ID3D11DepthStencilState* RenderStates::DepthMaskOnDSS = 0;
+
+ID3D11DepthStencilState* RenderStates::PlanetDSS = 0;
+ID3D11DepthStencilState* RenderStates::CloudDSS = 0;
 
 void RenderStates::InitAll(ID3D11Device* device)
 {
@@ -101,7 +106,7 @@ void RenderStates::InitAll(ID3D11Device* device)
 	//
 
 	D3D11_DEPTH_STENCIL_DESC disableDepthDesc = {0};
-	disableDepthDesc.DepthEnable = true;
+	disableDepthDesc.DepthEnable = false;
 	disableDepthDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
 
 	HR(device->CreateDepthStencilState(&disableDepthDesc, &DisableDepthDSS));
@@ -115,6 +120,75 @@ void RenderStates::InitAll(ID3D11Device* device)
 	dontWriteDepthDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 
 	HR(device->CreateDepthStencilState(&dontWriteDepthDesc, &DontWriteDepthDSS));
+
+	//
+	// DepthStencilDSS
+	//
+
+	D3D11_DEPTH_STENCIL_DESC depthMaskOffDesc = {0};
+	//depthMaskOffDesc.StencilEnable = true;
+	depthMaskOffDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+
+	HR(device->CreateDepthStencilState(&depthMaskOffDesc, &DepthMaskOffDSS));
+
+	//
+	// DepthStencilDSS
+	//
+
+	D3D11_DEPTH_STENCIL_DESC depthMaskOnDesc = {0};
+	//depthMaskOnDesc.DepthEnable = true;
+	//depthMaskOffDesc.StencilEnable = true;
+	depthMaskOnDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+
+	HR(device->CreateDepthStencilState(&depthMaskOnDesc, &DepthMaskOnDSS));
+
+	//
+	// PlanetDSS
+	//
+
+	D3D11_DEPTH_STENCIL_DESC planetDesc = {0};
+	planetDesc.DepthEnable = true;
+	planetDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	planetDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	planetDesc.StencilEnable = true;
+	planetDesc.StencilReadMask = 0xff;
+	planetDesc.StencilWriteMask = 0xff;
+
+	planetDesc.FrontFace.StencilFailOp		= D3D11_STENCIL_OP_KEEP;
+	planetDesc.FrontFace.StencilDepthFailOp	= D3D11_STENCIL_OP_KEEP;
+	planetDesc.FrontFace.StencilPassOp		= D3D11_STENCIL_OP_REPLACE;
+	planetDesc.FrontFace.StencilFunc		= D3D11_COMPARISON_ALWAYS;
+	
+	planetDesc.BackFace.StencilFailOp		= D3D11_STENCIL_OP_KEEP;
+	planetDesc.BackFace.StencilDepthFailOp	= D3D11_STENCIL_OP_KEEP;
+	planetDesc.BackFace.StencilPassOp		= D3D11_STENCIL_OP_REPLACE;
+	planetDesc.BackFace.StencilFunc		= D3D11_COMPARISON_ALWAYS;
+
+	HR(device->CreateDepthStencilState(&planetDesc, &PlanetDSS));
+
+	//
+	// CloudDSS
+	//
+
+	D3D11_DEPTH_STENCIL_DESC cloudDesc = {0};
+	cloudDesc.DepthEnable = true;
+	cloudDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	cloudDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	cloudDesc.StencilEnable = true;
+	cloudDesc.StencilReadMask = 0xff;
+	cloudDesc.StencilWriteMask = 0xff;
+
+	cloudDesc.FrontFace.StencilFailOp		= D3D11_STENCIL_OP_KEEP;
+	cloudDesc.FrontFace.StencilDepthFailOp	= D3D11_STENCIL_OP_KEEP;
+	cloudDesc.FrontFace.StencilPassOp		= D3D11_STENCIL_OP_REPLACE;
+	cloudDesc.FrontFace.StencilFunc		= D3D11_COMPARISON_ALWAYS;
+	
+	cloudDesc.BackFace.StencilFailOp		= D3D11_STENCIL_OP_KEEP;
+	cloudDesc.BackFace.StencilDepthFailOp	= D3D11_STENCIL_OP_KEEP;
+	cloudDesc.BackFace.StencilPassOp		= D3D11_STENCIL_OP_REPLACE;
+	cloudDesc.BackFace.StencilFunc		= D3D11_COMPARISON_ALWAYS;
+
+	HR(device->CreateDepthStencilState(&cloudDesc, &CloudDSS));
 }
 
 void RenderStates::DestroyAll()
@@ -124,4 +198,11 @@ void RenderStates::DestroyAll()
 	ReleaseCOM(CullFrontRS);
 	ReleaseCOM(AlphaToCoverageBS);
 	ReleaseCOM(TransparentBS);
+	ReleaseCOM(DontWriteDepthDSS);
+	ReleaseCOM(DisableDepthDSS);
+	ReleaseCOM(DepthMaskOffDSS);
+	ReleaseCOM(DepthMaskOnDSS);
+	
+	ReleaseCOM(PlanetDSS);
+	ReleaseCOM(CloudDSS);
 }

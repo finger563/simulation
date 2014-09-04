@@ -278,34 +278,38 @@ void Renderer::DrawScene()
 	Effects::DisplacementMapFX->SetG(-0.990f);
 	Effects::DisplacementMapFX->SetG2((-0.990f)*(-0.990f));
 	Effects::DisplacementMapFX->SetDirLights(mDirLights);
+	
+	// CLOUDS EFFECTS
+	Effects::CloudsFX->SetEyePosW(control.get_Camera().GetPosition());
+	Effects::CloudsFX->SetCameraPos(cameraPos);
+	Effects::CloudsFX->SetLightPos(sunPos);
+	Effects::CloudsFX->SetInvWaveLength(invWaveLength);
+	Effects::CloudsFX->SetCameraHeight(height);
+	Effects::CloudsFX->SetCameraHeight2(height*height);
+	Effects::CloudsFX->SetOuterRadius(outerRadius);
+	Effects::CloudsFX->SetOuterRadius2(outerRadius * outerRadius);
+	Effects::CloudsFX->SetInnerRadius(innerRadius);
+	Effects::CloudsFX->SetInnerRadius2(innerRadius * innerRadius);
+	Effects::CloudsFX->SetKrESun(Kr * ESun);
+	Effects::CloudsFX->SetKmESun(Km * ESun);
+	Effects::CloudsFX->SetKr4PI(Kr * 4.0f * MathHelper::Pi);
+	Effects::CloudsFX->SetKm4PI(Km * 4.0f * MathHelper::Pi);
+	Effects::CloudsFX->SetScale( scale );
+	Effects::CloudsFX->SetScaleOverScaleDepth( scale / 0.25f );
+	Effects::CloudsFX->SetG(-0.990f);
+	Effects::CloudsFX->SetG2((-0.990f)*(-0.990f));
+	Effects::CloudsFX->SetDirLights(mDirLights);
 	 
 	ID3DX11EffectTechnique* activeTech;
-	if ( height > outerRadius )
-		activeTech = Effects::DisplacementMapFX->PlanetFromSpaceTech;
-	else
-		activeTech = Effects::DisplacementMapFX->PlanetFromAtmoTech;
-	switch(mRenderOptions)
-	{
-	case RenderOptionsBasic:
-		activeTech = Effects::BasicFX->Light1TexTech;
-		md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		break;
-	case RenderOptionsNormalMap:
-		activeTech = Effects::NormalMapFX->Light1TexTech;
-		md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		break;
-	case RenderOptionsDisplacementMap:
-		if ( height > outerRadius )
-			activeTech = Effects::DisplacementMapFX->PlanetFromSpaceTech;
-		else
-			activeTech = Effects::DisplacementMapFX->PlanetFromAtmoTech;
-		md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-		break;
-	}
-	
+    D3DX11_TECHNIQUE_DESC techDesc;
+
 	XMMATRIX world;
 	XMMATRIX worldInvTranspose;
 	XMMATRIX worldViewProj;
+	
+	world = XMLoadFloat4x4(&mEarthWorld);
+	worldInvTranspose = MathHelper::InverseTranspose(world);
+	worldViewProj = world*view*proj;
 	
 	UINT stride = sizeof(Vertex::PosNormalTexTan);
     UINT offset = 0;
@@ -313,21 +317,23 @@ void Renderer::DrawScene()
 	md3dImmediateContext->IASetInputLayout(InputLayouts::PosNormalTexTan);
 	md3dImmediateContext->IASetVertexBuffers(0, 1, &mVB, &stride, &offset);
 	md3dImmediateContext->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
-
+	
 	if( GetAsyncKeyState('1') & 0x8000 )
 		md3dImmediateContext->RSSetState(RenderStates::WireframeRS);
-	
+		
 	// DRAW THE EARTH
+	md3dImmediateContext->OMSetDepthStencilState(RenderStates::PlanetDSS,255);
+	if ( height > outerRadius )
+		activeTech = Effects::DisplacementMapFX->PlanetFromSpaceTech;
+	else
+		activeTech = Effects::DisplacementMapFX->PlanetFromAtmoTech;
+	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 	Effects::DisplacementMapFX->SetHeightScale(29.029f);
 	Effects::DisplacementMapFX->SetMaxTessDistance(0.10f);
 	Effects::DisplacementMapFX->SetMinTessDistance(1000.0f);
 	Effects::DisplacementMapFX->SetMinTessFactor(1.0f);
 	Effects::DisplacementMapFX->SetMaxTessFactor(100.0f);
-    D3DX11_TECHNIQUE_DESC techDesc;
 	activeTech->GetDesc( &techDesc );
-	world = XMLoadFloat4x4(&mEarthWorld);
-	worldInvTranspose = MathHelper::InverseTranspose(world);
-	worldViewProj = world*view*proj;
     for(UINT p = 0; p < techDesc.Passes; ++p)
     {
 		switch(mRenderOptions)
@@ -366,61 +372,45 @@ void Renderer::DrawScene()
     }
 	
 	// DRAW THE CLOUDS
-	md3dImmediateContext->OMSetDepthStencilState(RenderStates::DontWriteDepthDSS,0);
-	if ( height > outerRadius )
-		activeTech = Effects::DisplacementMapFX->PlanetFromSpaceTech;
-	else
-		activeTech = Effects::DisplacementMapFX->PlanetFromAtmoTech;
-
-	if ( height < control.get_skyAltitude() ) {
-		md3dImmediateContext->RSSetState(RenderStates::ReverseWindingRS);
-	}
-	Effects::DisplacementMapFX->SetHeightScale(control.get_skyAltitude()/2.0f);
-	Effects::DisplacementMapFX->SetMaxTessDistance(1.0f);
-	Effects::DisplacementMapFX->SetMinTessDistance(1000.0f);
-	Effects::DisplacementMapFX->SetMinTessFactor(1.0f);
-	Effects::DisplacementMapFX->SetMaxTessFactor(1.0f);
+	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 	md3dImmediateContext->OMSetBlendState(RenderStates::TransparentBS, blendFactor, 0xffffffff);
+	if ( height > outerRadius ) {
+		md3dImmediateContext->OMSetDepthStencilState(RenderStates::DontWriteDepthDSS,0);
+		activeTech = Effects::CloudsFX->CloudsFromSpaceTech;
+	}
+	else {
+		//md3dImmediateContext->OMSetDepthStencilState(RenderStates::DepthMaskOffDSS,0);
+		md3dImmediateContext->OMSetDepthStencilState(RenderStates::CloudDSS,0);
+		md3dImmediateContext->RSSetState(RenderStates::ReverseWindingRS);
+		activeTech = Effects::CloudsFX->CloudsFromAtmoTech;
+	}
+
+	Effects::CloudsFX->SetHeightScale(control.get_skyAltitude()/2.0f);
+	Effects::CloudsFX->SetMaxTessDistance(1.0f);
+	Effects::CloudsFX->SetMinTessDistance(1000.0f);
+	Effects::CloudsFX->SetMinTessFactor(1.0f);
+	Effects::CloudsFX->SetMaxTessFactor(1.0f);
+
+	Effects::CloudsFX->SetWorld(world);
+	Effects::CloudsFX->SetWorldInvTranspose(worldInvTranspose);
+	Effects::CloudsFX->SetViewProj(viewProj);
+	Effects::CloudsFX->SetWorldViewProj(worldViewProj);
+	Effects::CloudsFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
+	Effects::CloudsFX->SetMaterial(mEarthMat);
+	Effects::CloudsFX->SetDiffuseMap(mCloudsDiffuseMapSRV);
+	Effects::CloudsFX->SetNormalMap(mCloudsNormalTexSRV);
+
 	activeTech->GetDesc( &techDesc );
+
     for(UINT p = 0; p < techDesc.Passes; ++p)
-    {
-		switch(mRenderOptions)
-		{
-		case RenderOptionsBasic:
-			Effects::BasicFX->SetWorld(world);
-			Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
-			Effects::BasicFX->SetWorldViewProj(worldViewProj);
-			Effects::BasicFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
-			Effects::BasicFX->SetMaterial(mEarthMat);
-			Effects::BasicFX->SetDiffuseMap(mCloudsDiffuseMapSRV);
-			break;
-		case RenderOptionsNormalMap:
-			Effects::NormalMapFX->SetWorld(world);
-			Effects::NormalMapFX->SetWorldInvTranspose(worldInvTranspose);
-			Effects::NormalMapFX->SetWorldViewProj(worldViewProj);
-			Effects::NormalMapFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
-			Effects::NormalMapFX->SetMaterial(mEarthMat);
-			Effects::NormalMapFX->SetDiffuseMap(mCloudsDiffuseMapSRV);
-			Effects::NormalMapFX->SetNormalMap(mCloudsNormalTexSRV);
-			break;
-		case RenderOptionsDisplacementMap:
-			Effects::DisplacementMapFX->SetWorld(world);
-			Effects::DisplacementMapFX->SetWorldInvTranspose(worldInvTranspose);
-			Effects::DisplacementMapFX->SetViewProj(viewProj);
-			Effects::DisplacementMapFX->SetWorldViewProj(worldViewProj);
-			Effects::DisplacementMapFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
-			Effects::DisplacementMapFX->SetMaterial(mEarthMat);
-			Effects::DisplacementMapFX->SetDiffuseMap(mCloudsDiffuseMapSRV);
-			Effects::DisplacementMapFX->SetNormalMap(mCloudsNormalTexSRV);
-			break;
-		}
-		
+    {		
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(mCloudsIndexCount, mCloudsIndexOffset, mCloudsVertexOffset);
     }
 	// restore default states
 	md3dImmediateContext->RSSetState(0);
 	md3dImmediateContext->OMSetDepthStencilState(0, 0);
+
 	
 	// FX sets tessellation stages, but it does not disable them.  So do that here
 	// to turn off tessellation.
@@ -439,7 +429,6 @@ void Renderer::DrawScene()
 	activeTech->GetDesc( &techDesc );
 	
 	md3dImmediateContext->RSSetState(RenderStates::CullFrontRS);
-	//md3dImmediateContext->OMSetDepthStencilState(RenderStates::disableDepthDSS,0);
 
     for(UINT p = 0; p < techDesc.Passes; ++p)
     {		

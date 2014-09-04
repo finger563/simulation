@@ -28,10 +28,6 @@ cbuffer cbPerFrame
 	float fKm4PI;			// Km * 4 * PI
 	float fScale;			// 1 / (fOuterRadius - fInnerRadius)
 	float fScaleOverScaleDepth;	// fScale / fScaleDepth
-
-	float  gFogStart;
-	float  gFogRange;
-	float4 gFogColor; 
 	
 	float gHeightScale;
 	float gMaxTessDistance;
@@ -81,7 +77,7 @@ struct VertexOut
 	float4 c1		  : COLOR1;
 };
 
-VertexOut VS_PlanetFromSpace(VertexIn vin)
+VertexOut VS_CloudsFromSpace(VertexIn vin)
 {
 	VertexOut vout;
 	
@@ -152,7 +148,7 @@ VertexOut VS_PlanetFromSpace(VertexIn vin)
 	return vout;
 }
 
-VertexOut VS_PlanetFromAtmo(VertexIn vin)
+VertexOut VS_CloudsFromAtmo(VertexIn vin)
 {
 	VertexOut vout;
 	
@@ -216,8 +212,6 @@ VertexOut VS_PlanetFromAtmo(VertexIn vin)
 	vout.c1.rgb = v3Attenuate;
 	vout.c1.a = 1;
 	vout.c0.a = 1;
-	//vout.c0 = float4(1,1,1,1);
-	//vout.c1 = float4(1,1,1,1);
 
 	return vout;
 }
@@ -412,11 +406,11 @@ float4 PS(DomainOut pin,
     return litColor;
 }
 
-technique11 PlanetFromSpace
+technique11 CloudsFromSpace
 {
     pass P0
     {
-        SetVertexShader( CompileShader( vs_5_0, VS_PlanetFromSpace() ) );
+        SetVertexShader( CompileShader( vs_5_0, VS_CloudsFromSpace() ) );
         SetHullShader( CompileShader( hs_5_0, HS() ) );
         SetDomainShader( CompileShader( ds_5_0, DS() ) );
 		SetGeometryShader( NULL );
@@ -424,11 +418,11 @@ technique11 PlanetFromSpace
     }
 }
 
-technique11 PlanetFromAtmo
+technique11 CloudsFromAtmo
 {
     pass P0
     {
-        SetVertexShader( CompileShader( vs_5_0, VS_PlanetFromAtmo() ) );
+        SetVertexShader( CompileShader( vs_5_0, VS_CloudsFromAtmo() ) );
         SetHullShader( CompileShader( hs_5_0, HS() ) );
         SetDomainShader( CompileShader( ds_5_0, DS() ) );
 		SetGeometryShader( NULL );
