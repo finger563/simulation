@@ -9,6 +9,7 @@ cbuffer cbPerFrame
 {
 	DirectionalLight gDirLights[3];
 	float3 gEyePosW;
+	float3 gPlanetPosW;
 	
 	float g;
 	float g2;
@@ -99,8 +100,8 @@ VertexOut VS_CloudsFromSpace(VertexIn vin)
 	
 	// Rescale [0,1] --> [gMinTessFactor, gMaxTessFactor].
 	vout.TessFactor = gMinTessFactor + tess*(gMaxTessFactor-gMinTessFactor);
-
-	float3 v3Pos = vin.PosL.xyz;
+	
+	float3 v3Pos = vout.PosW - gPlanetPosW;
 	float3 v3Ray = v3Pos - v3CameraPos;
 	v3Pos = normalize(v3Pos);
 	float fFar = length(v3Ray);
@@ -172,7 +173,7 @@ VertexOut VS_CloudsFromAtmo(VertexIn vin)
 	vout.TessFactor = gMinTessFactor + tess*(gMaxTessFactor-gMinTessFactor);
 	
 	// Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)
-	float3 v3Pos = vin.PosL.xyz;
+	float3 v3Pos = vout.PosW - gPlanetPosW;
 	float3 v3Ray = v3Pos - v3CameraPos;
 	v3Pos = normalize(v3Pos);
 	float fFar = length(v3Ray);

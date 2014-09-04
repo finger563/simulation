@@ -122,6 +122,15 @@ void Renderer::UpdateScene(float dt)
 		XMStoreFloat4x4(&mEarthWorld, R*T);
 	}
 
+	if (GetAsyncKeyState('T') & 0x8000) {
+		control.set_earthAngle( control.get_earthAngle() - dt );
+		XMVECTOR trans = XMLoadFloat3(&control.get_earthPosW());
+		XMMATRIX T = XMMatrixTranslationFromVector(trans);
+		XMMATRIX R = XMMatrixRotationY(control.get_earthAngle());
+	
+		XMStoreFloat4x4(&mEarthWorld, R*T);
+	}
+
 	if (GetAsyncKeyState(VK_LCONTROL) & 0x8000)
 		control.set_Speed(control.get_Speed()*0.9f);
 	if (GetAsyncKeyState(VK_TAB) & 0x8000)
@@ -219,6 +228,8 @@ void Renderer::DrawScene()
 	XMStoreFloat3(&sunPos,-light);
 	
 	// SKY EFFECTS
+	Effects::SkyFX->SetEyePosW(control.get_Camera().GetPosition());
+	Effects::SkyFX->SetPlanetPosW(control.get_earthPosW());
 	Effects::SkyFX->SetDirLights(mDirLights);
 	Effects::SkyFX->SetCameraPos(cameraPos);
 	Effects::SkyFX->SetLightPos(sunPos);
@@ -239,6 +250,8 @@ void Renderer::DrawScene()
 	Effects::SkyFX->SetG2((-0.990f)*(-0.990f));
 	
 	// SPACE EFFECTS
+	Effects::SpaceFX->SetEyePosW(control.get_Camera().GetPosition());
+	Effects::SpaceFX->SetPlanetPosW(control.get_earthPosW());
 	Effects::SpaceFX->SetCameraPos(cameraPos);
 	Effects::SpaceFX->SetLightPos(sunPos);
 	Effects::SpaceFX->SetInvWaveLength(invWaveLength);
@@ -259,6 +272,7 @@ void Renderer::DrawScene()
 	
 	// DISPLACEMENT MAPPING EFFECTS
 	Effects::DisplacementMapFX->SetEyePosW(control.get_Camera().GetPosition());
+	Effects::DisplacementMapFX->SetPlanetPosW(control.get_earthPosW());
 	Effects::DisplacementMapFX->SetCameraPos(cameraPos);
 	Effects::DisplacementMapFX->SetLightPos(sunPos);
 	Effects::DisplacementMapFX->SetInvWaveLength(invWaveLength);
@@ -280,6 +294,7 @@ void Renderer::DrawScene()
 	
 	// CLOUDS EFFECTS
 	Effects::CloudsFX->SetEyePosW(control.get_Camera().GetPosition());
+	Effects::CloudsFX->SetPlanetPosW(control.get_earthPosW());
 	Effects::CloudsFX->SetCameraPos(cameraPos);
 	Effects::CloudsFX->SetLightPos(sunPos);
 	Effects::CloudsFX->SetInvWaveLength(invWaveLength);
