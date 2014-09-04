@@ -114,8 +114,7 @@ void Renderer::UpdateScene(float dt)
 {
 
 	if (GetAsyncKeyState('R') & 0x8000) {
-		float angle = control.get_earthAngle() + dt;
-		control.set_earthAngle( MathHelper::Clamp(angle,0.0f,2*MathHelper::Pi + 0.01f));
+		control.set_earthAngle( control.get_earthAngle() + dt );
 		XMVECTOR trans = XMLoadFloat3(&control.get_earthPosW());
 		XMMATRIX T = XMMatrixTranslationFromVector(trans);
 		XMMATRIX R = XMMatrixRotationY(control.get_earthAngle());

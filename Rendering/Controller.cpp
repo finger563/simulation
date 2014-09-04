@@ -102,7 +102,7 @@ float Controller::get_earthAngle()
 
 void Controller::set_earthAngle(float a) 
 {
-	earthAngle = a;
+	earthAngle = fmod(a, MathHelper::Pi * 2.0f);
 }
 
 float Controller::get_farClipPlaneDist() 
