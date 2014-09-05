@@ -5,31 +5,8 @@
 #include "LightHelper.fx"
 #include "PlanetHelper.fx"
  
-cbuffer cbPerFrame
+cbuffer cbPerDispMapFrame
 {
-	DirectionalLight gDirLights[3];
-	float3 gEyePosW;
-	float3 gPlanetPosW;
-	
-	float g;
-	float g2;
-	
-	float3 v3CameraPos;		// The camera's current position
-	float3 v3LightPos;		// The direction vector to the light source
-	float3 v3InvWavelength;	// 1 / pow(wavelength, 4) for the red, green, and blue channels
-	float fCameraHeight;	// The camera's current height
-	float fCameraHeight2;	// fCameraHeight^2
-	float fOuterRadius;		// The outer (atmosphere) radius
-	float fOuterRadius2;	// fOuterRadius^2
-	float fInnerRadius;		// The inner (planetary) radius
-	float fInnerRadius2;	// fInnerRadius^2
-	float fKrESun;			// Kr * ESun
-	float fKmESun;			// Km * ESun
-	float fKr4PI;			// Kr * 4 * PI
-	float fKm4PI;			// Km * 4 * PI
-	float fScale;			// 1 / (fOuterRadius - fInnerRadius)
-	float fScaleOverScaleDepth;	// fScale / fScaleDepth
-
 	float  gFogStart;
 	float  gFogRange;
 	float4 gFogColor; 
@@ -40,16 +17,6 @@ cbuffer cbPerFrame
 	float gMinTessFactor;
 	float gMaxTessFactor;
 };
-
-cbuffer cbPerObject
-{
-	float4x4 gWorld;
-	float4x4 gWorldInvTranspose;
-	float4x4 gViewProj;
-	float4x4 gWorldViewProj;
-	float4x4 gTexTransform;
-	Material gMaterial;
-}; 
 
 // Nonnumeric values cannot be added to a cbuffer.
 Texture2D gDiffuseMap;

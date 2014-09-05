@@ -7,6 +7,42 @@ const float fSamples = 5.0;
 const float fScaleDepth = 0.25;
 const float fInvScaleDepth = 4.0;
 
+cbuffer cbPerPlanetFrame
+{
+	DirectionalLight gDirLights[3];
+	float3 gEyePosW;
+	float3 gPlanetPosW;
+	
+	float3 v3CameraPos;		// The camera's current position relative to center of planet
+	float3 v3LightPos;		// The direction vector to the light source
+	float3 v3InvWavelength;	// 1 / pow(wavelength, 4) for the red, green, and blue channels
+	float fCameraHeight;	// The camera's current height
+	float fCameraHeight2;	// fCameraHeight^2
+	float fOuterRadius;		// The outer (atmosphere) radius
+	float fOuterRadius2;	// fOuterRadius^2
+	float fInnerRadius;		// The inner (planetary) radius
+	float fInnerRadius2;	// fInnerRadius^2
+	float fKrESun;			// Kr * ESun
+	float fKmESun;			// Km * ESun
+	float fKr4PI;			// Kr * 4 * PI
+	float fKm4PI;			// Km * 4 * PI
+	float fScale;			// 1 / (fOuterRadius - fInnerRadius)
+	float fScaleOverScaleDepth;	// fScale / fScaleDepth
+
+	float g;
+	float g2;
+};
+
+cbuffer cbPerObject
+{
+	float4x4 gWorld;
+	float4x4 gWorldInvTranspose;
+	float4x4 gViewProj;
+	float4x4 gWorldViewProj;
+	float4x4 gTexTransform;
+	Material gMaterial;
+}; 
+
 // The scale equation calculated by Vernier's Graphical Analysis
 float scale(float fCos)
 {
