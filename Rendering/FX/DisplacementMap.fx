@@ -286,8 +286,9 @@ DomainOut DS(PatchTess patchTess,
 	
 	// Choose the mipmap level based on distance to the eye; specifically, choose
 	// the next miplevel every MipInterval units, and clamp the miplevel in [0,6].
-	const float MipInterval = 20.0f;
+	const float MipInterval = 3000.0f;
 	float mipLevel = clamp( (distance(dout.PosW, gEyePosW) - MipInterval) / MipInterval, 0.0f, 6.0f);
+	//float mipLevel = 0.0f;
 	
 	// Sample height map (stored in alpha channel).
 	float h = gNormalMap.SampleLevel(samLinear, dout.Tex, mipLevel).a;

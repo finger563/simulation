@@ -344,7 +344,7 @@ void Renderer::DrawScene()
 	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 	Effects::DisplacementMapFX->SetHeightScale(29.029f);
 	Effects::DisplacementMapFX->SetMaxTessDistance(0.10f);
-	Effects::DisplacementMapFX->SetMinTessDistance(1000.0f);
+	Effects::DisplacementMapFX->SetMinTessDistance(3000.0f);
 	Effects::DisplacementMapFX->SetMinTessFactor(1.0f);
 	Effects::DisplacementMapFX->SetMaxTessFactor(100.0f);
 	activeTech->GetDesc( &techDesc );
