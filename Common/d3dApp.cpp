@@ -28,7 +28,7 @@ D3DApp::D3DApp(HINSTANCE hInstance)
 	md3dDriverType(D3D_DRIVER_TYPE_HARDWARE),
 	mClientWidth(800),
 	mClientHeight(600),
-	mEnable4xMsaa(false),
+	mEnable4xMsaa(true),
 	mhMainWnd(0),
 	mAppPaused(false),
 	mMinimized(false),
@@ -365,6 +365,7 @@ bool D3DApp::InitMainWindow()
 	}
 
 	ShowWindow(mhMainWnd, SW_SHOW);
+	//SetCapture(mhMainWnd);
 	UpdateWindow(mhMainWnd);
 
 	return true;

@@ -55,7 +55,7 @@ void Controller::OnMouseMove(WPARAM btnState, int x, int y)
 		mCam.Pitch(dy);
 		mCam.RotateUp(dx);
 	}
-
+	//SetCursorPos(0,0);
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
 }
