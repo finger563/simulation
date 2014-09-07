@@ -1,17 +1,43 @@
+//=============================================================================
+// PlanetHelper.fx by William Emfinger : 2014
+//=============================================================================
+
+#include "LightHelper.fx"
 
 // The number of sample points taken along the ray
-const int nSamples = 5;
-const float fSamples = 5.0;
+static const int nSamples = 5;
+static const float fSamples = 5.0;
 
 // The scale depth (the altitude at which the average atmospheric density is found)
-const float fScaleDepth = 0.25;
-const float fInvScaleDepth = 4.0;
+static const float fScaleDepth = 0.25;
+static const float fInvScaleDepth = 4.0;
 
-cbuffer cbPerPlanetFrame
+// Nonnumeric values cannot be added to a cbuffer.
+Texture2D gDiffuseMap;
+Texture2D gNormalMap;
+
+struct VertexIn
+{
+	float3 PosL     : POSITION;
+	float3 NormalL  : NORMAL;
+	float2 Tex      : TEXCOORD;
+	float3 TangentL : TANGENT;
+};
+
+cbuffer cbPerFrame
 {
 	DirectionalLight gDirLights[3];
 	float3 gEyePosW;
+};
+
+cbuffer cbPerPlanet
+{
 	float3 gPlanetPosW;
+
+	float4x4 gWorld;
+	float4x4 gWorldInvTranspose;
+	float4x4 gViewProj;
+	float4x4 gWorldViewProj;
 	
 	float3 v3CameraPos;		// The camera's current position relative to center of planet
 	float3 v3LightPos;		// The direction vector to the light source
@@ -33,15 +59,36 @@ cbuffer cbPerPlanetFrame
 	float g2;
 };
 
-cbuffer cbPerObject
+cbuffer cbPerTessMesh
 {
-	float4x4 gWorld;
-	float4x4 gWorldInvTranspose;
-	float4x4 gViewProj;
-	float4x4 gWorldViewProj;
+	float gHeightScale;
+	float gMaxTessDistance;
+	float gMinTessDistance;
+	float gMinTessFactor;
+	float gMaxTessFactor;
+};
+
+cbuffer cbPerLayer
+{
 	float4x4 gTexTransform;
 	Material gMaterial;
 }; 
+
+SamplerState samLinear
+{
+	Filter = MIN_MAG_MIP_LINEAR;
+	AddressU = WRAP;
+	AddressV = WRAP;
+};
+
+SamplerState samAnisotropic
+{
+	Filter = ANISOTROPIC;
+	MaxAnisotropy = 4;
+
+	AddressU = WRAP;
+	AddressV = WRAP;
+};
 
 // The scale equation calculated by Vernier's Graphical Analysis
 float scale(float fCos)

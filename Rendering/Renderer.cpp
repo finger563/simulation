@@ -194,13 +194,7 @@ void Renderer::DrawScene()
 	
 	float blendFactor[] = {0.0f, 0.0f, 0.0f, 0.0f};
 
-	// Set per frame constants.
-	Effects::BasicFX->SetDirLights(mDirLights);
-	Effects::BasicFX->SetEyePosW(control.get_Camera().GetPosition());
-	
-	Effects::NormalMapFX->SetDirLights(mDirLights);
-	Effects::NormalMapFX->SetEyePosW(control.get_Camera().GetPosition());
-	
+	// Set per frame constants.	
 	float wavelength[3] = {0.650f, 0.570f, 0.475f};
 	XMFLOAT3 invWaveLength = XMFLOAT3( 1.0f/powf(wavelength[0],4.0f),
 									   1.0f/powf(wavelength[1],4.0f),
@@ -226,94 +220,7 @@ void Renderer::DrawScene()
 	XMVECTOR light = XMLoadFloat3(&mDirLights[0].Direction);
 	XMFLOAT3 sunPos;
 	XMStoreFloat3(&sunPos,-light);
-	
-	// SKY EFFECTS
-	Effects::SkyFX->SetEyePosW(control.get_Camera().GetPosition());
-	Effects::SkyFX->SetPlanetPosW(control.get_earthPosW());
-	Effects::SkyFX->SetDirLights(mDirLights);
-	Effects::SkyFX->SetCameraPos(cameraPos);
-	Effects::SkyFX->SetLightPos(sunPos);
-	Effects::SkyFX->SetInvWaveLength(invWaveLength);
-	Effects::SkyFX->SetCameraHeight(height);
-	Effects::SkyFX->SetCameraHeight2(height*height);
-	Effects::SkyFX->SetOuterRadius(outerRadius);
-	Effects::SkyFX->SetOuterRadius2(outerRadius * outerRadius);
-	Effects::SkyFX->SetInnerRadius(innerRadius);
-	Effects::SkyFX->SetInnerRadius2(innerRadius * innerRadius);
-	Effects::SkyFX->SetKrESun(Kr * ESun);
-	Effects::SkyFX->SetKmESun(Km * ESun);
-	Effects::SkyFX->SetKr4PI(Kr * 4.0f * MathHelper::Pi);
-	Effects::SkyFX->SetKm4PI(Km * 4.0f * MathHelper::Pi);
-	Effects::SkyFX->SetScale( scale );
-	Effects::SkyFX->SetScaleOverScaleDepth( scale / 0.25f );
-	Effects::SkyFX->SetG(-0.990f);
-	Effects::SkyFX->SetG2((-0.990f)*(-0.990f));
-	
-	// SPACE EFFECTS
-	Effects::SpaceFX->SetEyePosW(control.get_Camera().GetPosition());
-	Effects::SpaceFX->SetPlanetPosW(control.get_earthPosW());
-	Effects::SpaceFX->SetCameraPos(cameraPos);
-	Effects::SpaceFX->SetLightPos(sunPos);
-	Effects::SpaceFX->SetInvWaveLength(invWaveLength);
-	Effects::SpaceFX->SetCameraHeight(height);
-	Effects::SpaceFX->SetCameraHeight2(height*height);
-	Effects::SpaceFX->SetOuterRadius(outerRadius);
-	Effects::SpaceFX->SetOuterRadius2(outerRadius * outerRadius);
-	Effects::SpaceFX->SetInnerRadius(innerRadius);
-	Effects::SpaceFX->SetInnerRadius2(innerRadius * innerRadius);
-	Effects::SpaceFX->SetKrESun(Kr * ESun);
-	Effects::SpaceFX->SetKmESun(Km * ESun);
-	Effects::SpaceFX->SetKr4PI(Kr * 4.0f * MathHelper::Pi);
-	Effects::SpaceFX->SetKm4PI(Km * 4.0f * MathHelper::Pi);
-	Effects::SpaceFX->SetScale( scale );
-	Effects::SpaceFX->SetScaleOverScaleDepth( scale / 0.25f );
-	Effects::SpaceFX->SetG(-0.990f);
-	Effects::SpaceFX->SetG2((-0.990f)*(-0.990f));
-	
-	// DISPLACEMENT MAPPING EFFECTS
-	Effects::DisplacementMapFX->SetEyePosW(control.get_Camera().GetPosition());
-	Effects::DisplacementMapFX->SetPlanetPosW(control.get_earthPosW());
-	Effects::DisplacementMapFX->SetCameraPos(cameraPos);
-	Effects::DisplacementMapFX->SetLightPos(sunPos);
-	Effects::DisplacementMapFX->SetInvWaveLength(invWaveLength);
-	Effects::DisplacementMapFX->SetCameraHeight(height);
-	Effects::DisplacementMapFX->SetCameraHeight2(height*height);
-	Effects::DisplacementMapFX->SetOuterRadius(outerRadius);
-	Effects::DisplacementMapFX->SetOuterRadius2(outerRadius * outerRadius);
-	Effects::DisplacementMapFX->SetInnerRadius(innerRadius);
-	Effects::DisplacementMapFX->SetInnerRadius2(innerRadius * innerRadius);
-	Effects::DisplacementMapFX->SetKrESun(Kr * ESun);
-	Effects::DisplacementMapFX->SetKmESun(Km * ESun);
-	Effects::DisplacementMapFX->SetKr4PI(Kr * 4.0f * MathHelper::Pi);
-	Effects::DisplacementMapFX->SetKm4PI(Km * 4.0f * MathHelper::Pi);
-	Effects::DisplacementMapFX->SetScale( scale );
-	Effects::DisplacementMapFX->SetScaleOverScaleDepth( scale / 0.25f );
-	Effects::DisplacementMapFX->SetG(-0.990f);
-	Effects::DisplacementMapFX->SetG2((-0.990f)*(-0.990f));
-	Effects::DisplacementMapFX->SetDirLights(mDirLights);
-	
-	// CLOUDS EFFECTS
-	Effects::CloudsFX->SetEyePosW(control.get_Camera().GetPosition());
-	Effects::CloudsFX->SetPlanetPosW(control.get_earthPosW());
-	Effects::CloudsFX->SetCameraPos(cameraPos);
-	Effects::CloudsFX->SetLightPos(sunPos);
-	Effects::CloudsFX->SetInvWaveLength(invWaveLength);
-	Effects::CloudsFX->SetCameraHeight(height);
-	Effects::CloudsFX->SetCameraHeight2(height*height);
-	Effects::CloudsFX->SetOuterRadius(outerRadius);
-	Effects::CloudsFX->SetOuterRadius2(outerRadius * outerRadius);
-	Effects::CloudsFX->SetInnerRadius(innerRadius);
-	Effects::CloudsFX->SetInnerRadius2(innerRadius * innerRadius);
-	Effects::CloudsFX->SetKrESun(Kr * ESun);
-	Effects::CloudsFX->SetKmESun(Km * ESun);
-	Effects::CloudsFX->SetKr4PI(Kr * 4.0f * MathHelper::Pi);
-	Effects::CloudsFX->SetKm4PI(Km * 4.0f * MathHelper::Pi);
-	Effects::CloudsFX->SetScale( scale );
-	Effects::CloudsFX->SetScaleOverScaleDepth( scale / 0.25f );
-	Effects::CloudsFX->SetG(-0.990f);
-	Effects::CloudsFX->SetG2((-0.990f)*(-0.990f));
-	Effects::CloudsFX->SetDirLights(mDirLights);
-	 
+		 
 	ID3DX11EffectTechnique* activeTech;
     D3DX11_TECHNIQUE_DESC techDesc;
 
@@ -342,45 +249,46 @@ void Renderer::DrawScene()
 	else
 		activeTech = Effects::DisplacementMapFX->PlanetFromAtmoTech;
 	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+	
+	// DISPLACEMENT MAPPING EFFECTS
+	Effects::DisplacementMapFX->SetEyePosW(control.get_Camera().GetPosition());
+	Effects::DisplacementMapFX->SetPlanetPosW(control.get_earthPosW());
+	Effects::DisplacementMapFX->SetCameraPos(cameraPos);
+	Effects::DisplacementMapFX->SetLightPos(sunPos);
+	Effects::DisplacementMapFX->SetInvWaveLength(invWaveLength);
+	Effects::DisplacementMapFX->SetCameraHeight(height);
+	Effects::DisplacementMapFX->SetCameraHeight2(height*height);
+	Effects::DisplacementMapFX->SetOuterRadius(outerRadius);
+	Effects::DisplacementMapFX->SetOuterRadius2(outerRadius * outerRadius);
+	Effects::DisplacementMapFX->SetInnerRadius(innerRadius);
+	Effects::DisplacementMapFX->SetInnerRadius2(innerRadius * innerRadius);
+	Effects::DisplacementMapFX->SetKrESun(Kr * ESun);
+	Effects::DisplacementMapFX->SetKmESun(Km * ESun);
+	Effects::DisplacementMapFX->SetKr4PI(Kr * 4.0f * MathHelper::Pi);
+	Effects::DisplacementMapFX->SetKm4PI(Km * 4.0f * MathHelper::Pi);
+	Effects::DisplacementMapFX->SetScale( scale );
+	Effects::DisplacementMapFX->SetScaleOverScaleDepth( scale / 0.25f );
+	Effects::DisplacementMapFX->SetG(-0.990f);
+	Effects::DisplacementMapFX->SetG2((-0.990f)*(-0.990f));
+	Effects::DisplacementMapFX->SetDirLights(mDirLights);
+
 	Effects::DisplacementMapFX->SetHeightScale(29.029f);
 	Effects::DisplacementMapFX->SetMaxTessDistance(0.10f);
 	Effects::DisplacementMapFX->SetMinTessDistance(3000.0f);
 	Effects::DisplacementMapFX->SetMinTessFactor(1.0f);
 	Effects::DisplacementMapFX->SetMaxTessFactor(100.0f);
+	
+	Effects::DisplacementMapFX->SetWorld(world);
+	Effects::DisplacementMapFX->SetWorldInvTranspose(worldInvTranspose);
+	Effects::DisplacementMapFX->SetViewProj(viewProj);
+	Effects::DisplacementMapFX->SetWorldViewProj(worldViewProj);
+	Effects::DisplacementMapFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
+	Effects::DisplacementMapFX->SetMaterial(mEarthMat);
+	Effects::DisplacementMapFX->SetDiffuseMap(mEarthDiffuseMapSRV);
+	Effects::DisplacementMapFX->SetNormalMap(mEarthNormalTexSRV);
 	activeTech->GetDesc( &techDesc );
     for(UINT p = 0; p < techDesc.Passes; ++p)
     {
-		switch(mRenderOptions)
-		{
-		case RenderOptionsBasic:
-			Effects::BasicFX->SetWorld(world);
-			Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
-			Effects::BasicFX->SetWorldViewProj(worldViewProj);
-			Effects::BasicFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
-			Effects::BasicFX->SetMaterial(mEarthMat);
-			Effects::BasicFX->SetDiffuseMap(mEarthDiffuseMapSRV);
-			break;
-		case RenderOptionsNormalMap:
-			Effects::NormalMapFX->SetWorld(world);
-			Effects::NormalMapFX->SetWorldInvTranspose(worldInvTranspose);
-			Effects::NormalMapFX->SetWorldViewProj(worldViewProj);
-			Effects::NormalMapFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
-			Effects::NormalMapFX->SetMaterial(mEarthMat);
-			Effects::NormalMapFX->SetDiffuseMap(mEarthDiffuseMapSRV);
-			Effects::NormalMapFX->SetNormalMap(mEarthNormalTexSRV);
-			break;
-		case RenderOptionsDisplacementMap:
-			Effects::DisplacementMapFX->SetWorld(world);
-			Effects::DisplacementMapFX->SetWorldInvTranspose(worldInvTranspose);
-			Effects::DisplacementMapFX->SetViewProj(viewProj);
-			Effects::DisplacementMapFX->SetWorldViewProj(worldViewProj);
-			Effects::DisplacementMapFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
-			Effects::DisplacementMapFX->SetMaterial(mEarthMat);
-			Effects::DisplacementMapFX->SetDiffuseMap(mEarthDiffuseMapSRV);
-			Effects::DisplacementMapFX->SetNormalMap(mEarthNormalTexSRV);
-			break;
-		}
-		
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(mEarthIndexCount, mEarthIndexOffset, mEarthVertexOffset);
     }
@@ -397,6 +305,28 @@ void Renderer::DrawScene()
 		md3dImmediateContext->RSSetState(RenderStates::ReverseWindingRS);
 		activeTech = Effects::CloudsFX->CloudsFromAtmoTech;
 	}
+	
+	// CLOUDS EFFECTS
+	Effects::CloudsFX->SetEyePosW(control.get_Camera().GetPosition());
+	Effects::CloudsFX->SetPlanetPosW(control.get_earthPosW());
+	Effects::CloudsFX->SetCameraPos(cameraPos);
+	Effects::CloudsFX->SetLightPos(sunPos);
+	Effects::CloudsFX->SetInvWaveLength(invWaveLength);
+	Effects::CloudsFX->SetCameraHeight(height);
+	Effects::CloudsFX->SetCameraHeight2(height*height);
+	Effects::CloudsFX->SetOuterRadius(outerRadius);
+	Effects::CloudsFX->SetOuterRadius2(outerRadius * outerRadius);
+	Effects::CloudsFX->SetInnerRadius(innerRadius);
+	Effects::CloudsFX->SetInnerRadius2(innerRadius * innerRadius);
+	Effects::CloudsFX->SetKrESun(Kr * ESun);
+	Effects::CloudsFX->SetKmESun(Km * ESun);
+	Effects::CloudsFX->SetKr4PI(Kr * 4.0f * MathHelper::Pi);
+	Effects::CloudsFX->SetKm4PI(Km * 4.0f * MathHelper::Pi);
+	Effects::CloudsFX->SetScale( scale );
+	Effects::CloudsFX->SetScaleOverScaleDepth( scale / 0.25f );
+	Effects::CloudsFX->SetG(-0.990f);
+	Effects::CloudsFX->SetG2((-0.990f)*(-0.990f));
+	Effects::CloudsFX->SetDirLights(mDirLights);
 
 	Effects::CloudsFX->SetHeightScale(control.get_skyAltitude()/2.0f);
 	Effects::CloudsFX->SetMaxTessDistance(1.0f);
@@ -442,14 +372,36 @@ void Renderer::DrawScene()
 	activeTech->GetDesc( &techDesc );
 	
 	md3dImmediateContext->RSSetState(RenderStates::CullFrontRS);
+	
+	// SKY EFFECTS
+	Effects::SkyFX->SetEyePosW(control.get_Camera().GetPosition());
+	Effects::SkyFX->SetPlanetPosW(control.get_earthPosW());
+	Effects::SkyFX->SetDirLights(mDirLights);
+	Effects::SkyFX->SetCameraPos(cameraPos);
+	Effects::SkyFX->SetLightPos(sunPos);
+	Effects::SkyFX->SetInvWaveLength(invWaveLength);
+	Effects::SkyFX->SetCameraHeight(height);
+	Effects::SkyFX->SetCameraHeight2(height*height);
+	Effects::SkyFX->SetOuterRadius(outerRadius);
+	Effects::SkyFX->SetOuterRadius2(outerRadius * outerRadius);
+	Effects::SkyFX->SetInnerRadius(innerRadius);
+	Effects::SkyFX->SetInnerRadius2(innerRadius * innerRadius);
+	Effects::SkyFX->SetKrESun(Kr * ESun);
+	Effects::SkyFX->SetKmESun(Km * ESun);
+	Effects::SkyFX->SetKr4PI(Kr * 4.0f * MathHelper::Pi);
+	Effects::SkyFX->SetKm4PI(Km * 4.0f * MathHelper::Pi);
+	Effects::SkyFX->SetScale( scale );
+	Effects::SkyFX->SetScaleOverScaleDepth( scale / 0.25f );
+	Effects::SkyFX->SetG(-0.990f);
+	Effects::SkyFX->SetG2((-0.990f)*(-0.990f));
+
+	Effects::SkyFX->SetWorld(world);
+	Effects::SkyFX->SetWorldInvTranspose(worldInvTranspose);
+	Effects::SkyFX->SetWorldViewProj(worldViewProj);
+	Effects::SkyFX->SetMaterial(mEarthMat);
 
     for(UINT p = 0; p < techDesc.Passes; ++p)
-    {		
-		Effects::SkyFX->SetWorld(world);
-		Effects::SkyFX->SetWorldInvTranspose(worldInvTranspose);
-		Effects::SkyFX->SetWorldViewProj(worldViewProj);
-		Effects::SkyFX->SetMaterial(mEarthMat);
-				
+    {				
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(mSkyIndexCount, mSkyIndexOffset, mSkyVertexOffset);
     }

@@ -4,26 +4,8 @@
 // Effect used to shade sky dome.
 //=============================================================================
 
-#include "LightHelper.fx"
 #include "PlanetHelper.fx"
  
-// Nonnumeric values cannot be added to a cbuffer.
- 
-SamplerState samLinear
-{
-	Filter = MIN_MAG_MIP_LINEAR;
-	AddressU = WRAP;
-	AddressV = WRAP;
-};
-
-struct VertexIn
-{
-	float3 PosL     : POSITION;
-	float3 NormalL  : NORMAL;
-	float2 Tex      : TEXCOORD;
-	float3 TangentL : TANGENT;
-};
-
 struct VertexOut
 {
 	float4 PosH		  : SV_POSITION;
@@ -157,11 +139,6 @@ float4 PS(VertexOut pin) : SV_Target
 	color.a = color.b;
 	return color;
 }
-
-BlendState blend
-{
-
-};
 
 technique11 SkyFromSpace
 {

@@ -2,40 +2,7 @@
 // NormalMap.fx by Frank Luna (C) 2011 All Rights Reserved.
 //=============================================================================
 
-#include "LightHelper.fx"
 #include "PlanetHelper.fx"
- 
-cbuffer cbPerDispMapFrame
-{
-	float  gFogStart;
-	float  gFogRange;
-	float4 gFogColor; 
-	
-	float gHeightScale;
-	float gMaxTessDistance;
-	float gMinTessDistance;
-	float gMinTessFactor;
-	float gMaxTessFactor;
-};
-
-// Nonnumeric values cannot be added to a cbuffer.
-Texture2D gDiffuseMap;
-Texture2D gNormalMap;
-
-SamplerState samLinear
-{
-	Filter = MIN_MAG_MIP_LINEAR;
-	AddressU = WRAP;
-	AddressV = WRAP;
-};
-
-struct VertexIn
-{
-	float3 PosL     : POSITION;
-	float3 NormalL  : NORMAL;
-	float2 Tex      : TEXCOORD;
-	float3 TangentL : TANGENT;
-};
 
 struct VertexOut
 {

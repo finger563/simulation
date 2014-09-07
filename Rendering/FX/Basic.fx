@@ -5,38 +5,8 @@
 //=============================================================================
 
 #include "LightHelper.fx"
- 
-cbuffer cbPerFrame
-{
-	DirectionalLight gDirLights[3];
-	float3 gEyePosW;
+#include "PlanetHelper.fx" 
 
-	float  gFogStart;
-	float  gFogRange;
-	float4 gFogColor; 
-};
-
-cbuffer cbPerObject
-{
-	float4x4 gWorld;
-	float4x4 gWorldInvTranspose;
-	float4x4 gWorldViewProj;
-	float4x4 gTexTransform;
-	Material gMaterial;
-}; 
-
-// Nonnumeric values cannot be added to a cbuffer.
-Texture2D gDiffuseMap;
-
-SamplerState samAnisotropic
-{
-	Filter = ANISOTROPIC;
-	MaxAnisotropy = 4;
-
-	AddressU = WRAP;
-	AddressV = WRAP;
-};
- 
 struct VertexIn
 {
 	float3 PosL    : POSITION;

@@ -106,19 +106,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="FX\Basic.fx">
-      <Filter>FX</Filter>
-    </CustomBuild>
     <CustomBuild Include="FX\DisplacementMap.fx">
       <Filter>FX</Filter>
     </CustomBuild>
     <CustomBuild Include="FX\Sky.fx">
-      <Filter>FX</Filter>
-    </CustomBuild>
-    <CustomBuild Include="FX\NormalMap.fx">
-      <Filter>FX</Filter>
-    </CustomBuild>
-    <CustomBuild Include="FX\Space.fx">
       <Filter>FX</Filter>
     </CustomBuild>
     <CustomBuild Include="FX\Clouds.fx">
