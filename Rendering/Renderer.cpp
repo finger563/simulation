@@ -230,6 +230,7 @@ void Renderer::DrawScene()
 	if( GetAsyncKeyState('1') & 0x8000 )
 		md3dImmediateContext->RSSetState(RenderStates::WireframeRS);
 		
+#pragma region EARTH
 	// DRAW THE EARTH
 	md3dImmediateContext->OMSetDepthStencilState(RenderStates::PlanetDSS,255);
 	if ( height > outerRadius )
@@ -278,9 +279,63 @@ void Renderer::DrawScene()
     for(UINT p = 0; p < techDesc.Passes; ++p)
     {
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
-		md3dImmediateContext->DrawIndexed(mEarthIndexCount, mEarthIndexOffset, mEarthVertexOffset);
+		//md3dImmediateContext->DrawIndexed(mEarthIndexCount, mEarthIndexOffset, mEarthVertexOffset);
     }
+#pragma endregion
 	
+#pragma region OCEAN
+	// DRAW THE OCEAN
+	if ( height > outerRadius )
+		activeTech = Effects::OceanFX->OceanFromSpaceTech;
+	else
+		activeTech = Effects::OceanFX->OceanFromAtmoTech;
+	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+	
+	// OCEAN EFFECTS
+	Effects::OceanFX->SetEyePosW(control.get_Camera().GetPosition());
+	Effects::OceanFX->SetPlanetPosW(control.get_earthPosW());
+	Effects::OceanFX->SetCameraPos(cameraPos);
+	Effects::OceanFX->SetLightPos(sunPos);
+	Effects::OceanFX->SetInvWaveLength(invWaveLength);
+	Effects::OceanFX->SetCameraHeight(height);
+	Effects::OceanFX->SetCameraHeight2(height*height);
+	Effects::OceanFX->SetOuterRadius(outerRadius);
+	Effects::OceanFX->SetOuterRadius2(outerRadius * outerRadius);
+	Effects::OceanFX->SetInnerRadius(innerRadius);
+	Effects::OceanFX->SetInnerRadius2(innerRadius * innerRadius);
+	Effects::OceanFX->SetKrESun(Kr * ESun);
+	Effects::OceanFX->SetKmESun(Km * ESun);
+	Effects::OceanFX->SetKr4PI(Kr * 4.0f * MathHelper::Pi);
+	Effects::OceanFX->SetKm4PI(Km * 4.0f * MathHelper::Pi);
+	Effects::OceanFX->SetScale( scale );
+	Effects::OceanFX->SetScaleOverScaleDepth( scale / 0.25f );
+	Effects::OceanFX->SetG(-0.990f);
+	Effects::OceanFX->SetG2((-0.990f)*(-0.990f));
+	Effects::OceanFX->SetDirLights(mDirLights);
+
+	Effects::OceanFX->SetHeightScale(0.1f);
+	Effects::OceanFX->SetMaxTessDistance(0.10f);
+	Effects::OceanFX->SetMinTessDistance(3000.0f);
+	Effects::OceanFX->SetMinTessFactor(1.0f);
+	Effects::OceanFX->SetMaxTessFactor(100.0f);
+	
+	Effects::OceanFX->SetWorld(world);
+	Effects::OceanFX->SetWorldInvTranspose(worldInvTranspose);
+	Effects::OceanFX->SetViewProj(viewProj);
+	Effects::OceanFX->SetWorldViewProj(worldViewProj);
+	Effects::OceanFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
+	Effects::OceanFX->SetMaterial(mEarthMat);
+	Effects::OceanFX->SetDiffuseMap(mEarthDiffuseMapSRV);
+	Effects::OceanFX->SetNormalMap(mEarthNormalTexSRV);
+	activeTech->GetDesc( &techDesc );
+    for(UINT p = 0; p < techDesc.Passes; ++p)
+    {
+		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+		md3dImmediateContext->DrawIndexed(mOceanIndexCount, mOceanIndexOffset, mOceanVertexOffset);
+    }
+#pragma endregion
+	
+#pragma region CLOUDS
 	// DRAW THE CLOUDS
 	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 	md3dImmediateContext->OMSetBlendState(RenderStates::TransparentBS, blendFactor, 0xffffffff);
@@ -293,7 +348,7 @@ void Renderer::DrawScene()
 		md3dImmediateContext->RSSetState(RenderStates::ReverseWindingRS);
 		activeTech = Effects::CloudsFX->CloudsFromAtmoTech;
 	}
-	
+
 	// CLOUDS EFFECTS
 	Effects::CloudsFX->SetEyePosW(control.get_Camera().GetPosition());
 	Effects::CloudsFX->SetPlanetPosW(control.get_earthPosW());
@@ -341,13 +396,14 @@ void Renderer::DrawScene()
 	// restore default states
 	md3dImmediateContext->RSSetState(0);
 	md3dImmediateContext->OMSetDepthStencilState(0, 0);
+#pragma endregion
 
-	
 	// FX sets tessellation stages, but it does not disable them.  So do that here
 	// to turn off tessellation.
 	md3dImmediateContext->HSSetShader(0, 0, 0);
 	md3dImmediateContext->DSSetShader(0, 0, 0);	
 
+#pragma region SKY
 	// DRAW THE SKY
 	if ( height > outerRadius ) {
 		activeTech = Effects::SkyFX->SkyFromSpaceTech;
@@ -393,6 +449,8 @@ void Renderer::DrawScene()
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(mSkyIndexCount, mSkyIndexOffset, mSkyVertexOffset);
     }
+#pragma endregion
+
 	// restore default states
 	md3dImmediateContext->RSSetState(0);
 	md3dImmediateContext->OMSetDepthStencilState(0, 0);
@@ -412,6 +470,7 @@ void Renderer::BuildGeometryBuffers()
 	geoGen.CreateGeosphere(control.get_earthRadius() + control.get_skyAltitude(), 7.0f, skyMesh);
 	geoGen.CreateGeosphere(control.get_earthRadius(), 4.0f, cloudMesh);
 	geoGen.CreateGeosphere(control.get_earthRadius(),5.0f,earthMesh);
+	geoGen.CreateGeosphere(control.get_earthRadius(),5.0f,oceanMesh);
 	
 	// Cache the vertex offsets to each object in the concatenated vertex buffer.
 	mEarthVertexOffset      = 0;
@@ -422,10 +481,11 @@ void Renderer::BuildGeometryBuffers()
 	mEarthIndexCount      = earthMesh.Indices.size();
 	mSkyIndexCount		  = skyMesh.Indices.size();
 	mCloudsIndexCount	  = cloudMesh.Indices.size();
+	mOceanIndexCount	  = oceanMesh.Indices.size();
 	
-	UINT totalVertexCount = earthMesh.Vertices.size() + skyMesh.Vertices.size() + cloudMesh.Indices.size();
+	UINT totalVertexCount = earthMesh.Vertices.size() + skyMesh.Vertices.size() + cloudMesh.Indices.size()+ oceanMesh.Indices.size();
 
-	UINT totalIndexCount = mEarthIndexCount + mSkyIndexCount + mCloudsIndexCount;
+	UINT totalIndexCount = mEarthIndexCount + mSkyIndexCount + mCloudsIndexCount + mOceanIndexCount;
 
 	//
 	// Extract the vertex elements we are interested in and pack the
@@ -463,6 +523,16 @@ void Renderer::BuildGeometryBuffers()
 		vertices[k].TangentU	= cloudMesh.Vertices[i].TangentU;
 	}
 
+	mOceanVertexOffset = k;
+
+	for(size_t i = 0; i < oceanMesh.Vertices.size(); ++i, ++k)
+	{
+		vertices[k].Pos			= oceanMesh.Vertices[i].Position;
+		vertices[k].Normal		= oceanMesh.Vertices[i].Normal;
+		vertices[k].Tex			= oceanMesh.Vertices[i].TexC;
+		vertices[k].TangentU	= oceanMesh.Vertices[i].TangentU;
+	}
+
     D3D11_BUFFER_DESC vbd;
     vbd.Usage = D3D11_USAGE_IMMUTABLE;
     vbd.ByteWidth = sizeof(Vertex::PosNormalTexTan) * totalVertexCount;
@@ -483,6 +553,8 @@ void Renderer::BuildGeometryBuffers()
 	indices.insert(indices.end(), skyMesh.Indices.begin(), skyMesh.Indices.end());
 	mCloudsIndexOffset = indices.size();
 	indices.insert(indices.end(), cloudMesh.Indices.begin(), cloudMesh.Indices.end());
+	mOceanIndexOffset = indices.size();
+	indices.insert(indices.end(), oceanMesh.Indices.begin(), oceanMesh.Indices.end());
 
 	D3D11_BUFFER_DESC ibd;
     ibd.Usage = D3D11_USAGE_IMMUTABLE;

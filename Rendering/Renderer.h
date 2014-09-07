@@ -61,6 +61,10 @@ private:
 	UINT mCloudsIndexOffset;
 	UINT mCloudsIndexCount;
 	
+	int mOceanVertexOffset;
+	UINT mOceanIndexOffset;
+	UINT mOceanIndexCount;
+	
 	Controller control;
 };
 

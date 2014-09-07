@@ -88,6 +88,35 @@ DisplacementMapEffect::~DisplacementMapEffect()
 }
 #pragma endregion
 
+#pragma region OceanEffect
+OceanEffect::OceanEffect(ID3D11Device* device, const std::wstring& filename)
+	: PlanetEffect(device, filename)
+{
+	OceanFromSpaceTech = mFX->GetTechniqueByName("OceanFromSpace");
+	OceanFromAtmoTech = mFX->GetTechniqueByName("OceanFromAtmo");
+
+	ViewProj          = mFX->GetVariableByName("gViewProj")->AsMatrix();
+	WorldViewProj     = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
+	World             = mFX->GetVariableByName("gWorld")->AsMatrix();
+	WorldInvTranspose = mFX->GetVariableByName("gWorldInvTranspose")->AsMatrix();
+	TexTransform      = mFX->GetVariableByName("gTexTransform")->AsMatrix();
+	DirLights         = mFX->GetVariableByName("gDirLights");
+	Mat               = mFX->GetVariableByName("gMaterial");
+	HeightScale       = mFX->GetVariableByName("gHeightScale")->AsScalar();
+	MaxTessDistance   = mFX->GetVariableByName("gMaxTessDistance")->AsScalar();
+	MinTessDistance   = mFX->GetVariableByName("gMinTessDistance")->AsScalar();
+	MinTessFactor     = mFX->GetVariableByName("gMinTessFactor")->AsScalar();
+	MaxTessFactor     = mFX->GetVariableByName("gMaxTessFactor")->AsScalar();
+	DiffuseMap        = mFX->GetVariableByName("gDiffuseMap")->AsShaderResource();
+	CubeMap           = mFX->GetVariableByName("gCubeMap")->AsShaderResource();
+	NormalMap         = mFX->GetVariableByName("gNormalMap")->AsShaderResource();
+}
+
+OceanEffect::~OceanEffect()
+{
+}
+#pragma endregion
+
 #pragma region CloudsEffect
 CloudsEffect::CloudsEffect(ID3D11Device* device, const std::wstring& filename)
 	: PlanetEffect(device, filename)
@@ -139,13 +168,14 @@ SkyEffect::~SkyEffect()
 
 #pragma region Effects
 
-PlanetEffect*          Effects::PlanetFX          = 0;
+OceanEffect*		   Effects::OceanFX			  = 0;
 CloudsEffect*		   Effects::CloudsFX		  = 0;
 DisplacementMapEffect* Effects::DisplacementMapFX = 0;
 SkyEffect*             Effects::SkyFX             = 0;
 
 void Effects::InitAll(ID3D11Device* device)
 {
+	OceanFX			  = new OceanEffect(device, L"FX/Ocean.fxo");
 	DisplacementMapFX = new DisplacementMapEffect(device, L"FX/DisplacementMap.fxo");
 	CloudsFX		  = new CloudsEffect(device, L"FX/Clouds.fxo");
 	SkyFX             = new SkyEffect(device, L"FX/Sky.fxo");
@@ -153,6 +183,7 @@ void Effects::InitAll(ID3D11Device* device)
 
 void Effects::DestroyAll()
 {
+	SafeDelete(OceanFX);
 	SafeDelete(DisplacementMapFX);
 	SafeDelete(CloudsFX);
 	SafeDelete(SkyFX);

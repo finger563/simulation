@@ -115,6 +115,9 @@
     <CustomBuild Include="FX\Clouds.fx">
       <Filter>FX</Filter>
     </CustomBuild>
+    <CustomBuild Include="FX\Ocean.fx">
+      <Filter>FX</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <None Include="FX\LightHelper.fx">
