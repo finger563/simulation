@@ -110,9 +110,10 @@ void Renderer::OnResize()
 	control.get_Camera().SetLens(0.25f*MathHelper::Pi, AspectRatio(), control.get_nearClipPlaneDist(), control.get_farClipPlaneDist());
 }
 
+static float _time=0;
 void Renderer::UpdateScene(float dt)
 {
-
+	_time += dt;
 	if (GetAsyncKeyState('R') & 0x8000) {
 		control.set_earthAngle( control.get_earthAngle() + dt );
 		XMVECTOR trans = XMLoadFloat3(&control.get_earthPosW());
@@ -327,6 +328,13 @@ void Renderer::DrawScene()
 	Effects::OceanFX->SetMaterial(mEarthMat);
 	Effects::OceanFX->SetDiffuseMap(mEarthDiffuseMapSRV);
 	Effects::OceanFX->SetNormalMap(mEarthNormalTexSRV);
+
+	Effects::OceanFX->SetTime( _time );
+	//Effects::OceanFX->SetLambda( 10.0f );
+	//Effects::OceanFX->SetA( 10.0f );
+	//Effects::OceanFX->SetK( XMFLOAT2(1.0f, 0.0f) );
+	Effects::OceanFX->SetPI2(MathHelper::Pi*2.0f);
+
 	activeTech->GetDesc( &techDesc );
     for(UINT p = 0; p < techDesc.Passes; ++p)
     {

@@ -142,6 +142,12 @@ public:
 	void SetMinTessDistance(float f)                    { MinTessDistance->SetFloat(f); }
 	void SetMinTessFactor(float f)                      { MinTessFactor->SetFloat(f); }
 	void SetMaxTessFactor(float f)                      { MaxTessFactor->SetFloat(f); }
+	
+	void SetTime(float f)								{ Time->SetFloat(f); }
+	void SetK(const XMFLOAT2& v)						{ K->SetRawValue(&v, 0, sizeof(XMFLOAT2)); }
+	void SetA(float f)									{ A->SetFloat(f); }
+	void SetLambda(float f)								{ Lambda->SetFloat(f); }
+	void SetPI2(float f)								{ PI2->SetFloat(f); }
 
 	void SetDiffuseMap(ID3D11ShaderResourceView* tex)   { DiffuseMap->SetResource(tex); }
 	void SetCubeMap(ID3D11ShaderResourceView* tex)      { CubeMap->SetResource(tex); }
@@ -149,6 +155,12 @@ public:
 	
 	ID3DX11EffectTechnique* OceanFromSpaceTech;
 	ID3DX11EffectTechnique* OceanFromAtmoTech;
+	
+	ID3DX11EffectScalarVariable* Time;
+	ID3DX11EffectScalarVariable* Lambda;
+	ID3DX11EffectScalarVariable* A;
+	ID3DX11EffectVectorVariable* K;
+	ID3DX11EffectScalarVariable* PI2;
 	
 	ID3DX11EffectMatrixVariable* ViewProj;
 	ID3DX11EffectMatrixVariable* WorldViewProj;

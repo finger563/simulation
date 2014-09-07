@@ -4,8 +4,18 @@
 
 #include "PlanetHelper.fx"
 
+static const int gNumWaves = 5;
+static const float gLambda[5] = {10.0, 5.0, 1.0, 0.5, 7.0};
+static const float gA[5] = {1.0, 2.0, 0.5, 0.05, 0.8};
+static const float2 gK[5] = {{1.0,0}, {0,1.0}, {1.0,1.0}, {-1.0, 0}, {0,-1.0}};
+
 cbuffer cbPerOcean
 {
+	float gTime;
+	//float gLambda;
+	//float2 gK;
+	//float gA;
+	float gPI2;
 };
 
 struct VertexOut
@@ -263,6 +273,17 @@ DomainOut DS(PatchTess patchTess,
 	
 	// Sample height map (stored in alpha channel).
 	//float h = gNormalMap.SampleLevel(samLinear, dout.Tex, mipLevel).a;
+	float _x = atan(dout.NormalW.y / dout.NormalW.x);
+	float _y = asin(dout.NormalW.z / length(dout.NormalW) );
+	for (int i = 0; i< gNumWaves; i++) {
+		float v = sqrt(9.81 * gLambda[i] / gPI2);
+		float _d = dot( dout.PosW.xy, gK[i] );
+		float phase = (gPI2 * _d + v*gTime )/ gLambda[i];
+		float cP = cos(phase);
+		float sP = sin(phase);
+		float2 s = gA[i] * float2(-cP,sP);
+		dout.PosW.xy += s;
+	}
 	
 	// Offset vertex along normal.
 	//dout.PosW += (gHeightScale*h)*dout.NormalW;

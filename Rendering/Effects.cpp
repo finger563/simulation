@@ -94,6 +94,12 @@ OceanEffect::OceanEffect(ID3D11Device* device, const std::wstring& filename)
 {
 	OceanFromSpaceTech = mFX->GetTechniqueByName("OceanFromSpace");
 	OceanFromAtmoTech = mFX->GetTechniqueByName("OceanFromAtmo");
+	
+	Time		      = mFX->GetVariableByName("gTime")->AsScalar();
+	Lambda		      = mFX->GetVariableByName("gLambda")->AsScalar();
+	A				  = mFX->GetVariableByName("gA")->AsScalar();
+	K				  = mFX->GetVariableByName("gK")->AsVector();
+	PI2			      = mFX->GetVariableByName("gPI2")->AsScalar();
 
 	ViewProj          = mFX->GetVariableByName("gViewProj")->AsMatrix();
 	WorldViewProj     = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
