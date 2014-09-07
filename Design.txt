@@ -28,6 +28,13 @@ Questions:
       * world positions (x,y,z)
       * local positions ( latitude, longitude, altitude )
 
+* Frustum culling:
+  * test mesh points for inclusion into the rendering
+  * XNA math functions all throughout
+* Cube subdivision into ellipsoid
+  * when frustum tests each vertex against the frustum, the included meshes are subdivided based on distance
+  * Need to ensure backfaces are removed prior to subdivision ( early point*normal rejection )
+
 Goals:
 ------
 * Rendering Engine:

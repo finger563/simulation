@@ -19,6 +19,18 @@
     <Filter Include="FX">
       <UniqueIdentifier>{ec19f0a8-c849-4dd6-8149-ed3bcacc7af6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Object">
+      <UniqueIdentifier>{09c17776-aae6-4faa-9c89-f803394c3476}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Math">
+      <UniqueIdentifier>{fe4dd337-3d7d-4e18-93b5-e83f16f42b94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BVH">
+      <UniqueIdentifier>{251f7d1c-a4e8-404e-b61a-dbea151875e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BSP">
+      <UniqueIdentifier>{6c77004b-6f06-4b82-af16-3528705b516e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vertex.cpp">
