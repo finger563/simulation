@@ -9,13 +9,6 @@
 #include "RenderStates.h"
 #include "Controller.h"
 
-enum RenderOptions
-{
-	RenderOptionsBasic = 0,
-	RenderOptionsNormalMap = 1,
-	RenderOptionsDisplacementMap = 2
-};
-
 class Renderer : public D3DApp
 {
 public:
@@ -67,9 +60,7 @@ private:
 	int mCloudsVertexOffset;
 	UINT mCloudsIndexOffset;
 	UINT mCloudsIndexCount;
-
-	RenderOptions mRenderOptions;
-
+	
 	Controller control;
 };
 

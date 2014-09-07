@@ -28,7 +28,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
  
 
 Renderer::Renderer(HINSTANCE hInstance)
-: D3DApp(hInstance), mVB(0), mIB(0), mEarthDiffuseMapSRV(0), mEarthNormalTexSRV(0), control(hInstance),  mRenderOptions(RenderOptionsDisplacementMap)
+: D3DApp(hInstance), mVB(0), mIB(0), mEarthDiffuseMapSRV(0), mEarthNormalTexSRV(0), control(hInstance)
 {
 	mMainWndCaption = L"Crate Demo";
 	control.Init();
@@ -168,18 +168,6 @@ void Renderer::UpdateScene(float dt)
 		control.get_Camera().Pitch(dt);
 	if (GetAsyncKeyState(VK_DOWN) & 0x8000)
 		control.get_Camera().Pitch(-dt);
-	
-	//
-	// Switch the rendering effect based on key presses.
-	//
-	if( GetAsyncKeyState('2') & 0x8000 )
-		mRenderOptions = RenderOptionsBasic; 
-
-	if( GetAsyncKeyState('3') & 0x8000 )
-		mRenderOptions = RenderOptionsNormalMap; 
-
-	if( GetAsyncKeyState('4') & 0x8000 )
-		mRenderOptions = RenderOptionsDisplacementMap; 
 }
 
 void Renderer::DrawScene()
@@ -417,6 +405,7 @@ void Renderer::BuildGeometryBuffers()
 	GeometryGenerator::MeshData earthMesh;
 	GeometryGenerator::MeshData skyMesh;
 	GeometryGenerator::MeshData cloudMesh;
+	GeometryGenerator::MeshData oceanMesh;
 
 	GeometryGenerator geoGen;
 	
