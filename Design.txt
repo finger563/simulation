@@ -14,6 +14,20 @@ Questions:
       * may have subpartitions?
     * Use the partition cubes for frustum culling 
 
+* For Global Rendering:
+  * Binary Space Partitioning
+    * Octree/Quadtree
+  * Subdivided Meshes
+    * Bounding Volume Heirarchy
+    * Ellipsoid class
+      * mesh generated for each cell in the root BVH
+      * Subdivided meshes for each of those cells' children and so on.
+      * Choose which mesh to show based on Distance to viewer from cell
+      * Subdivide at initialization and just stream? or only subdivide when needed?
+    * Coordinate transforms to get
+      * world positions (x,y,z)
+      * local positions ( latitude, longitude, altitude )
+
 Goals:
 ------
 * Rendering Engine:
