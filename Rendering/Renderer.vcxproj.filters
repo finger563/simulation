@@ -31,6 +31,15 @@
     <Filter Include="Source Files\BSP">
       <UniqueIdentifier>{6c77004b-6f06-4b82-af16-3528705b516e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Object\Ellipsoid">
+      <UniqueIdentifier>{2388d9c4-2518-435f-8d5e-b10424089c45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Object">
+      <UniqueIdentifier>{21566673-7ffb-446f-b540-618c81b4ea49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Object\Ellipsoid">
+      <UniqueIdentifier>{e1741410-4a36-468b-8a0f-ed9f6fabc8e5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vertex.cpp">
@@ -71,6 +80,9 @@
     </ClCompile>
     <ClCompile Include="RenderStates.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Ellipsoid.cpp">
+      <Filter>Source Files\Object\Ellipsoid</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -115,6 +127,12 @@
     </ClInclude>
     <ClInclude Include="RenderStates.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Ellipsoid.h">
+      <Filter>Header Files\Object\Ellipsoid</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Header Files\Object</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
