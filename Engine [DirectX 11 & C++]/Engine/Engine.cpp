@@ -99,9 +99,8 @@ IDWriteFactory *DWriteFactory;
 IDWriteTextFormat *TextFormat;
 std::wstring printText;
 
-
 /*
- * Interfaces required for simple lighting
+ * Interfaces for Simple Lighting
  */
 ID3D11Buffer* cbPerFrameBuffer;
 ID3D11PixelShader* D2D_PS;
@@ -198,10 +197,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,
 struct cbPerObject
 {
 	XMMATRIX  WVP;
-	/*
-	 * Send our object's World Space matrix to the effect file.
-	 */
-	XMMATRIX World;
+    XMMATRIX  World;
 };
 
 cbPerObject cbPerObj;
@@ -209,7 +205,6 @@ cbPerObject cbPerObj;
 //***************************************************************************************
 // Light
 //***************************************************************************************
-
 struct Light
 {
 	Light()
@@ -224,17 +219,12 @@ struct Light
 
 Light light;
 
-/*
- * Key structure sent to the Pixel Shaders constant buffer.
- * Update and send to PS constant buffer once every frame.
- */
 struct cbPerFrame
 {
 	Light  light;
 };
 
 cbPerFrame constbuffPerFrame;
-
 //***************************************************************************************
 // Vertex Structure and Vertex (Input) Layout
 //***************************************************************************************
@@ -735,7 +725,7 @@ bool InitScene()
 	d3d11DevCon->PSSetShader(PS, 0, 0);
 
 	/*
-	 * Define the direction, ambient & diffuse members of light.
+	 * Defining Light direction, ambient and difuse values.
 	 */
 	light.dir = XMFLOAT3(0.25f, 0.5f, -1.0f);
 	light.ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
@@ -745,7 +735,7 @@ bool InitScene()
 	 * Create vertex buffer - start by making an array of vertices
 	 * using our vertex structure
 	 */
-	Vertex v[] =
+Vertex v[] =
 	{
 		// Front Face
 		Vertex(-1.0f, -1.0f, -1.0f, 0.0f, 1.0f,-1.0f, -1.0f, -1.0f),
@@ -907,9 +897,7 @@ bool InitScene()
 	hr = d3d11Device->CreateBuffer(&cbbd, NULL, &cbPerObjectBuffer);
 
 
-	/*
-	 * Create the buffer to send to the constant buffer per frame in the effect file.
-	 */
+	//Create the buffer to send to the cbuffer per frame in effect file
 	ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
 
 	cbbd.Usage = D3D11_USAGE_DEFAULT;
@@ -919,6 +907,8 @@ bool InitScene()
 	cbbd.MiscFlags = 0;
 
 	hr = d3d11Device->CreateBuffer(&cbbd, NULL, &cbPerFrameBuffer);
+
+
 
 	/*
 	 * Define our cameras position, Target, and up vectors.
@@ -1126,8 +1116,8 @@ void RenderText(std::wstring text, int inInt)
 	d3d11DevCon->IASetVertexBuffers( 0, 1, &d2dVertBuffer, &stride, &offset );
 
 	WVP =  XMMatrixIdentity();
-
 	cbPerObj.World = XMMatrixTranspose(WVP);
+
 
 	cbPerObj.WVP = XMMatrixTranspose(WVP);	
 	d3d11DevCon->UpdateSubresource( cbPerObjectBuffer, 0, NULL, &cbPerObj, 0, 0 );
@@ -1152,14 +1142,16 @@ void DrawScene()
 										1.0f, 
 										0);
 
-	// Bind Constant buffer with cbPerFrameBuffer. 
 	constbuffPerFrame.light = light;
 	d3d11DevCon->UpdateSubresource( cbPerFrameBuffer, 0, NULL, &constbuffPerFrame, 0, 0 );
 	d3d11DevCon->PSSetConstantBuffers(0, 1, &cbPerFrameBuffer);	
     
-    // Reset Vertex and Pixel Shaders
+    //Reset Vertex and Pixel Shaders
 	d3d11DevCon->VSSetShader(VS, 0, 0);
 	d3d11DevCon->PSSetShader(PS, 0, 0);
+
+	//Set our Render Target
+	d3d11DevCon->OMSetRenderTargets( 1, &renderTargetView, depthStencilView );
 
 
 	/*
@@ -1264,10 +1256,11 @@ void DrawScene()
 	d3d11DevCon->DrawIndexed( 36, 0, 0 );
 
 	WVP = cube2World * camView * camProjection;
+	cbPerObj.World = XMMatrixTranspose(cube2World);
 	cbPerObj.WVP = XMMatrixTranspose(WVP);	
 	d3d11DevCon->UpdateSubresource( cbPerObjectBuffer, 0, NULL, &cbPerObj, 0, 0 );
 	d3d11DevCon->VSSetConstantBuffers( 0, 1, &cbPerObjectBuffer );
-
+	
 	/*
 	 * Sending the Sampler State and Texture to the Shader
 	 */
