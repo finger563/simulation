@@ -26,6 +26,11 @@
 #pragma comment (lib, "DXErr.lib")
 #include <DXErr.h>
 
+// Direct Input
+#pragma comment (lib, "dinput8.lib")
+#pragma comment (lib, "dxguid.lib")
+#include <dinput.h>
+
 //***************************************************************************************
 // Global Interface Declarations
 //***************************************************************************************
@@ -106,6 +111,12 @@ ID3D11Buffer* cbPerFrameBuffer;
 ID3D11PixelShader* D2D_PS;
 ID3D10Blob* D2D_PS_Buffer;
 
+/*
+ * Interfaces for Keyboard and Mouse Input
+ */
+IDirectInputDevice8* DIKeyboard;
+IDirectInputDevice8* DIMouse;
+
 //***************************************************************************************
 // Other Global Declarations
 //***************************************************************************************
@@ -139,6 +150,23 @@ XMVECTOR camTarget;
 XMVECTOR camUp;
 
 /*
+ * First Person Camera
+ */
+XMVECTOR DefaultForward = XMVectorSet(0.0f,0.0f,1.0f, 0.0f);
+XMVECTOR DefaultRight = XMVectorSet(1.0f,0.0f,0.0f, 0.0f);
+XMVECTOR camForward = XMVectorSet(0.0f,0.0f,1.0f, 0.0f);
+XMVECTOR camRight = XMVectorSet(1.0f,0.0f,0.0f, 0.0f);
+
+XMMATRIX camRotationMatrix;
+XMMATRIX groundWorld;
+
+float moveLeftRight = 0.0f;
+float moveBackForward = 0.0f;
+
+float camYaw = 0.0f;
+float camPitch = 0.0f;
+
+/*
  * High Resolution Timer variables
  */
 double countsPerSecond = 0.0;
@@ -150,6 +178,20 @@ int fps = 0;
 __int64 frameTimeOld = 0;
 double frameTime;
 
+/*
+ * Mouse-specific variables
+ */
+DIMOUSESTATE mouseLastState;
+LPDIRECTINPUT8 DirectInput;
+
+float rotx = 0;
+float rotz = 0;
+float scaleX = 1.0f;
+float scaleY = 1.0f;
+
+XMMATRIX Rotationx;
+XMMATRIX Rotationz;
+
 //***************************************************************************************
 // Primary Function Prototypes
 //***************************************************************************************
@@ -158,6 +200,11 @@ void CleanUp();
 bool InitScene();
 void UpdateScene(double time);
 void DrawScene();
+
+/*
+ * Camera Update Function
+ */
+void UpdateCamera();
 
 
 /*
@@ -201,6 +248,13 @@ struct cbPerObject
 };
 
 cbPerObject cbPerObj;
+
+
+/*
+ * Functions to Initialize and Detect Input 
+ */
+bool InitDirectInput(HINSTANCE hInstance);
+void DetectInput(double time);
 
 //***************************************************************************************
 // Light
@@ -312,6 +366,13 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	{
 		MessageBox(0, L"Scene Initialization - Failed",
 						L"Error", MB_OK);
+		return 0;
+	}
+
+	if(!InitDirectInput(hInstance))
+	{
+		MessageBox(0, L"Direct Input Initialization - Failed",
+			L"Error", MB_OK);
 		return 0;
 	}
 
@@ -603,11 +664,114 @@ bool InitD2D_D3D101_DWrite(IDXGIAdapter1 *Adapter)
 	return true;
 }
 
+//***************************************************************************************
+// Direct Input
+//***************************************************************************************
+bool InitDirectInput(HINSTANCE hInstance)
+{
+	hr = DirectInput8Create(hInstance,
+							DIRECTINPUT_VERSION,
+							IID_IDirectInput8,
+							(void**)&DirectInput,
+							NULL); 
+
+	hr = DirectInput->CreateDevice(GUID_SysKeyboard,
+								   &DIKeyboard,
+								   NULL);
+
+	hr = DirectInput->CreateDevice(GUID_SysMouse,
+								   &DIMouse,
+								   NULL);
+
+	hr = DIKeyboard->SetDataFormat(&c_dfDIKeyboard);
+	hr = DIKeyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+
+	hr = DIMouse->SetDataFormat(&c_dfDIMouse);
+	hr = DIMouse->SetCooperativeLevel(hwnd, DISCL_EXCLUSIVE | DISCL_NOWINKEY | DISCL_FOREGROUND);
+
+	return true;
+}
+
+void UpdateCamera()
+{
+	camRotationMatrix = XMMatrixRotationRollPitchYaw(camPitch, camYaw, 0);
+	camTarget = XMVector3TransformCoord(DefaultForward, camRotationMatrix );
+	camTarget = XMVector3Normalize(camTarget);
+
+	XMMATRIX RotateYTempMatrix;
+	RotateYTempMatrix = XMMatrixRotationY(camYaw);
+
+	camRight = XMVector3TransformCoord(DefaultRight, RotateYTempMatrix);
+	camUp = XMVector3TransformCoord(camUp, RotateYTempMatrix);
+	camForward = XMVector3TransformCoord(DefaultForward, RotateYTempMatrix);
+
+	camPosition += moveLeftRight*camRight;
+	camPosition += moveBackForward*camForward;
+
+	moveLeftRight = 0.0f;
+	moveBackForward = 0.0f;
+
+	camTarget = camPosition + camTarget;	
+
+	camView = XMMatrixLookAtLH( camPosition, camTarget, camUp );
+}
+
+void DetectInput(double time)
+{
+	DIMOUSESTATE mouseCurrState;
+
+	BYTE keyboardState[256];
+
+	DIKeyboard->Acquire();
+	DIMouse->Acquire();
+
+	DIMouse->GetDeviceState(sizeof(DIMOUSESTATE), &mouseCurrState);
+
+	DIKeyboard->GetDeviceState(sizeof(keyboardState),(LPVOID)&keyboardState);
+
+	if(keyboardState[DIK_ESCAPE] & 0x80)
+		PostMessage(hwnd, WM_DESTROY, 0, 0);
+
+	float speed = 15.0f * time;
+
+	if(keyboardState[DIK_A] & 0x80)
+	{
+		moveLeftRight -= speed;
+	}
+	if(keyboardState[DIK_D] & 0x80)
+	{
+		moveLeftRight += speed;
+	}
+	if(keyboardState[DIK_W] & 0x80)
+	{
+		moveBackForward += speed;
+	}
+	if(keyboardState[DIK_S] & 0x80)
+	{
+		moveBackForward -= speed;
+	}
+	if((mouseCurrState.lX != mouseLastState.lX) || (mouseCurrState.lY != mouseLastState.lY))
+	{
+		camYaw += mouseLastState.lX * 0.001f;
+
+		camPitch += mouseCurrState.lY * 0.001f;
+
+		mouseLastState = mouseCurrState;
+	}
+
+	UpdateCamera();
+
+	return;
+}
+
 /*
  * Release Interfaces when we are done with them
  */
 void CleanUp()
 {
+	SwapChain->SetFullscreenState(false, NULL);
+	PostMessage(hwnd, WM_DESTROY, 0, 0);
+
 	SwapChain->Release();
 	d3d11Device->Release();
 	d3d11DevCon->Release();
@@ -622,7 +786,9 @@ void CleanUp()
 	depthStencilView->Release();
 	depthStencilBuffer->Release();
 	cbPerObjectBuffer->Release();
+	// Wireframe cleanup
 	WireFrame->Release();
+	// Transparency cleanup
 	Transparency->Release();
 	CCWcullMode->Release();
 	CWcullMode->Release();
@@ -637,7 +803,12 @@ void CleanUp()
 	DWriteFactory->Release();
 	TextFormat->Release();
 	d2dTexture->Release();
+	// Light perFrameBuffer clean up
 	cbPerFrameBuffer->Release();
+	// Direct Input clean up
+	DIKeyboard->Unacquire();
+	DIMouse->Unacquire();
+	DirectInput->Release();
 }
 
 void InitD2DScreenTexture()
@@ -1035,20 +1206,24 @@ void UpdateScene(double time)
 	//Reset cube1World
 	cube1World = XMMatrixIdentity();
 
-	//Define cube1's world space matrix
-	XMVECTOR rotaxis = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	Rotation = XMMatrixRotationAxis( rotaxis, rot);
+	XMVECTOR rotyaxis = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	XMVECTOR rotzaxis = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+	XMVECTOR rotxaxis = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+
+	Rotation = XMMatrixRotationAxis(rotyaxis, rot);
+	Rotationx = XMMatrixRotationAxis(rotxaxis, rotx);
+	Rotationz = XMMatrixRotationAxis(rotzaxis, rotz);
 	Translation = XMMatrixTranslation( 0.0f, 0.0f, 4.0f );
 
 	//Set cube1's world space using the transformations
-	cube1World = Translation * Rotation;
+	cube1World = Translation * Rotation * Rotationx * Rotationz;
 
 	//Reset cube2World
 	cube2World = XMMatrixIdentity();
 
 	//Define cube2's world space matrix
-	Rotation = XMMatrixRotationAxis( rotaxis, -rot);
-	Scale = XMMatrixScaling( 1.3f, 1.3f, 1.3f );
+	Rotation = XMMatrixRotationAxis( rotyaxis, -rot);
+	Scale = XMMatrixScaling( scaleX, scaleY, 1.3f );
 
 	//Set cube2's world space matrix
 	cube2World = Rotation * Scale;
@@ -1335,6 +1510,9 @@ int messageloop(){
 			std::wostringstream window_title; 
 			window_title << "Rendering Engine " << "[FPS: " << fps << " ]";
 			SetWindowText(hwnd, window_title.str().c_str());
+
+			// Detect Direct Input
+			DetectInput(frameTime);
 
 			// Call UpdateScene with new FPS
 			UpdateScene(frameTime);
