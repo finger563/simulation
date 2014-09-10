@@ -460,7 +460,7 @@ bool InitializeWindow(HINSTANCE hInstance,
 	hwnd = CreateWindowEx( NULL,
 						   WndClassName,
 						   L"Rendering Engine",
-						   WS_OVERLAPPEDWINDOW,
+						   WS_OVERLAPPEDWINDOW, // WS_OVERLAPPEDWINDOW
 						   CW_USEDEFAULT, CW_USEDEFAULT,
 						   width, height,
 						   NULL,
@@ -475,7 +475,7 @@ bool InitializeWindow(HINSTANCE hInstance,
 		return 1;
 	}
 
-	ShowWindow(hwnd, ShowWnd);
+	ShowWindow(hwnd, SW_MAXIMIZE); 
 	UpdateWindow(hwnd);
 
 	return true;
@@ -729,12 +729,19 @@ void UpdateCamera()
 	camTarget = XMVector3TransformCoord(DefaultForward, camRotationMatrix );
 	camTarget = XMVector3Normalize(camTarget);
 
+	/*
+	// First-Person Camera
 	XMMATRIX RotateYTempMatrix;
 	RotateYTempMatrix = XMMatrixRotationY(camYaw);
 
 	camRight = XMVector3TransformCoord(DefaultRight, RotateYTempMatrix);
 	camUp = XMVector3TransformCoord(camUp, RotateYTempMatrix);
-	camForward = XMVector3TransformCoord(DefaultForward, RotateYTempMatrix);
+	camForward = XMVector3TransformCoord(DefaultForward, RotateYTempMatrix);*/
+	
+	// Free-Look Camera
+	camRight = XMVector3TransformCoord(DefaultRight, camRotationMatrix);
+	camForward = XMVector3TransformCoord(DefaultForward, camRotationMatrix);
+	camUp = XMVector3Cross(camForward, camRight);
 
 	camPosition += moveLeftRight*camRight;
 	camPosition += moveBackForward*camForward;
@@ -1550,11 +1557,50 @@ void DrawScene()
 	float bgColor[4] = {(0.0f, 0.0f, 0.0f, 0.0f)};
 	d3d11DevCon->ClearRenderTargetView(renderTargetView, bgColor);
 
+	UINT stride = sizeof( Vertex );
+	UINT offset = 0;
+
+	// Set the default blend state (no blending) for opaque objects
+	d3d11DevCon->OMSetBlendState(0, 0, 0xffffffff);
+
+	
 	// Refresh the Depth/Stencil view
 	d3d11DevCon->ClearDepthStencilView( depthStencilView, 
 										D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 
 										1.0f, 
 										0);
+	//Set our Render Target
+	d3d11DevCon->OMSetRenderTargets( 1, &renderTargetView, depthStencilView );
+
+	/*
+	 * SKYBOX
+	 */
+	//Set the spheres index buffer
+	d3d11DevCon->IASetIndexBuffer( sphereIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	//Set the spheres vertex buffer
+	d3d11DevCon->IASetVertexBuffers( 0, 1, &sphereVertBuffer, &stride, &offset );
+
+	//Set the WVP matrix and send it to the constant buffer in effect file
+	WVP = sphereWorld * camView * camProjection;
+	cbPerObj.WVP = XMMatrixTranspose(WVP);	
+	cbPerObj.World = XMMatrixTranspose(sphereWorld);	
+	d3d11DevCon->UpdateSubresource( cbPerObjectBuffer, 0, NULL, &cbPerObj, 0, 0 );
+	d3d11DevCon->VSSetConstantBuffers( 0, 1, &cbPerObjectBuffer );
+	//Send our skymap resource view to pixel shader
+	d3d11DevCon->PSSetShaderResources( 0, 1, &smrv );
+	d3d11DevCon->PSSetSamplers( 0, 1, &CubesTexSamplerState );
+
+	//Set the new VS and PS shaders
+	d3d11DevCon->VSSetShader(SKYMAP_VS, 0, 0);
+	d3d11DevCon->PSSetShader(SKYMAP_PS, 0, 0);
+	//Set the new depth/stencil and RS states
+	d3d11DevCon->OMSetDepthStencilState(DSLessEqual, 0);
+	d3d11DevCon->RSSetState(RSCullNone);
+	d3d11DevCon->DrawIndexed( NumSphereFaces * 3, 0, 0 );
+
+	//Set the default VS shader and depth/stencil state
+	d3d11DevCon->VSSetShader(VS, 0, 0);
+	d3d11DevCon->OMSetDepthStencilState(NULL, 0);
 
 	constbuffPerFrame.light = light;
 	d3d11DevCon->UpdateSubresource( cbPerFrameBuffer, 0, NULL, &constbuffPerFrame, 0, 0 );
@@ -1563,9 +1609,6 @@ void DrawScene()
     //Reset Vertex and Pixel Shaders
 	d3d11DevCon->VSSetShader(VS, 0, 0);
 	d3d11DevCon->PSSetShader(PS, 0, 0);
-
-	//Set our Render Target
-	d3d11DevCon->OMSetRenderTargets( 1, &renderTargetView, depthStencilView );
 
 
 	/*
@@ -1580,14 +1623,12 @@ void DrawScene()
 	// Fine-tune the blending equation
 	float blendFactor[] = {0.75f, 0.75f, 0.75f, 1.0f};
 
-	// Set the default blend state (no blending) for opaque objects
-	d3d11DevCon->OMSetBlendState(0, 0, 0xffffffff);
-
 	//Set the cubes index buffer
 	d3d11DevCon->IASetIndexBuffer( squareIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 	//Set the cubes vertex buffer
+	/*
 	UINT stride = sizeof( Vertex );
-	UINT offset = 0;
+	UINT offset = 0;*/
 	d3d11DevCon->IASetVertexBuffers( 0, 1, &squareVertBuffer, &stride, &offset );
 
 	// RENDER OPAQUE OBJECTS HERE
@@ -1625,9 +1666,8 @@ void DrawScene()
 		// Switch the order in which the cubes are drawn
 		XMMATRIX tempMatrix = cube1World;
 		cube1World = cube2World;
-		cube2World = tempMatrix;
+		cube2World = tempMatrix;	
 	}
-
 
 	/*
 	 * Create the WVP matrix which will be sent to the vertex shader to reposition the objects vertices correctly. 
@@ -1705,36 +1745,6 @@ void DrawScene()
 
 	// Render this text
 	RenderText(L"FPS: ", fps);
-
-	/*
-	 * SKYBOX
-	 */
-	//Set the spheres index buffer
-	d3d11DevCon->IASetIndexBuffer( sphereIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-	//Set the spheres vertex buffer
-	d3d11DevCon->IASetVertexBuffers( 0, 1, &sphereVertBuffer, &stride, &offset );
-
-	//Set the WVP matrix and send it to the constant buffer in effect file
-	WVP = sphereWorld * camView * camProjection;
-	cbPerObj.WVP = XMMatrixTranspose(WVP);	
-	cbPerObj.World = XMMatrixTranspose(sphereWorld);	
-	d3d11DevCon->UpdateSubresource( cbPerObjectBuffer, 0, NULL, &cbPerObj, 0, 0 );
-	d3d11DevCon->VSSetConstantBuffers( 0, 1, &cbPerObjectBuffer );
-	//Send our skymap resource view to pixel shader
-	d3d11DevCon->PSSetShaderResources( 0, 1, &smrv );
-	d3d11DevCon->PSSetSamplers( 0, 1, &CubesTexSamplerState );
-
-	//Set the new VS and PS shaders
-	d3d11DevCon->VSSetShader(SKYMAP_VS, 0, 0);
-	d3d11DevCon->PSSetShader(SKYMAP_PS, 0, 0);
-	//Set the new depth/stencil and RS states
-	d3d11DevCon->OMSetDepthStencilState(DSLessEqual, 0);
-	d3d11DevCon->RSSetState(RSCullNone);
-	d3d11DevCon->DrawIndexed( NumSphereFaces * 3, 0, 0 );
-
-	//Set the default VS shader and depth/stencil state
-	d3d11DevCon->VSSetShader(VS, 0, 0);
-	d3d11DevCon->OMSetDepthStencilState(NULL, 0);
 
 
 	//Present the backbuffer to the screen
