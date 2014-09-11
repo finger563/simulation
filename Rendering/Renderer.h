@@ -8,6 +8,7 @@
 #include "d3dApp.h"
 #include "RenderStates.h"
 #include "Controller.h"
+#include "Ellipsoid.h"
 
 enum RenderOptions
 {

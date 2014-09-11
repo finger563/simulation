@@ -2,6 +2,8 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include <Windows.h>
+#include <D3DX11.h>
 #include <xnamath.h>
 #include <dxerr.h>
 #include <cassert>
@@ -12,15 +14,13 @@
 #include <fstream>
 #include <vector>
 
-#include "QuadTreeNode.h"
-
 class Object
 {
 private:
 	XMFLOAT3		position;
 	XMFLOAT4		rotation;	// quaternion
 	float			scale;
-	XMFloat4x4		RTS;	// rotation translation & scale matrix
+	XMFLOAT4X4		RTS;	// rotation translation & scale matrix
 
 	XMFLOAT3		velocity;
 	float			mass;	

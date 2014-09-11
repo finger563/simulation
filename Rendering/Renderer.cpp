@@ -3,7 +3,7 @@
 //***************************************************************************************
 
 #include "d3dx11Effect.h"
-#include "GeometryGenerator.h"
+//#include "GeometryGenerator.h"
 #include "MathHelper.h"
 #include "LightHelper.h"
 #include "Effects.h"
@@ -193,13 +193,21 @@ void Renderer::DrawScene()
 	XMMATRIX viewProj	= control.get_Camera().ViewProj();
 	
 	float blendFactor[] = {0.0f, 0.0f, 0.0f, 0.0f};
-
-	// Set per frame constants.
-	Effects::BasicFX->SetDirLights(mDirLights);
-	Effects::BasicFX->SetEyePosW(control.get_Camera().GetPosition());
 	
-	Effects::NormalMapFX->SetDirLights(mDirLights);
-	Effects::NormalMapFX->SetEyePosW(control.get_Camera().GetPosition());
+	ID3DX11EffectTechnique* activeTech;
+    D3DX11_TECHNIQUE_DESC techDesc;
+
+	XMMATRIX world;
+	XMMATRIX worldInvTranspose;
+	XMMATRIX worldViewProj;
+	
+	world = XMLoadFloat4x4(&mEarthWorld);
+	worldInvTranspose = MathHelper::InverseTranspose(world);
+	worldViewProj = world*view*proj;
+	
+	UINT stride = sizeof(Vertex::PosNormalTexTan);
+    UINT offset = 0;
+	
 	
 	float wavelength[3] = {0.650f, 0.570f, 0.475f};
 	XMFLOAT3 invWaveLength = XMFLOAT3( 1.0f/powf(wavelength[0],4.0f),
@@ -226,6 +234,71 @@ void Renderer::DrawScene()
 	XMVECTOR light = XMLoadFloat3(&mDirLights[0].Direction);
 	XMFLOAT3 sunPos;
 	XMStoreFloat3(&sunPos,-light);
+
+
+	// Set per frame constants.
+	Effects::BasicFX->SetDirLights(mDirLights);
+	Effects::BasicFX->SetEyePosW(control.get_Camera().GetPosition());
+	
+#if 1
+
+	ID3D11Buffer* mVB_test;
+	ID3D11Buffer* mIB_test;
+
+	std::vector<Vertex::PosNormalTexTan> vertices;
+	
+    D3D11_BUFFER_DESC vbd;
+    vbd.Usage = D3D11_USAGE_IMMUTABLE;
+    vbd.ByteWidth = sizeof(Vertex::PosNormalTexTan) * vertices.size();
+    vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    vbd.CPUAccessFlags = 0;
+    vbd.MiscFlags = 0;
+    D3D11_SUBRESOURCE_DATA vinitData;
+    vinitData.pSysMem = &vertices[0];
+    HR(md3dDevice->CreateBuffer(&vbd, &vinitData, &mVB_test));
+
+	//
+	// Pack the indices of all the meshes into one index buffer.
+	//
+
+	std::vector<UINT> indices;
+	//indices.insert(indices.end(), earthMesh.Indices.begin(), earthMesh.Indices.end());
+
+	D3D11_BUFFER_DESC ibd;
+    ibd.Usage = D3D11_USAGE_IMMUTABLE;
+    ibd.ByteWidth = sizeof(UINT) * indices.size();
+    ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+    ibd.CPUAccessFlags = 0;
+    ibd.MiscFlags = 0;
+    D3D11_SUBRESOURCE_DATA iinitData;
+    iinitData.pSysMem = &indices[0];
+    HR(md3dDevice->CreateBuffer(&ibd, &iinitData, &mIB_test));
+
+	md3dImmediateContext->IASetInputLayout(InputLayouts::PosNormalTexTan);
+	md3dImmediateContext->IASetVertexBuffers(0, 1, &mVB_test, &stride, &offset);
+	md3dImmediateContext->IASetIndexBuffer(mIB_test, DXGI_FORMAT_R32_UINT, 0);
+	
+	md3dImmediateContext->RSSetState(RenderStates::WireframeRS);
+
+	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	Effects::BasicFX->SetWorld(world);
+	Effects::BasicFX->SetDirLights(mDirLights);
+	Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
+	Effects::BasicFX->SetWorldViewProj(worldViewProj);
+	Effects::BasicFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
+	Effects::BasicFX->SetMaterial(mEarthMat);
+	Effects::BasicFX->SetDiffuseMap(mEarthDiffuseMapSRV);
+	
+	activeTech = Effects::BasicFX->Light1Tech;
+	activeTech->GetDesc( &techDesc );
+    for(UINT p = 0; p < techDesc.Passes; ++p)
+    {
+		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+		md3dImmediateContext->DrawIndexed(mEarthIndexCount, mEarthIndexOffset, mEarthVertexOffset);
+	}
+#else
+	Effects::NormalMapFX->SetDirLights(mDirLights);
+	Effects::NormalMapFX->SetEyePosW(control.get_Camera().GetPosition());
 	
 	// SKY EFFECTS
 	Effects::SkyFX->SetEyePosW(control.get_Camera().GetPosition());
@@ -316,17 +389,6 @@ void Renderer::DrawScene()
 	 
 	ID3DX11EffectTechnique* activeTech;
     D3DX11_TECHNIQUE_DESC techDesc;
-
-	XMMATRIX world;
-	XMMATRIX worldInvTranspose;
-	XMMATRIX worldViewProj;
-	
-	world = XMLoadFloat4x4(&mEarthWorld);
-	worldInvTranspose = MathHelper::InverseTranspose(world);
-	worldViewProj = world*view*proj;
-	
-	UINT stride = sizeof(Vertex::PosNormalTexTan);
-    UINT offset = 0;
 
 	md3dImmediateContext->IASetInputLayout(InputLayouts::PosNormalTexTan);
 	md3dImmediateContext->IASetVertexBuffers(0, 1, &mVB, &stride, &offset);
@@ -456,12 +518,14 @@ void Renderer::DrawScene()
 	// restore default states
 	md3dImmediateContext->RSSetState(0);
 	md3dImmediateContext->OMSetDepthStencilState(0, 0);
+#endif
 
 	HR(mSwapChain->Present(0, 0));
 }
 
 void Renderer::BuildGeometryBuffers()
 {
+#if 0 
 	GeometryGenerator::MeshData earthMesh;
 	GeometryGenerator::MeshData skyMesh;
 	GeometryGenerator::MeshData cloudMesh;
@@ -552,5 +616,6 @@ void Renderer::BuildGeometryBuffers()
     D3D11_SUBRESOURCE_DATA iinitData;
     iinitData.pSysMem = &indices[0];
     HR(md3dDevice->CreateBuffer(&ibd, &iinitData, &mIB));
+#endif
 }
  

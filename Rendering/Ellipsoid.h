@@ -3,6 +3,7 @@
 #define ELLIPSOID_H
 
 #include "Object.h"
+#include "QuadTreeNode.h"
 
 class Ellipsoid : Object
 {
@@ -38,6 +39,12 @@ public:
 	float getA() { return a; }
 	float getB() { return b; }
 	float getC() { return c; }
+
+	void generateMeshes( int qtDepth = 10.0f );
+
+private:
+	void generateQT( QuadTreeNode* node, int numChildren, int numSubdivisions );
+	void subdividePlanar( QuadTreeNode::MeshData mesh, int quadrant );
 };
 
 #endif // ELLIPSOID_H
