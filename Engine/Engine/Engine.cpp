@@ -128,8 +128,14 @@ ID3D11Buffer* sphereVertBuffer;
 
 ID3D11VertexShader* SKYMAP_VS;
 ID3D11PixelShader* SKYMAP_PS;
+ID3D11PixelShader* TESSELLATE_PS;
+ID3D11HullShader* TESS_HS;
+ID3D11DomainShader *TESS_DS;
 ID3D10Blob* SKYMAP_VS_Buffer;
 ID3D10Blob* SKYMAP_PS_Buffer;
+ID3D10Blob* TESSELLATE_PS_Buffer;
+ID3D10Blob* TESS_HS_Buffer;
+ID3D10Blob* TESS_DS_Buffer;
 
 ID3D11ShaderResourceView* smrv;
 
@@ -853,8 +859,14 @@ void CleanUp()
 
 	SKYMAP_VS->Release();
 	SKYMAP_PS->Release();
+	TESSELLATE_PS->Release();
+	TESS_DS->Release();
+	TESS_HS->Release();
 	SKYMAP_VS_Buffer->Release();
 	SKYMAP_PS_Buffer->Release();
+	TESSELLATE_PS_Buffer->Release();
+	TESS_HS_Buffer->Release();
+	TESS_DS_Buffer->Release();
 
 	smrv->Release();
 
@@ -1063,12 +1075,15 @@ bool InitScene()
 	/*
 	 * Start Initializing scene by creating the shaders - compiled from Effects.fx
 	 */
-	hr = D3DX11CompileFromFile(L"Effects.fx", 0, 0, "VS", "vs_4_0", 0, 0, 0, &VS_Buffer, 0, 0);
-	hr = D3DX11CompileFromFile(L"Effects.fx", 0, 0, "PS", "ps_4_0", 0, 0, 0, &PS_Buffer, 0, 0);
-	hr = D3DX11CompileFromFile(L"Effects.fx", 0, 0, "D2D_PS", "ps_4_0", 0, 0, 0, &D2D_PS_Buffer, 0, 0);
+	hr = D3DX11CompileFromFile(L"Effects.fx", 0, 0, "VS", "vs_5_0", 0, 0, 0, &VS_Buffer, 0, 0);
+	hr = D3DX11CompileFromFile(L"Effects.fx", 0, 0, "PS", "ps_5_0", 0, 0, 0, &PS_Buffer, 0, 0);
+	hr = D3DX11CompileFromFile(L"Effects.fx", 0, 0, "D2D_PS", "ps_5_0", 0, 0, 0, &D2D_PS_Buffer, 0, 0);
 
-	hr = D3DX11CompileFromFile(L"Effects.fx", 0, 0, "SKYMAP_VS", "vs_4_0", 0, 0, 0, &SKYMAP_VS_Buffer, 0, 0);
-	hr = D3DX11CompileFromFile(L"Effects.fx", 0, 0, "SKYMAP_PS", "ps_4_0", 0, 0, 0, &SKYMAP_PS_Buffer, 0, 0);
+	hr = D3DX11CompileFromFile(L"Effects.fx", 0, 0, "SKYMAP_VS", "vs_5_0", 0, 0, 0, &SKYMAP_VS_Buffer, 0, 0);
+	hr = D3DX11CompileFromFile(L"Effects.fx", 0, 0, "SKYMAP_PS", "ps_5_0", 0, 0, 0, &SKYMAP_PS_Buffer, 0, 0);
+	hr = D3DX11CompileFromFile(L"Effects.fx", 0, 0, "TESSELLATE_PS", "ps_5_0", 0, 0, 0, &TESSELLATE_PS_Buffer, 0, 0);
+	hr = D3DX11CompileFromFile(L"Effects.fx", 0, 0, "TESS_DS", "ds_5_0", 0, 0, 0, &TESS_DS_Buffer, 0, 0);
+	hr = D3DX11CompileFromFile(L"Effects.fx", 0, 0, "TESS_HS", "hs_5_0", 0, 0, 0, &TESS_HS_Buffer, 0, 0);
 
 	/*
 	 * Create the shader objects
@@ -1079,6 +1094,9 @@ bool InitScene()
 
 	hr = d3d11Device->CreateVertexShader(SKYMAP_VS_Buffer->GetBufferPointer(), SKYMAP_VS_Buffer->GetBufferSize(), NULL, &SKYMAP_VS);
 	hr = d3d11Device->CreatePixelShader(SKYMAP_PS_Buffer->GetBufferPointer(), SKYMAP_PS_Buffer->GetBufferSize(), NULL, &SKYMAP_PS);
+	hr = d3d11Device->CreatePixelShader(TESSELLATE_PS_Buffer->GetBufferPointer(), TESSELLATE_PS_Buffer->GetBufferSize(), NULL, &TESSELLATE_PS);
+	hr = d3d11Device->CreateDomainShader(TESS_DS_Buffer->GetBufferPointer(), TESS_DS_Buffer->GetBufferSize(), NULL, &TESS_DS);
+	hr = d3d11Device->CreateHullShader(TESS_HS_Buffer->GetBufferPointer(), TESS_HS_Buffer->GetBufferSize(), NULL, &TESS_HS);
 
 	/*
 	 * Set the shaders as the current pipeline shaders
@@ -1575,6 +1593,7 @@ void DrawScene()
 	/*
 	 * SKYBOX
 	 */
+	d3d11DevCon->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	//Set the spheres index buffer
 	d3d11DevCon->IASetIndexBuffer( sphereIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 	//Set the spheres vertex buffer
@@ -1589,7 +1608,7 @@ void DrawScene()
 	//Send our skymap resource view to pixel shader
 	d3d11DevCon->PSSetShaderResources( 0, 1, &smrv );
 	d3d11DevCon->PSSetSamplers( 0, 1, &CubesTexSamplerState );
-
+	
 	//Set the new VS and PS shaders
 	d3d11DevCon->VSSetShader(SKYMAP_VS, 0, 0);
 	d3d11DevCon->PSSetShader(SKYMAP_PS, 0, 0);
@@ -1620,6 +1639,8 @@ void DrawScene()
 	 * so that the transparent objects can blend with the opaque objects.
 	 */
 
+#if 1
+
 	// Fine-tune the blending equation
 	float blendFactor[] = {0.75f, 0.75f, 0.75f, 1.0f};
 
@@ -1632,6 +1653,15 @@ void DrawScene()
 	d3d11DevCon->IASetVertexBuffers( 0, 1, &squareVertBuffer, &stride, &offset );
 
 	// RENDER OPAQUE OBJECTS HERE
+	
+	//Set the new VS and PS shaders
+	d3d11DevCon->VSSetShader(VS, 0, 0);
+	//d3d11DevCon->HSSetShader(TESS_HS, 0, 0);
+	//d3d11DevCon->DSSetShader(TESS_DS, 0, 0);
+	d3d11DevCon->PSSetShader(PS, 0, 0);
+	
+	//d3d11DevCon->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
+	d3d11DevCon->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
 	// Set the blend state for transparent objects
 	d3d11DevCon->OMSetBlendState(Transparency, blendFactor, 0xffffffff);
@@ -1743,7 +1773,10 @@ void DrawScene()
 	d3d11DevCon->RSSetState(CWcullMode);
 	d3d11DevCon->DrawIndexed( 36, 0, 0 );
 
+#endif
 	// Render this text
+	
+	//d3d101Device->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_POINTLIST);	
 	RenderText(L"FPS: ", fps);
 
 
