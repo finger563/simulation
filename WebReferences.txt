@@ -37,9 +37,11 @@ Clouds:
 
 Trees:
 ------
+* http://vterrain.org/Plants/Papers/
 
 Grass:
 ------
+* http://vterrain.org/Plants/Papers/
 
 Water:
 ------
@@ -52,14 +54,31 @@ Water:
 
 Physics:
 --------
-* http://blog.mmacklin.com/2010/11/01/adventures-in-fluid-simulation/
-* http://www.dunnalex.com/ViewProject.php?id=%270006%27
-* http://devblogs.nvidia.com/parallelforall/thinking-parallel-part-i-collision-detection-gpu/
-* http://http.developer.nvidia.com/GPUGems/gpugems_ch38.html
-* http://mmmovania.blogspot.cz/2011/05/simple-bouncing-box-physx3.html
-* http://physxinfo.com/news/11109/introduction-to-position-based-fluids/
-* http://scrawkblog.com/2013/05/21/gpu-gems-to-unity-2d-fluid-simulation/
-* http://en.wikipedia.org/wiki/Smoothed-particle_hydrodynamics
-* http://jsbsim.sourceforge.net/documentation.html
-* http://prideout.net/blog/?p=66
-* http://http.developer.nvidia.com/GPUGems3/gpugems3_ch32.html
+* Physics API:
+** PHYSX:
+*** http://docs.nvidia.com/gameworks/content/gameworkslibrary/physx/guide/Manual/Index.html
+*** http://docs.nvidia.com/gameworks/content/gameworkslibrary/physx/apireference/files/index.html
+*** http://mmmovania.blogspot.cz/2011/05/simple-bouncing-box-physx3.html
+
+** JSBSIM:
+*** http://jsbsim.sourceforge.net/documentation.html
+
+** HAVOK:
+*** http://mmmovania.blogspot.com/2014/03/havok-physics-engine-tutorial-series.html
+*** https://software.intel.com/en-us/forums/topic/278673
+*** http://dalyup.wordpress.com/2014/05/26/havok-tutorial-01-getting-started-3/
+
+* Fluids:
+** http://blog.mmacklin.com/2010/11/01/adventures-in-fluid-simulation/
+** http://http.developer.nvidia.com/GPUGems/gpugems_ch38.html
+** http://physxinfo.com/news/11109/introduction-to-position-based-fluids/
+** http://scrawkblog.com/2013/05/21/gpu-gems-to-unity-2d-fluid-simulation/
+** http://en.wikipedia.org/wiki/Smoothed-particle_hydrodynamics
+** http://prideout.net/blog/?p=66
+
+* Explosions:
+** http://www.dunnalex.com/ViewProject.php?id=%270006%27
+
+* Collision Detection:
+** http://devblogs.nvidia.com/parallelforall/thinking-parallel-part-i-collision-detection-gpu/
+** http://http.developer.nvidia.com/GPUGems3/gpugems3_ch32.html
