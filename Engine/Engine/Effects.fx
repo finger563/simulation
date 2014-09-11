@@ -118,7 +118,7 @@ struct PatchTess
 	float InsideTess  : SV_InsideTessFactor;
 };
 
-PatchTess PatchHS(InputPatch<SKYMAP_VS_OUTPUT,3> patch, 
+PatchTess PatchHS(InputPatch<VS_OUTPUT,3> patch, 
                   uint patchID : SV_PrimitiveID)
 {
 	PatchTess pt;
@@ -148,7 +148,7 @@ struct HullOut
 [outputtopology("triangle_cw")]
 [outputcontrolpoints(3)]
 [patchconstantfunc("PatchHS")]
-HullOut TESS_HS(InputPatch<SKYMAP_VS_OUTPUT,3> p, 
+HullOut TESS_HS(InputPatch<VS_OUTPUT,3> p, 
            uint i : SV_OutputControlPointID,
            uint patchId : SV_PrimitiveID)
 {
@@ -157,7 +157,7 @@ HullOut TESS_HS(InputPatch<SKYMAP_VS_OUTPUT,3> p,
 	// Pass through shader.
 	hout.Pos     = p[i].Pos;
 	hout.normal  = p[i].normal;
-	hout.texCoord      = p[i].texCoord;
+	hout.texCoord      = p[i].TexCoord;
 	return hout;
 }
 

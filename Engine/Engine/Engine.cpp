@@ -1654,15 +1654,15 @@ void DrawScene()
 
 	// RENDER OPAQUE OBJECTS HERE
 	
+	d3d11DevCon->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
+	//d3d11DevCon->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+
 	//Set the new VS and PS shaders
 	d3d11DevCon->VSSetShader(VS, 0, 0);
-	//d3d11DevCon->HSSetShader(TESS_HS, 0, 0);
-	//d3d11DevCon->DSSetShader(TESS_DS, 0, 0);
-	d3d11DevCon->PSSetShader(PS, 0, 0);
+	d3d11DevCon->HSSetShader(TESS_HS, 0, 0);
+	d3d11DevCon->DSSetShader(TESS_DS, 0, 0);
+	d3d11DevCon->PSSetShader(TESSELLATE_PS, 0, 0);
 	
-	//d3d11DevCon->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST );
-	d3d11DevCon->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-
 	// Set the blend state for transparent objects
 	d3d11DevCon->OMSetBlendState(Transparency, blendFactor, 0xffffffff);
 
