@@ -118,7 +118,9 @@
     <ClInclude Include="..\Common\Waves.h" />
     <ClInclude Include="Effects.h" />
     <ClInclude Include="Ellipsoid.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="QuadTreeNode.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="RenderStates.h" />

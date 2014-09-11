@@ -40,6 +40,9 @@
     <Filter Include="Header Files\Object\Ellipsoid">
       <UniqueIdentifier>{e1741410-4a36-468b-8a0f-ed9f6fabc8e5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\BVH">
+      <UniqueIdentifier>{54ccd5e8-2c2f-442f-ad42-7decda0089b9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vertex.cpp">
@@ -132,6 +135,12 @@
       <Filter>Header Files\Object\Ellipsoid</Filter>
     </ClInclude>
     <ClInclude Include="Object.h">
+      <Filter>Header Files\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="QuadTreeNode.h">
+      <Filter>Header Files\BVH</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
       <Filter>Header Files\Object</Filter>
     </ClInclude>
   </ItemGroup>
