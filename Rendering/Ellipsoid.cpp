@@ -1,76 +1,56 @@
 
 #include "Ellipsoid.h"
 
-QuadTreeNode::MeshData Ellipsoid::getMesh( XMFLOAT3 relPos ) {
-	QuadTreeNode::MeshData retMesh;
-	int vertOffset = 0;
-	for (int i=0;i<6;i++) {
-		for (int j=0;j<4;j++) {
-			for (int k=0;k<4;k++) {
-				for (int n=0;n<rootQT->children[i]->children[j]->children[k]->mesh.Vertices.size();n++) {
-					retMesh.Vertices.push_back(rootQT->children[i]->children[j]->children[k]->mesh.Vertices[n]);
-				}
-				for (int n=0;n<rootQT->children[i]->children[j]->children[k]->mesh.Indices.size();n++) {
-					retMesh.Indices.push_back(rootQT->children[i]->children[j]->children[k]->mesh.Indices[n] + vertOffset);
-				}
-				vertOffset += rootQT->children[i]->children[j]->children[k]->mesh.Vertices.size();
-			}
-		}
-	}
-	//retMesh = rootQT->mesh;
-	return retMesh;
-}
-
 void Ellipsoid::generateMeshes( int qtDepth ) {
-	QuadTreeNode::MeshData faces[6];
+	MeshData faces[6];
 
-	QuadTreeNode::Vertex v[24];
+	Vertex v[24];
 	    
 	// Fill in the front face vertex data.
-	v[0] = QuadTreeNode::Vertex(-a, -c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-	v[1] = QuadTreeNode::Vertex(-a, +c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	v[2] = QuadTreeNode::Vertex(+a, +c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-	v[3] = QuadTreeNode::Vertex(+a, -c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+	v[0] = Vertex(-a, -c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	v[1] = Vertex(-a, +c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	v[2] = Vertex(+a, +c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	v[3] = Vertex(+a, -c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
 
 	faces[0].Vertices.assign(&v[0], &v[4]);
 
 	// Fill in the back face vertex data.
-	v[4] = QuadTreeNode::Vertex(-a, -c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-	v[5] = QuadTreeNode::Vertex(+a, -c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-	v[6] = QuadTreeNode::Vertex(+a, +c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	v[7] = QuadTreeNode::Vertex(-a, +c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	v[4] = Vertex(-a, -c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+	v[5] = Vertex(+a, -c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	v[6] = Vertex(+a, +c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	v[7] = Vertex(-a, +c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 
 	faces[1].Vertices.assign(&v[4], &v[8]);
 
 	// Fill in the top face vertex data.
-	v[8]  = QuadTreeNode::Vertex(-a, +c, -b, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-	v[9]  = QuadTreeNode::Vertex(-a, +c, +b, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	v[10] = QuadTreeNode::Vertex(+a, +c, +b, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-	v[11] = QuadTreeNode::Vertex(+a, +c, -b, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+	v[8]  = Vertex(-a, +c, -b, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	v[9]  = Vertex(-a, +c, +b, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	v[10] = Vertex(+a, +c, +b, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	v[11] = Vertex(+a, +c, -b, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
 
 	faces[2].Vertices.assign(&v[8], &v[12]);
 
 	// Fill in the bottom face vertex data.
-	v[12] = QuadTreeNode::Vertex(-a, -c, -b, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-	v[13] = QuadTreeNode::Vertex(+a, -c, -b, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-	v[14] = QuadTreeNode::Vertex(+a, -c, +b, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	v[15] = QuadTreeNode::Vertex(-a, -c, +b, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	v[12] = Vertex(-a, -c, -b, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+	v[13] = Vertex(+a, -c, -b, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	v[14] = Vertex(+a, -c, +b, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	v[15] = Vertex(-a, -c, +b, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 
 	faces[3].Vertices.assign(&v[12], &v[16]);
 
 	// Fill in the left face vertex data.
-	v[16] = QuadTreeNode::Vertex(-a, -c, +b, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f);
-	v[17] = QuadTreeNode::Vertex(-a, +c, +b, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f);
-	v[18] = QuadTreeNode::Vertex(-a, +c, -b, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f);
-	v[19] = QuadTreeNode::Vertex(-a, -c, -b, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f);
+	v[16] = Vertex(-a, -c, +b, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f);
+	v[17] = Vertex(-a, +c, +b, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f);
+	v[18] = Vertex(-a, +c, -b, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f);
+	v[19] = Vertex(-a, -c, -b, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f);
 
 	faces[4].Vertices.assign(&v[16], &v[20]);
 
 	// Fill in the right face vertex data.
-	v[20] = QuadTreeNode::Vertex(+a, -c, -b, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f);
-	v[21] = QuadTreeNode::Vertex(+a, +c, -b, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
-	v[22] = QuadTreeNode::Vertex(+a, +c, +b, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-	v[23] = QuadTreeNode::Vertex(+a, -c, +b, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+	v[20] = Vertex(+a, -c, -b, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f);
+	v[21] = Vertex(+a, +c, -b, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+	v[22] = Vertex(+a, +c, +b, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	v[23] = Vertex(+a, -c, +b, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
 
 	faces[5].Vertices.assign(&v[20], &v[24]);
  
@@ -119,117 +99,85 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 	if ( rootQT ) {
 		delete rootQT;
 	}
-	rootQT = new QuadTreeNode( NULL, 10.0f, 6);	// create root QTNode, error = 10, 1 child for each face of the starting cube
-	rootQT->mesh.Vertices.assign(&v[0], &v[24]);
-	rootQT->mesh.Indices.assign(&i[0], &i[36]);
+	rootQT = new QuadTreeNode( NULL, 36, 10.0f, 6);	// create root QTNode, error = 10, 1 child for each face of the starting cube
+	Vertices.assign(&v[0], &v[24]);
+	std::copy(&i[0],&i[36],rootQT->indices);
+	//rootQT->mesh.Indices.assign(&i[0], &i[36]);
 
-	int numSubdivisions = 4;
 	for (int i=0; i < 6; i++) {
-		rootQT->children[i] = new QuadTreeNode( rootQT, rootQT->error/2.0f, 4 );
-		rootQT->children[i]->mesh = faces[i];
-		generateQT( rootQT->children[i], 4, numSubdivisions );
+		rootQT->children[i] = new QuadTreeNode( rootQT, 6, rootQT->error/2.0f, 4 );
+		//rootQT->children[i]->mesh = faces[i];
+		std::copy(&faces[i].Indices[0],&faces[i].Indices[6],rootQT->children[i]->indices);
+		generateQT( rootQT->children[i], 4, qtDepth );
 	}
 }
 
 void Ellipsoid::generateQT( QuadTreeNode* node, int numChildren, int numSubdivisions ) {
 	int remainingSubdivisions = numSubdivisions - 1;
 	for (int i=0; i < numChildren; i++) {
-		node->children[i] = new QuadTreeNode(node, node->error/2.0f, numChildren);
-		node->children[i]->mesh = node->mesh;
-		subdividePlanar(node->children[i]->mesh, i);
+		node->children[i] = new QuadTreeNode(node, 6, node->error/2.0f, numChildren);
+		subdividePlanarQuad( node );
 		if ( remainingSubdivisions > 0 ) 
 			generateQT( node->children[i], numChildren, remainingSubdivisions );
 	}
 }
 
-void Ellipsoid::subdividePlanar( QuadTreeNode::MeshData& mesh, int quadrant ) {
-	XMFLOAT3 normal = mesh.Vertices[0].Normal;
-	XMFLOAT3 down = XMFLOAT3(0,0,0);
-	XMFLOAT3 right = mesh.Vertices[0].TangentU;
-	if ( abs(normal.x) ) {
-		down.y = -1.0f;
-	}
-	else if ( abs(normal.y) ) {
-		if ( normal.y > 0 ) {
-			down.z = -1.0f;
-		}
-		else {
-			down.z = 1.0f;
-		}
-	}
-	else if ( abs(normal.z) ) {
-		down.y = -1.0f;
-	}
-	right = XMFLOAT3(right.x/2.0f, right.y/2.0f, right.z/2.0f);
-	down = XMFLOAT3(down.x/2.0f, down.y/2.0f, down.z/2.0f);
-	XMVECTOR d = XMLoadFloat3( & down );
-	XMVECTOR r = XMLoadFloat3( & right );
-	
-	XMVECTOR bottomLeft = XMLoadFloat3( &mesh.Vertices[0].Position );
-	XMVECTOR topLeft = XMLoadFloat3( &mesh.Vertices[1].Position );
-	XMVECTOR topRight = XMLoadFloat3( &mesh.Vertices[2].Position );
-	r = (topRight - topLeft) / 2.0f;
-	d = (bottomLeft - topLeft) / 2.0f;
+void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
+	XMVECTOR bottomLeft = XMLoadFloat3( &Vertices[node->indices[0]].Position );
+	XMVECTOR topLeft = XMLoadFloat3( &Vertices[node->indices[1]].Position );
+	XMVECTOR topRight = XMLoadFloat3( &Vertices[node->indices[2]].Position );
+	XMVECTOR bottomRight = XMLoadFloat3( &Vertices[node->indices[5]].Position );
 
-	XMVECTOR pos;
-	switch ( quadrant ) {
-	case 0:	// upper left
-		pos = XMLoadFloat3( &mesh.Vertices[0].Position );
-		pos = pos - d;
-		XMStoreFloat3(&mesh.Vertices[0].Position,pos);
-		
-		pos = XMLoadFloat3( &mesh.Vertices[2].Position );
-		pos = pos - r;
-		XMStoreFloat3(&mesh.Vertices[2].Position,pos);
-		
-		pos = XMLoadFloat3( &mesh.Vertices[3].Position );
-		pos = pos - d;
-		pos = pos - r;
-		XMStoreFloat3(&mesh.Vertices[3].Position,pos);
-		break;
-	case 1: // upper right
-		pos = XMLoadFloat3( &mesh.Vertices[0].Position );
-		pos = pos - d;
-		pos = pos + r;
-		XMStoreFloat3(&mesh.Vertices[0].Position,pos);
-		
-		pos = XMLoadFloat3( &mesh.Vertices[1].Position );
-		pos = pos + r;
-		XMStoreFloat3(&mesh.Vertices[1].Position,pos);
-		
-		pos = XMLoadFloat3( &mesh.Vertices[3].Position );
-		pos = pos - d;
-		XMStoreFloat3(&mesh.Vertices[3].Position,pos);
-		break;
-	case 2: // lower left
-		pos = XMLoadFloat3( &mesh.Vertices[1].Position );
-		pos = pos + d;
-		XMStoreFloat3(&mesh.Vertices[1].Position,pos);
-		
-		pos = XMLoadFloat3( &mesh.Vertices[2].Position );
-		pos = pos - r;
-		pos = pos + d;
-		XMStoreFloat3(&mesh.Vertices[2].Position,pos);
-		
-		pos = XMLoadFloat3( &mesh.Vertices[3].Position );
-		pos = pos - r;
-		XMStoreFloat3(&mesh.Vertices[3].Position,pos);
-		break;
-	case 3: // lower right
-		pos = XMLoadFloat3( &mesh.Vertices[0].Position );
-		pos = pos + r;
-		XMStoreFloat3(&mesh.Vertices[0].Position,pos);
-		
-		pos = XMLoadFloat3( &mesh.Vertices[1].Position );
-		pos = pos + d;
-		pos = pos + r;
-		XMStoreFloat3(&mesh.Vertices[1].Position,pos);
-		
-		pos = XMLoadFloat3( &mesh.Vertices[2].Position );
-		pos = pos + d;
-		XMStoreFloat3(&mesh.Vertices[2].Position,pos);
-		break;
-	default:
-		break;
-	}
+	XMFLOAT3 midTop;
+	XMStoreFloat3(&midTop,(topRight - topLeft) / 2.0f + topLeft);
+	XMFLOAT3 midBottom;
+	XMStoreFloat3(&midBottom,(bottomRight - bottomLeft) / 2.0f + bottomLeft);
+	XMFLOAT3 midRight;
+	XMStoreFloat3(&midRight,(bottomRight - topRight) / 2.0f + topRight);
+	XMFLOAT3 midLeft;
+	XMStoreFloat3(&midLeft,(bottomLeft - topLeft) / 2.0f + topLeft);
+	XMFLOAT3 center;
+	XMStoreFloat3(&center,(bottomRight - topLeft) / 2.0f + topLeft);
+
+	Vertex tmp = Vertices[node->indices[0]];
+	tmp.Position = midLeft;		// 4
+	Vertices.push_back( tmp );
+	tmp.Position = midTop;		// 5
+	Vertices.push_back( tmp );
+	tmp.Position = midBottom;	// 6
+	Vertices.push_back( tmp );
+	tmp.Position = center;		// 7
+	Vertices.push_back( tmp );
+	tmp.Position = midRight;	// 8
+	Vertices.push_back( tmp );
+
+	int startInd = node->indices[0];
+	
+	node->children[0]->indices[0] = startInd + 0;
+	node->children[0]->indices[1] = startInd + 4;
+	node->children[0]->indices[2] = startInd + 7;
+	node->children[0]->indices[3] = startInd + 0;
+	node->children[0]->indices[4] = startInd + 7;
+	node->children[0]->indices[5] = startInd + 6;
+	
+	node->children[1]->indices[0] = startInd + 4;
+	node->children[1]->indices[1] = startInd + 1;
+	node->children[1]->indices[2] = startInd + 5;
+	node->children[1]->indices[3] = startInd + 4;
+	node->children[1]->indices[4] = startInd + 5;
+	node->children[1]->indices[5] = startInd + 7;
+	
+	node->children[2]->indices[0] = startInd + 7;
+	node->children[2]->indices[1] = startInd + 5;
+	node->children[2]->indices[2] = startInd + 2;
+	node->children[2]->indices[3] = startInd + 7;
+	node->children[2]->indices[4] = startInd + 2;
+	node->children[2]->indices[5] = startInd + 8;
+	
+	node->children[3]->indices[0] = startInd + 6;
+	node->children[3]->indices[1] = startInd + 7;
+	node->children[3]->indices[2] = startInd + 8;
+	node->children[3]->indices[3] = startInd + 6;
+	node->children[3]->indices[4] = startInd + 8;
+	node->children[3]->indices[5] = startInd + 3;
 }

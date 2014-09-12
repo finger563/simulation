@@ -8,51 +8,37 @@
 #include <vector>
 
 struct QuadTreeNode
-{
-	
-	struct Vertex
-	{
-		Vertex(){}
-		Vertex(const XMFLOAT3& p, const XMFLOAT3& n, const XMFLOAT3& t, const XMFLOAT2& uv)
-			: Position(p), Normal(n), TangentU(t), TexC(uv){}
-		Vertex(
-			float px, float py, float pz, 
-			float nx, float ny, float nz,
-			float tx, float ty, float tz,
-			float u, float v)
-			: Position(px,py,pz), Normal(nx,ny,nz),
-				TangentU(tx, ty, tz), TexC(u,v){}
+{	
+	QuadTreeNode*	*children;	// pointer to array of children pointers of this node
+	int				numChildren;// number of children this QT node has
+	QuadTreeNode*	parent;		// parent QT node
+	float			error;		// deviation of this QTnode from actual mesh
+	UINT*			indices;	// indices into some mesh
+	int				numIndices;	// number of indices this node has 
 
-		XMFLOAT3 Position;
-		XMFLOAT3 Normal;
-		XMFLOAT3 TangentU;
-		XMFLOAT2 TexC;
-	};
-
-	struct MeshData
-	{
-		std::vector<Vertex> Vertices;
-		std::vector<UINT> Indices;
-	};
-
-	QuadTreeNode*	*children;
-	int				numChildren;
-	QuadTreeNode*	parent;
-	float			error;
-	MeshData		mesh;
-
-	QuadTreeNode ( QuadTreeNode* _parent = NULL, float _error = 100.0f, int _children = 0 ) 
-	: parent(_parent), error(_error) {
-		if ( _children > 0 )
+	QuadTreeNode ( QuadTreeNode* _parent = NULL, int _numIndices = 6, float _error = 100.0f, int _numChildren = 0 ) 
+	: parent(_parent), numIndices(_numIndices), error(_error) {
+		if ( _numChildren > 0 )
 		{
-			children = new QuadTreeNode*[_children];
-			numChildren = _children;
+			children = new QuadTreeNode*[_numChildren];
+			numChildren = _numChildren;
 			for (int i=0; i< numChildren; i++)
 				children[i] = NULL;
 		}
 		else {
 			children = NULL;
 			numChildren = 0;
+		}
+
+		if ( _numIndices > 0 ) {
+			numIndices = _numIndices;
+			indices = new UINT[numIndices];
+			for (int i=0; i< numIndices; i++)
+				indices[i] = 0;
+		}
+		else {
+			numIndices = 0;
+			indices = NULL;
 		}
 	}
 
@@ -63,8 +49,12 @@ struct QuadTreeNode
 					delete children[i];
 				}
 			}
+			delete children;
 		}
-		delete children;
+		
+		if ( indices ) {
+			delete indices;
+		}
 	}
 };
 

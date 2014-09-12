@@ -248,11 +248,9 @@ void Renderer::DrawScene()
 
 	ID3D11Buffer* mVB_test;
 	ID3D11Buffer* mIB_test;
-
-	QuadTreeNode::MeshData earthMesh = earth.getMesh( control.get_Camera().GetPosition() );
-
-	std::vector<Vertex::PosNormalTexTan> vertices( earthMesh.Vertices.size() );
-
+	
+	std::vector<Vertex::PosNormalTexTan> vertices;// = earthMesh.Vertices.size() );
+	/*
 	UINT k = 0;
 	for(size_t i = 0; i < earthMesh.Vertices.size(); ++i, ++k)
 	{
@@ -261,7 +259,7 @@ void Renderer::DrawScene()
 		vertices[k].Tex			= earthMesh.Vertices[i].TexC;
 		vertices[k].TangentU	= earthMesh.Vertices[i].TangentU;
 	}
-		
+	*/
 	
     D3D11_BUFFER_DESC vbd;
     vbd.Usage = D3D11_USAGE_IMMUTABLE;
@@ -278,7 +276,7 @@ void Renderer::DrawScene()
 	//
 
 	std::vector<UINT> indices;
-	indices.insert(indices.end(), earthMesh.Indices.begin(), earthMesh.Indices.end());
+	//indices.insert(indices.end(), earthMesh.Indices.begin(), earthMesh.Indices.end());
 
 	D3D11_BUFFER_DESC ibd;
     ibd.Usage = D3D11_USAGE_IMMUTABLE;
@@ -310,7 +308,7 @@ void Renderer::DrawScene()
     for(UINT p = 0; p < techDesc.Passes; ++p)
     {
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
-		md3dImmediateContext->DrawIndexed(earthMesh.Indices.size(), 0, 0);
+		//md3dImmediateContext->DrawIndexed(earthMesh.Indices.size(), 0, 0);
 	}
 
 	ReleaseCOM(mVB_test);
@@ -543,7 +541,7 @@ void Renderer::BuildGeometryBuffers()
 {
 #if USE_QUADTREE
 	earth = Ellipsoid(control.get_earthRadius()/2.0f, control.get_earthRadius()/2.0f, control.get_earthRadius()/2.0f);
-	earth.generateMeshes();
+	earth.generateMeshes( 3 );
 #else
 	GeometryGenerator::MeshData earthMesh;
 	GeometryGenerator::MeshData skyMesh;
