@@ -1,12 +1,27 @@
 
 #include "Ellipsoid.h"
 
-void Ellipsoid::generateMeshes( int qtDepth ) {
-	if ( rootQT ) {
-		delete rootQT;
+QuadTreeNode::MeshData Ellipsoid::getMesh( XMFLOAT3 relPos ) {
+	QuadTreeNode::MeshData retMesh;
+	int vertOffset = 0;
+	for (int i=0;i<6;i++) {
+		for (int j=0;j<4;j++) {
+			for (int k=0;k<4;k++) {
+				for (int n=0;n<rootQT->children[i]->children[j]->children[k]->mesh.Vertices.size();n++) {
+					retMesh.Vertices.push_back(rootQT->children[i]->children[j]->children[k]->mesh.Vertices[n]);
+				}
+				for (int n=0;n<rootQT->children[i]->children[j]->children[k]->mesh.Indices.size();n++) {
+					retMesh.Indices.push_back(rootQT->children[i]->children[j]->children[k]->mesh.Indices[n] + vertOffset);
+				}
+				vertOffset += rootQT->children[i]->children[j]->children[k]->mesh.Vertices.size();
+			}
+		}
 	}
-	rootQT = new QuadTreeNode( NULL, 10.0f, 6);	// create root QTNode, error = 10, 1 child for each face of the starting cube
-		
+	//retMesh = rootQT->mesh;
+	return retMesh;
+}
+
+void Ellipsoid::generateMeshes( int qtDepth ) {
 	QuadTreeNode::MeshData faces[6];
 
 	QuadTreeNode::Vertex v[24];
@@ -58,8 +73,6 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 	v[23] = QuadTreeNode::Vertex(+a, -c, +b, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
 
 	faces[5].Vertices.assign(&v[20], &v[24]);
-
-	rootQT->mesh.Vertices.assign(&v[0], &v[24]);
  
 	//
 	// Create the indices.
@@ -103,6 +116,11 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 
 	faces[5].Indices.assign(&i[30], &i[36]);
 
+	if ( rootQT ) {
+		delete rootQT;
+	}
+	rootQT = new QuadTreeNode( NULL, 10.0f, 6);	// create root QTNode, error = 10, 1 child for each face of the starting cube
+	rootQT->mesh.Vertices.assign(&v[0], &v[24]);
 	rootQT->mesh.Indices.assign(&i[0], &i[36]);
 
 	int numSubdivisions = 4;
@@ -124,7 +142,7 @@ void Ellipsoid::generateQT( QuadTreeNode* node, int numChildren, int numSubdivis
 	}
 }
 
-void Ellipsoid::subdividePlanar( QuadTreeNode::MeshData mesh, int quadrant ) {
+void Ellipsoid::subdividePlanar( QuadTreeNode::MeshData& mesh, int quadrant ) {
 	XMFLOAT3 normal = mesh.Vertices[0].Normal;
 	XMFLOAT3 down = XMFLOAT3(0,0,0);
 	XMFLOAT3 right = mesh.Vertices[0].TangentU;
@@ -146,6 +164,13 @@ void Ellipsoid::subdividePlanar( QuadTreeNode::MeshData mesh, int quadrant ) {
 	down = XMFLOAT3(down.x/2.0f, down.y/2.0f, down.z/2.0f);
 	XMVECTOR d = XMLoadFloat3( & down );
 	XMVECTOR r = XMLoadFloat3( & right );
+	
+	XMVECTOR bottomLeft = XMLoadFloat3( &mesh.Vertices[0].Position );
+	XMVECTOR topLeft = XMLoadFloat3( &mesh.Vertices[1].Position );
+	XMVECTOR topRight = XMLoadFloat3( &mesh.Vertices[2].Position );
+	r = (topRight - topLeft) / 2.0f;
+	d = (bottomLeft - topLeft) / 2.0f;
+
 	XMVECTOR pos;
 	switch ( quadrant ) {
 	case 0:	// upper left

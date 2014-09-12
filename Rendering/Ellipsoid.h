@@ -42,9 +42,11 @@ public:
 
 	void generateMeshes( int qtDepth = 10.0f );
 
+	QuadTreeNode::MeshData getMesh ( XMFLOAT3 relPos );
+
 private:
 	void generateQT( QuadTreeNode* node, int numChildren, int numSubdivisions );
-	void subdividePlanar( QuadTreeNode::MeshData mesh, int quadrant );
+	void subdividePlanar( QuadTreeNode::MeshData& mesh, int quadrant );
 };
 
 #endif // ELLIPSOID_H

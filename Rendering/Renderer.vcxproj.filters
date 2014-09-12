@@ -84,6 +84,9 @@
     <ClCompile Include="Ellipsoid.cpp">
       <Filter>Source Files\Object\Ellipsoid</Filter>
     </ClCompile>
+    <ClCompile Include="..\Common\GeometryGenerator.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Effects.h">
@@ -133,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="QuadTreeNode.h">
       <Filter>Header Files\BVH</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\GeometryGenerator.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

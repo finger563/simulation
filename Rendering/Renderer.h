@@ -8,7 +8,12 @@
 #include "d3dApp.h"
 #include "RenderStates.h"
 #include "Controller.h"
+
+#define USE_QUADTREE 1
+
+#if USE_QUADTREE
 #include "Ellipsoid.h"
+#endif
 
 enum RenderOptions
 {
@@ -40,6 +45,10 @@ private:
 	void BuildGeometryBuffers();
 
 private:
+#if USE_QUADTREE
+	Ellipsoid earth;
+#endif
+
 	ID3D11Buffer* mVB;
 	ID3D11Buffer* mIB;
 

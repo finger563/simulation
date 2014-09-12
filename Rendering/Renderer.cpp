@@ -3,12 +3,16 @@
 //***************************************************************************************
 
 #include "d3dx11Effect.h"
-//#include "GeometryGenerator.h"
 #include "MathHelper.h"
 #include "LightHelper.h"
 #include "Effects.h"
 #include "Vertex.h"
 #include "Renderer.h"
+
+#if USE_QUADTREE
+#else
+#include "GeometryGenerator.h"
+#endif
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 				   PSTR cmdLine, int showCmd)
@@ -240,12 +244,24 @@ void Renderer::DrawScene()
 	Effects::BasicFX->SetDirLights(mDirLights);
 	Effects::BasicFX->SetEyePosW(control.get_Camera().GetPosition());
 	
-#if 1
+#if USE_QUADTREE
 
 	ID3D11Buffer* mVB_test;
 	ID3D11Buffer* mIB_test;
 
-	std::vector<Vertex::PosNormalTexTan> vertices;
+	QuadTreeNode::MeshData earthMesh = earth.getMesh( control.get_Camera().GetPosition() );
+
+	std::vector<Vertex::PosNormalTexTan> vertices( earthMesh.Vertices.size() );
+
+	UINT k = 0;
+	for(size_t i = 0; i < earthMesh.Vertices.size(); ++i, ++k)
+	{
+		vertices[k].Pos			= earthMesh.Vertices[i].Position;
+		vertices[k].Normal		= earthMesh.Vertices[i].Normal;
+		vertices[k].Tex			= earthMesh.Vertices[i].TexC;
+		vertices[k].TangentU	= earthMesh.Vertices[i].TangentU;
+	}
+		
 	
     D3D11_BUFFER_DESC vbd;
     vbd.Usage = D3D11_USAGE_IMMUTABLE;
@@ -262,7 +278,7 @@ void Renderer::DrawScene()
 	//
 
 	std::vector<UINT> indices;
-	//indices.insert(indices.end(), earthMesh.Indices.begin(), earthMesh.Indices.end());
+	indices.insert(indices.end(), earthMesh.Indices.begin(), earthMesh.Indices.end());
 
 	D3D11_BUFFER_DESC ibd;
     ibd.Usage = D3D11_USAGE_IMMUTABLE;
@@ -294,8 +310,11 @@ void Renderer::DrawScene()
     for(UINT p = 0; p < techDesc.Passes; ++p)
     {
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
-		md3dImmediateContext->DrawIndexed(mEarthIndexCount, mEarthIndexOffset, mEarthVertexOffset);
+		md3dImmediateContext->DrawIndexed(earthMesh.Indices.size(), 0, 0);
 	}
+
+	ReleaseCOM(mVB_test);
+	ReleaseCOM(mIB_test);
 #else
 	Effects::NormalMapFX->SetDirLights(mDirLights);
 	Effects::NormalMapFX->SetEyePosW(control.get_Camera().GetPosition());
@@ -387,9 +406,6 @@ void Renderer::DrawScene()
 	Effects::CloudsFX->SetG2((-0.990f)*(-0.990f));
 	Effects::CloudsFX->SetDirLights(mDirLights);
 	 
-	ID3DX11EffectTechnique* activeTech;
-    D3DX11_TECHNIQUE_DESC techDesc;
-
 	md3dImmediateContext->IASetInputLayout(InputLayouts::PosNormalTexTan);
 	md3dImmediateContext->IASetVertexBuffers(0, 1, &mVB, &stride, &offset);
 	md3dImmediateContext->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
@@ -525,7 +541,10 @@ void Renderer::DrawScene()
 
 void Renderer::BuildGeometryBuffers()
 {
-#if 0 
+#if USE_QUADTREE
+	earth = Ellipsoid(control.get_earthRadius()/2.0f, control.get_earthRadius()/2.0f, control.get_earthRadius()/2.0f);
+	earth.generateMeshes();
+#else
 	GeometryGenerator::MeshData earthMesh;
 	GeometryGenerator::MeshData skyMesh;
 	GeometryGenerator::MeshData cloudMesh;
