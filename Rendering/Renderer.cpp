@@ -246,37 +246,13 @@ void Renderer::DrawScene()
 	
 #if USE_QUADTREE
 
-	ID3D11Buffer* mVB_test;
 	ID3D11Buffer* mIB_test;
 	
-	std::vector<Object::Vertex> earthVerts = earth.getVertices();
-	std::vector<Vertex::PosNormalTexTan> vertices( earthVerts.size() );
-	
-	UINT k = 0;
-	for(size_t i = 0; i < earthVerts.size(); ++i, ++k)
-	{
-		vertices[k].Pos			= earthVerts[i].Position;
-		vertices[k].Normal		= earthVerts[i].Normal;
-		vertices[k].Tex			= earthVerts[i].TexC;
-		vertices[k].TangentU	= earthVerts[i].TangentU;
-	}
-	
-	
-    D3D11_BUFFER_DESC vbd;
-    vbd.Usage = D3D11_USAGE_IMMUTABLE;
-    vbd.ByteWidth = sizeof(Vertex::PosNormalTexTan) * vertices.size();
-    vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    vbd.CPUAccessFlags = 0;
-    vbd.MiscFlags = 0;
-    D3D11_SUBRESOURCE_DATA vinitData;
-    vinitData.pSysMem = &vertices[0];
-    HR(md3dDevice->CreateBuffer(&vbd, &vinitData, &mVB_test));
+	std::vector<UINT> indices = earth.getIndices();
 
 	//
 	// Pack the indices of all the meshes into one index buffer.
 	//
-
-	std::vector<UINT> indices = earth.getIndices();
 
 	D3D11_BUFFER_DESC ibd;
     ibd.Usage = D3D11_USAGE_IMMUTABLE;
@@ -289,7 +265,7 @@ void Renderer::DrawScene()
     HR(md3dDevice->CreateBuffer(&ibd, &iinitData, &mIB_test));
 
 	md3dImmediateContext->IASetInputLayout(InputLayouts::PosNormalTexTan);
-	md3dImmediateContext->IASetVertexBuffers(0, 1, &mVB_test, &stride, &offset);
+	md3dImmediateContext->IASetVertexBuffers(0, 1, &mVB, &stride, &offset);
 	md3dImmediateContext->IASetIndexBuffer(mIB_test, DXGI_FORMAT_R32_UINT, 0);
 	
 	md3dImmediateContext->RSSetState(RenderStates::WireframeRS);
@@ -311,7 +287,6 @@ void Renderer::DrawScene()
 		md3dImmediateContext->DrawIndexed(indices.size(), 0, 0);
 	}
 
-	ReleaseCOM(mVB_test);
 	ReleaseCOM(mIB_test);
 #else
 	Effects::NormalMapFX->SetDirLights(mDirLights);
@@ -541,7 +516,31 @@ void Renderer::BuildGeometryBuffers()
 {
 #if USE_QUADTREE
 	earth = Ellipsoid(control.get_earthRadius()/2.0f, control.get_earthRadius()/2.0f, control.get_earthRadius()/2.0f);
-	earth.generateMeshes( 3 );
+	earth.generateMeshes( 7 );
+	
+	std::vector<Object::Vertex> earthVerts = earth.getVertices();
+	std::vector<Vertex::PosNormalTexTan> vertices( earthVerts.size() );
+	
+	UINT k = 0;
+	for(size_t i = 0; i < earthVerts.size(); ++i, ++k)
+	{
+		vertices[k].Pos			= earthVerts[i].Position;
+		vertices[k].Normal		= earthVerts[i].Normal;
+		vertices[k].Tex			= earthVerts[i].TexC;
+		vertices[k].TangentU	= earthVerts[i].TangentU;
+	}
+	
+	
+    D3D11_BUFFER_DESC vbd;
+    vbd.Usage = D3D11_USAGE_IMMUTABLE;
+    vbd.ByteWidth = sizeof(Vertex::PosNormalTexTan) * vertices.size();
+    vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    vbd.CPUAccessFlags = 0;
+    vbd.MiscFlags = 0;
+    D3D11_SUBRESOURCE_DATA vinitData;
+    vinitData.pSysMem = &vertices[0];
+    HR(md3dDevice->CreateBuffer(&vbd, &vinitData, &mVB));
+
 #else
 	GeometryGenerator::MeshData earthMesh;
 	GeometryGenerator::MeshData skyMesh;
