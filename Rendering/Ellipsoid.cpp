@@ -138,46 +138,64 @@ void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 	XMStoreFloat3(&midLeft,(bottomLeft - topLeft) / 2.0f + topLeft);
 	XMFLOAT3 center;
 	XMStoreFloat3(&center,(bottomRight - topLeft) / 2.0f + topLeft);
+	
+	int v0 = node->indices[0];
+	int v1 = node->indices[1];
+	int v2 = node->indices[2];
+	int v3 = node->indices[5];
 
 	Vertex tmp = Vertices[node->indices[0]];
 	tmp.Position = midLeft;		// 4
 	Vertices.push_back( tmp );
+	
+	int v4 = Vertices.size() - 1;
+
 	tmp.Position = midTop;		// 5
 	Vertices.push_back( tmp );
+	
+	int v5 = Vertices.size() - 1;
+
 	tmp.Position = midBottom;	// 6
 	Vertices.push_back( tmp );
+	
+	int v6 = Vertices.size() - 1;
+
 	tmp.Position = center;		// 7
 	Vertices.push_back( tmp );
+
+	int v7 = Vertices.size() - 1;
+
 	tmp.Position = midRight;	// 8
 	Vertices.push_back( tmp );
 
-	int startInd = node->indices[0];
+	int v8 = Vertices.size() - 1;
+
 	
-	node->children[0]->indices[0] = startInd + 0;
-	node->children[0]->indices[1] = startInd + 4;
-	node->children[0]->indices[2] = startInd + 7;
-	node->children[0]->indices[3] = startInd + 0;
-	node->children[0]->indices[4] = startInd + 7;
-	node->children[0]->indices[5] = startInd + 6;
+	node->children[0]->indices[0] = v0;
+	node->children[0]->indices[1] = v4;
+	node->children[0]->indices[2] = v7;
+	node->children[0]->indices[3] = v0;
+	node->children[0]->indices[4] = v7;
+	node->children[0]->indices[5] = v6;
 	
-	node->children[1]->indices[0] = startInd + 4;
-	node->children[1]->indices[1] = startInd + 1;
-	node->children[1]->indices[2] = startInd + 5;
-	node->children[1]->indices[3] = startInd + 4;
-	node->children[1]->indices[4] = startInd + 5;
-	node->children[1]->indices[5] = startInd + 7;
+	node->children[1]->indices[0] = v4;
+	node->children[1]->indices[1] = v1;
+	node->children[1]->indices[2] = v5;
+	node->children[1]->indices[3] = v4;
+	node->children[1]->indices[4] = v5;
+	node->children[1]->indices[5] = v7;
 	
-	node->children[2]->indices[0] = startInd + 7;
-	node->children[2]->indices[1] = startInd + 5;
-	node->children[2]->indices[2] = startInd + 2;
-	node->children[2]->indices[3] = startInd + 7;
-	node->children[2]->indices[4] = startInd + 2;
-	node->children[2]->indices[5] = startInd + 8;
+	node->children[2]->indices[0] = v7;
+	node->children[2]->indices[1] = v5;
+	node->children[2]->indices[2] = v2;
+	node->children[2]->indices[3] = v7;
+	node->children[2]->indices[4] = v2;
+	node->children[2]->indices[5] = v8;
 	
-	node->children[3]->indices[0] = startInd + 6;
-	node->children[3]->indices[1] = startInd + 7;
-	node->children[3]->indices[2] = startInd + 8;
-	node->children[3]->indices[3] = startInd + 6;
-	node->children[3]->indices[4] = startInd + 8;
-	node->children[3]->indices[5] = startInd + 3;
+	node->children[3]->indices[0] = v6;
+	node->children[3]->indices[1] = v7;
+	node->children[3]->indices[2] = v8;
+	node->children[3]->indices[3] = v6;
+	node->children[3]->indices[4] = v8;
+	node->children[3]->indices[5] = v3;
 }
