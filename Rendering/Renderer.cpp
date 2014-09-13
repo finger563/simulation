@@ -249,17 +249,18 @@ void Renderer::DrawScene()
 	ID3D11Buffer* mVB_test;
 	ID3D11Buffer* mIB_test;
 	
-	std::vector<Vertex::PosNormalTexTan> vertices;// = earthMesh.Vertices.size() );
-	/*
+	std::vector<Object::Vertex> earthVerts = earth.getVertices();
+	std::vector<Vertex::PosNormalTexTan> vertices( earthVerts.size() );
+	
 	UINT k = 0;
-	for(size_t i = 0; i < earthMesh.Vertices.size(); ++i, ++k)
+	for(size_t i = 0; i < earthVerts.size(); ++i, ++k)
 	{
-		vertices[k].Pos			= earthMesh.Vertices[i].Position;
-		vertices[k].Normal		= earthMesh.Vertices[i].Normal;
-		vertices[k].Tex			= earthMesh.Vertices[i].TexC;
-		vertices[k].TangentU	= earthMesh.Vertices[i].TangentU;
+		vertices[k].Pos			= earthVerts[i].Position;
+		vertices[k].Normal		= earthVerts[i].Normal;
+		vertices[k].Tex			= earthVerts[i].TexC;
+		vertices[k].TangentU	= earthVerts[i].TangentU;
 	}
-	*/
+	
 	
     D3D11_BUFFER_DESC vbd;
     vbd.Usage = D3D11_USAGE_IMMUTABLE;
@@ -275,8 +276,7 @@ void Renderer::DrawScene()
 	// Pack the indices of all the meshes into one index buffer.
 	//
 
-	std::vector<UINT> indices;
-	//indices.insert(indices.end(), earthMesh.Indices.begin(), earthMesh.Indices.end());
+	std::vector<UINT> indices = earth.getIndices();
 
 	D3D11_BUFFER_DESC ibd;
     ibd.Usage = D3D11_USAGE_IMMUTABLE;
@@ -308,7 +308,7 @@ void Renderer::DrawScene()
     for(UINT p = 0; p < techDesc.Passes; ++p)
     {
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
-		//md3dImmediateContext->DrawIndexed(earthMesh.Indices.size(), 0, 0);
+		md3dImmediateContext->DrawIndexed(indices.size(), 0, 0);
 	}
 
 	ReleaseCOM(mVB_test);

@@ -62,6 +62,8 @@ public:
 	void	setPosition ( XMFLOAT3 p ) { }
 	void	setVelocity ( XMFLOAT3 v ) { }
 	void	setMass		( float m ) { }
+
+	std::vector<Vertex> getVertices() { return Vertices; }
 };
 
 #endif // OBJECT_H

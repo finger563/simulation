@@ -5,7 +5,7 @@
 #include "Object.h"
 #include "QuadTreeNode.h"
 
-class Ellipsoid : Object
+class Ellipsoid : public Object
 {
 private:
 	float a, b, c; // radii in the local x,y,z dimensions respectively
@@ -41,6 +41,8 @@ public:
 	float getC() { return c; }
 
 	void generateMeshes( int qtDepth = 10.0f );
+
+	std::vector<UINT> getIndices();
 	
 private:
 	void generateQT( QuadTreeNode* node, int numChildren, int numSubdivisions );

@@ -1,6 +1,9 @@
 
 #include "Ellipsoid.h"
 
+std::vector<UINT> Ellipsoid::getIndices() {
+}
+
 void Ellipsoid::generateMeshes( int qtDepth ) {
 	MeshData faces[6];
 
