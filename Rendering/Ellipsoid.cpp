@@ -2,6 +2,17 @@
 #include "Ellipsoid.h"
 
 std::vector<UINT> Ellipsoid::getIndices() {
+	std::vector<UINT> retInd;
+	for (int i=0;i<6;i++) {
+		for (int j=0;j<4;j++) {
+			for (int k=0;k<4;k++) {
+				for (int n=0;n<6;n++) {
+					retInd.push_back(rootQT->children[i]->children[j]->children[k]->indices[n]);
+				}
+			}
+		}
+	}
+	return retInd;
 }
 
 void Ellipsoid::generateMeshes( int qtDepth ) {
@@ -61,56 +72,56 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 	// Create the indices.
 	//
 
-	UINT i[36];
+	UINT ind[36];
 
 	// Fill in the front face index data
-	i[0] = 0; i[1] = 1; i[2] = 2;
-	i[3] = 0; i[4] = 2; i[5] = 3;
+	ind[0] = 0; ind[1] = 1; ind[2] = 2;
+	ind[3] = 0; ind[4] = 2; ind[5] = 3;
 
-	faces[0].Indices.assign(&i[0], &i[6]);
+	faces[0].Indices.assign(&ind[0], &ind[6]);
 
 	// Fill in the back face index data
-	i[6] = 4; i[7]  = 5; i[8]  = 6;
-	i[9] = 4; i[10] = 6; i[11] = 7;
+	ind[6] = 4; ind[7]  = 5; ind[8]  = 6;
+	ind[9] = 4; ind[10] = 6; ind[11] = 7;
 
-	faces[1].Indices.assign(&i[6], &i[12]);
+	faces[1].Indices.assign(&ind[6], &ind[12]);
 
 	// Fill in the top face index data
-	i[12] = 8; i[13] =  9; i[14] = 10;
-	i[15] = 8; i[16] = 10; i[17] = 11;
+	ind[12] = 8; ind[13] =  9; ind[14] = 10;
+	ind[15] = 8; ind[16] = 10; ind[17] = 11;
 
-	faces[2].Indices.assign(&i[12], &i[18]);
+	faces[2].Indices.assign(&ind[12], &ind[18]);
 
 	// Fill in the bottom face index data
-	i[18] = 12; i[19] = 13; i[20] = 14;
-	i[21] = 12; i[22] = 14; i[23] = 15;
+	ind[18] = 12; ind[19] = 13; ind[20] = 14;
+	ind[21] = 12; ind[22] = 14; ind[23] = 15;
 
-	faces[3].Indices.assign(&i[18], &i[24]);
+	faces[3].Indices.assign(&ind[18], &ind[24]);
 
 	// Fill in the left face index data
-	i[24] = 16; i[25] = 17; i[26] = 18;
-	i[27] = 16; i[28] = 18; i[29] = 19;
+	ind[24] = 16; ind[25] = 17; ind[26] = 18;
+	ind[27] = 16; ind[28] = 18; ind[29] = 19;
 
-	faces[4].Indices.assign(&i[24], &i[30]);
+	faces[4].Indices.assign(&ind[24], &ind[30]);
 
 	// Fill in the right face index data
-	i[30] = 20; i[31] = 21; i[32] = 22;
-	i[33] = 20; i[34] = 22; i[35] = 23;
+	ind[30] = 20; ind[31] = 21; ind[32] = 22;
+	ind[33] = 20; ind[34] = 22; ind[35] = 23;
 
-	faces[5].Indices.assign(&i[30], &i[36]);
+	faces[5].Indices.assign(&ind[30], &ind[36]);
 
 	if ( rootQT ) {
 		delete rootQT;
 	}
 	rootQT = new QuadTreeNode( NULL, 36, 10.0f, 6);	// create root QTNode, error = 10, 1 child for each face of the starting cube
 	Vertices.assign(&v[0], &v[24]);
-	std::copy(&i[0],&i[36],rootQT->indices);
-	//rootQT->mesh.Indices.assign(&i[0], &i[36]);
+	std::copy(&ind[0],&ind[35],rootQT->indices);
+	//rootQT->mesh.Indices.assign(&ind[0], &ind[36]);
 
 	for (int i=0; i < 6; i++) {
 		rootQT->children[i] = new QuadTreeNode( rootQT, 6, rootQT->error/2.0f, 4 );
 		//rootQT->children[i]->mesh = faces[i];
-		std::copy(&faces[i].Indices[0],&faces[i].Indices[6],rootQT->children[i]->indices);
+		std::copy(&faces[i].Indices[0],&faces[i].Indices[5],rootQT->children[i]->indices);
 		generateQT( rootQT->children[i], 4, qtDepth );
 	}
 }
@@ -119,9 +130,12 @@ void Ellipsoid::generateQT( QuadTreeNode* node, int numChildren, int numSubdivis
 	int remainingSubdivisions = numSubdivisions - 1;
 	for (int i=0; i < numChildren; i++) {
 		node->children[i] = new QuadTreeNode(node, 6, node->error/2.0f, numChildren);
-		subdividePlanarQuad( node );
-		if ( remainingSubdivisions > 0 ) 
+	}
+	subdividePlanarQuad( node );
+	if ( remainingSubdivisions > 0 ) {
+		for (int i=0; i < numChildren; i++) {
 			generateQT( node->children[i], numChildren, remainingSubdivisions );
+		}
 	}
 }
 
@@ -147,7 +161,7 @@ void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 	int v2 = node->indices[2];
 	int v3 = node->indices[5];
 
-	Vertex tmp = Vertices[node->indices[0]];
+	Vertex tmp (Vertices[node->indices[0]]);
 	tmp.Position = midLeft;		// 4
 	Vertices.push_back( tmp );
 	
