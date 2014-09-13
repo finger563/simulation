@@ -292,7 +292,7 @@ void Renderer::DrawScene()
 	md3dImmediateContext->IASetVertexBuffers(0, 1, &mVB_test, &stride, &offset);
 	md3dImmediateContext->IASetIndexBuffer(mIB_test, DXGI_FORMAT_R32_UINT, 0);
 	
-	md3dImmediateContext->RSSetState(RenderStates::WireframeRS);
+	//md3dImmediateContext->RSSetState(RenderStates::WireframeRS);
 
 	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	Effects::BasicFX->SetWorld(world);
