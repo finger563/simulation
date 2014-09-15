@@ -41,8 +41,8 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 	XMStoreFloat( & length, XMVector3Length( snorm ) );
 	snorm = XMVector3Normalize( snorm );
 	XMStoreFloat3( &tmp, snorm );
-	verts[0].TexC.y = atan( tmp.y / tmp. x ) / 3.14159265358f + 0.5f;
-	verts[0].TexC.x = asin( tmp.z / length ) / 3.14159265358f + 0.5f;
+	verts[0].TexC.x = atan( tmp.z / tmp. x ) / 3.14159265358f + 0.5f;
+	verts[0].TexC.y = 1.0f - asin( tmp.y / length ) / 3.14159265358f + 0.5f;
 	verts[0].Normal = tmp;
 
 	verts[1] = Vertex(-a, +c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
@@ -53,8 +53,8 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 	XMStoreFloat( & length, XMVector3Length( snorm ) );
 	snorm = XMVector3Normalize( snorm );
 	XMStoreFloat3( &tmp, snorm );
-	verts[1].TexC.y = atan( tmp.y / tmp. x ) / 3.14159265358f + 0.5f;
-	verts[1].TexC.x = asin( tmp.z / length ) / 3.14159265358f + 1.0f;
+	verts[1].TexC.x = atan( tmp.z / tmp. x ) / 3.14159265358f + 0.5f;
+	verts[1].TexC.y = 1.0f - asin( tmp.y / length ) / 3.14159265358f + 1.0f;
 	verts[1].Normal = tmp;
 
 	verts[2] = Vertex(+a, +c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
@@ -65,8 +65,8 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 	XMStoreFloat( & length, XMVector3Length( snorm ) );
 	snorm = XMVector3Normalize( snorm );
 	XMStoreFloat3( &tmp, snorm );
-	verts[2].TexC.y = atan( tmp.y / tmp. x ) / 3.14159265358f + 0.5f;
-	verts[2].TexC.x = asin( tmp.z / length ) / 3.14159265358f + 0.5f;
+	verts[2].TexC.x = atan( tmp.z / tmp. x ) / 3.14159265358f + 0.5f;
+	verts[2].TexC.y = 1.0f - asin( tmp.y / length ) / 3.14159265358f + 0.5f;
 	verts[2].Normal = tmp;
 
 	verts[3] = Vertex(+a, -c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
@@ -77,8 +77,8 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 	XMStoreFloat( & length, XMVector3Length( snorm ) );
 	snorm = XMVector3Normalize( snorm );
 	XMStoreFloat3( &tmp, snorm );
-	verts[3].TexC.y = atan( tmp.y / tmp. x ) / 3.14159265358f + 0.5f;
-	verts[3].TexC.x = asin( tmp.z / length ) / 3.14159265358f + 0.5f;
+	verts[3].TexC.x = atan( tmp.z / tmp. x ) / 3.14159265358f + 0.5f;
+	verts[3].TexC.y = 1.0f - asin( tmp.y / length ) / 3.14159265358f + 0.5f;
 	verts[3].Normal = tmp;
 
 	// Fill in the back face vertex data.
@@ -90,8 +90,8 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 	XMStoreFloat( & length, XMVector3Length( snorm ) );
 	snorm = XMVector3Normalize( snorm );
 	XMStoreFloat3( &tmp, snorm );
-	verts[4].TexC.y = atan( tmp.y / tmp. x ) / 3.14159265358f + 0.5f;
-	verts[4].TexC.x = asin( tmp.z / length ) / 3.14159265358f + 0.5f;
+	verts[4].TexC.x = atan( tmp.z / tmp. x ) / 3.14159265358f + 0.5f;
+	verts[4].TexC.y = 1.0f - asin( tmp.y / length ) / 3.14159265358f + 0.5f;
 	verts[4].Normal = tmp;
 
 	verts[5] = Vertex(+a, +c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
@@ -102,8 +102,8 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 	XMStoreFloat( & length, XMVector3Length( snorm ) );
 	snorm = XMVector3Normalize( snorm );
 	XMStoreFloat3( &tmp, snorm );
-	verts[5].TexC.y = atan( tmp.y / tmp. x ) / 3.14159265358f + 0.5f;
-	verts[5].TexC.x = asin( tmp.z / length ) / 3.14159265358f + 0.5f;
+	verts[5].TexC.x = atan( tmp.z / tmp. x ) / 3.14159265358f + 0.5f;
+	verts[5].TexC.y = 1.0f - asin( tmp.y / length ) / 3.14159265358f + 0.5f;
 	verts[5].Normal = tmp;
 
 	verts[6] = Vertex(-a, +c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
@@ -114,8 +114,8 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 	XMStoreFloat( & length, XMVector3Length( snorm ) );
 	snorm = XMVector3Normalize( snorm );
 	XMStoreFloat3( &tmp, snorm );
-	verts[6].TexC.y = atan( tmp.y / tmp. x ) / 3.14159265358f + 0.5f;
-	verts[6].TexC.x = asin( tmp.z / length ) / 3.14159265358f + 0.5f;
+	verts[6].TexC.x = atan( tmp.z / tmp. x ) / 3.14159265358f + 0.5f;
+	verts[6].TexC.y = 1.0f - asin( tmp.y / length ) / 3.14159265358f + 0.5f;
 	verts[6].Normal = tmp;
 
 	verts[7] = Vertex(-a, -c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
@@ -126,8 +126,8 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 	XMStoreFloat( & length, XMVector3Length( snorm ) );
 	snorm = XMVector3Normalize( snorm );
 	XMStoreFloat3( &tmp, snorm );
-	verts[7].TexC.y = atan( tmp.y / tmp. x ) / 3.14159265358f + 0.5f;
-	verts[7].TexC.x = asin( tmp.z / length ) / 3.14159265358f + 0.5f;
+	verts[7].TexC.x = atan( tmp.z / tmp. x ) / 3.14159265358f + 0.5f;
+	verts[7].TexC.y = 1.0f - asin( tmp.y / length ) / 3.14159265358f + 0.5f;
 	verts[7].Normal = tmp;
 
  
@@ -238,8 +238,8 @@ void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 	snorm = XMVector3Normalize( snorm );
 	XMStoreFloat3( &normal, snorm );
 	Vertices.back().Normal = normal;
-	Vertices.back().TexC.y = atan( normal.y / normal. x ) / 3.14159265358f + 0.5f;
-	Vertices.back().TexC.x = asin( normal.z / length ) / 3.14159265358f + 0.5f;
+	Vertices.back().TexC.x = atan( normal.z / normal. x ) / 3.14159265358f + 0.5f;
+	Vertices.back().TexC.y = 1.0f - asin( normal.y / length ) / 3.14159265358f + 0.5f;
 	
 	int v4 = Vertices.size() - 1;
 
@@ -255,8 +255,8 @@ void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 	snorm = XMVector3Normalize( snorm );
 	XMStoreFloat3( &normal, snorm );
 	Vertices.back().Normal = normal;
-	Vertices.back().TexC.y = atan( normal.y / normal. x ) / 3.14159265358f + 0.5f;
-	Vertices.back().TexC.x = asin( normal.z / length ) / 3.14159265358f + 0.5f;
+	Vertices.back().TexC.x = atan( normal.z / normal. x ) / 3.14159265358f + 0.5f;
+	Vertices.back().TexC.y = 1.0f - asin( normal.y / length ) / 3.14159265358f + 0.5f;
 	
 	int v5 = Vertices.size() - 1;
 		
@@ -272,8 +272,8 @@ void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 	snorm = XMVector3Normalize( snorm );
 	XMStoreFloat3( &normal, snorm );
 	Vertices.back().Normal = normal;
-	Vertices.back().TexC.y = atan( normal.y / normal. x ) / 3.14159265358f + 0.5f;
-	Vertices.back().TexC.x = asin( normal.z / length ) / 3.14159265358f + 0.5f;
+	Vertices.back().TexC.x = atan( normal.z / normal. x ) / 3.14159265358f + 0.5f;
+	Vertices.back().TexC.y = 1.0f - asin( normal.y / length ) / 3.14159265358f + 0.5f;
 	
 	int v6 = Vertices.size() - 1;
 	
@@ -289,8 +289,8 @@ void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 	snorm = XMVector3Normalize( snorm );
 	XMStoreFloat3( &normal, snorm );
 	Vertices.back().Normal = normal;
-	Vertices.back().TexC.y = atan( normal.y / normal. x ) / 3.14159265358f + 0.5f;
-	Vertices.back().TexC.x = asin( normal.z / length ) / 3.14159265358f + 0.5f;
+	Vertices.back().TexC.x = atan( normal.z / normal. x ) / 3.14159265358f + 0.5f;
+	Vertices.back().TexC.y = 1.0f - asin( normal.y / length ) / 3.14159265358f + 0.5f;
 
 	int v7 = Vertices.size() - 1;
 	
@@ -306,8 +306,8 @@ void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 	snorm = XMVector3Normalize( snorm );
 	XMStoreFloat3( &normal, snorm );
 	Vertices.back().Normal = normal;
-	Vertices.back().TexC.y = atan( normal.y / normal. x ) / 3.14159265358f + 0.5f;
-	Vertices.back().TexC.x = asin( normal.z / length ) / 3.14159265358f + 0.5f;
+	Vertices.back().TexC.x = atan( normal.z / normal. x ) / 3.14159265358f + 0.5f;
+	Vertices.back().TexC.y = 1.0f - asin( normal.y / length ) / 3.14159265358f + 0.5f;
 
 	int v8 = Vertices.size() - 1;
 	
