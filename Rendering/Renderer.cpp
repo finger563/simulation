@@ -268,7 +268,8 @@ void Renderer::DrawScene()
 	md3dImmediateContext->IASetVertexBuffers(0, 1, &mVB, &stride, &offset);
 	md3dImmediateContext->IASetIndexBuffer(mIB_test, DXGI_FORMAT_R32_UINT, 0);
 	
-	md3dImmediateContext->RSSetState(RenderStates::WireframeRS);
+	if( GetAsyncKeyState('1') & 0x8000 )
+		md3dImmediateContext->RSSetState(RenderStates::WireframeRS);
 
 	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	Effects::BasicFX->SetWorld(world);
@@ -279,7 +280,7 @@ void Renderer::DrawScene()
 	Effects::BasicFX->SetMaterial(mEarthMat);
 	Effects::BasicFX->SetDiffuseMap(mEarthDiffuseMapSRV);
 	
-	activeTech = Effects::BasicFX->Light1Tech;
+	activeTech = Effects::BasicFX->Light1TexTech;
 	activeTech->GetDesc( &techDesc );
     for(UINT p = 0; p < techDesc.Passes; ++p)
     {
@@ -504,10 +505,11 @@ void Renderer::DrawScene()
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(mSkyIndexCount, mSkyIndexOffset, mSkyVertexOffset);
     }
+#endif
+	
 	// restore default states
 	md3dImmediateContext->RSSetState(0);
 	md3dImmediateContext->OMSetDepthStencilState(0, 0);
-#endif
 
 	HR(mSwapChain->Present(0, 0));
 }

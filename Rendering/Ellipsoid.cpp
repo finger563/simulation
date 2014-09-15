@@ -25,41 +25,110 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 	Vertex verts[8];
 
 	XMFLOAT3 radius(a,b,c);
+	XMFLOAT3 oneOverR2(1.0f/(a*a), 1.0f/(b*b), 1.0f/(c*c));
 	XMVECTOR r = XMLoadFloat3( &radius );
+	XMVECTOR overR2 = XMLoadFloat3( &oneOverR2 );
+	XMFLOAT3 tmp;
+	float length;
+	XMVECTOR snorm;
 	    
 	// Fill in the front face vertex data.
 	verts[0] = Vertex(-a, -c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 	XMVECTOR pos = XMVector3Normalize( XMLoadFloat3( & verts[0].Position ) ) * r;
 	XMStoreFloat3( &verts[0].Position, pos );
 
+	snorm = pos * overR2 ;
+	XMStoreFloat( & length, XMVector3Length( snorm ) );
+	snorm = XMVector3Normalize( snorm );
+	XMStoreFloat3( &tmp, snorm );
+	verts[0].TexC.x = atan( tmp.y / tmp. x );
+	verts[0].TexC.y = asin( tmp.z / length );
+	verts[0].Normal = tmp;
+
 	verts[1] = Vertex(-a, +c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 	pos = XMVector3Normalize( XMLoadFloat3( & verts[1].Position ) ) * r;
 	XMStoreFloat3( &verts[1].Position, pos );
+
+	snorm = pos * overR2 ;
+	XMStoreFloat( & length, XMVector3Length( snorm ) );
+	snorm = XMVector3Normalize( snorm );
+	XMStoreFloat3( &tmp, snorm );
+	verts[1].TexC.x = atan( tmp.y / tmp. x );
+	verts[1].TexC.y = asin( tmp.z / length );
+	verts[1].Normal = tmp;
 
 	verts[2] = Vertex(+a, +c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 	pos = XMVector3Normalize( XMLoadFloat3( & verts[2].Position ) ) * r;
 	XMStoreFloat3( &verts[2].Position, pos );
 
+	snorm = pos * overR2 ;
+	XMStoreFloat( & length, XMVector3Length( snorm ) );
+	snorm = XMVector3Normalize( snorm );
+	XMStoreFloat3( &tmp, snorm );
+	verts[2].TexC.x = atan( tmp.y / tmp. x );
+	verts[2].TexC.y = asin( tmp.z / length );
+	verts[2].Normal = tmp;
+
 	verts[3] = Vertex(+a, -c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
 	pos = XMVector3Normalize( XMLoadFloat3( & verts[3].Position ) ) * r;
 	XMStoreFloat3( &verts[3].Position, pos );
+
+	snorm = pos * overR2 ;
+	XMStoreFloat( & length, XMVector3Length( snorm ) );
+	snorm = XMVector3Normalize( snorm );
+	XMStoreFloat3( &tmp, snorm );
+	verts[3].TexC.x = atan( tmp.y / tmp. x );
+	verts[3].TexC.y = asin( tmp.z / length );
+	verts[3].Normal = tmp;
 
 	// Fill in the back face vertex data.
 	verts[4] = Vertex(+a, -c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 	pos = XMVector3Normalize( XMLoadFloat3( & verts[4].Position ) ) * r;
 	XMStoreFloat3( &verts[4].Position, pos );
 
+	snorm = pos * overR2 ;
+	XMStoreFloat( & length, XMVector3Length( snorm ) );
+	snorm = XMVector3Normalize( snorm );
+	XMStoreFloat3( &tmp, snorm );
+	verts[4].TexC.x = atan( tmp.y / tmp. x );
+	verts[4].TexC.y = asin( tmp.z / length );
+	verts[4].Normal = tmp;
+
 	verts[5] = Vertex(+a, +c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 	pos = XMVector3Normalize( XMLoadFloat3( & verts[5].Position ) ) * r;
 	XMStoreFloat3( &verts[5].Position, pos );
+
+	snorm = pos * overR2 ;
+	XMStoreFloat( & length, XMVector3Length( snorm ) );
+	snorm = XMVector3Normalize( snorm );
+	XMStoreFloat3( &tmp, snorm );
+	verts[5].TexC.x = atan( tmp.y / tmp. x );
+	verts[5].TexC.y = asin( tmp.z / length );
+	verts[5].Normal = tmp;
 
 	verts[6] = Vertex(-a, +c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 	pos = XMVector3Normalize( XMLoadFloat3( & verts[6].Position ) ) * r;
 	XMStoreFloat3( &verts[6].Position, pos );
 
+	snorm = pos * overR2 ;
+	XMStoreFloat( & length, XMVector3Length( snorm ) );
+	snorm = XMVector3Normalize( snorm );
+	XMStoreFloat3( &tmp, snorm );
+	verts[6].TexC.x = atan( tmp.y / tmp. x );
+	verts[6].TexC.y = asin( tmp.z / length );
+	verts[6].Normal = tmp;
+
 	verts[7] = Vertex(-a, -c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
 	pos = XMVector3Normalize( XMLoadFloat3( & verts[7].Position ) ) * r;
 	XMStoreFloat3( &verts[7].Position, pos );
+
+	snorm = pos * overR2 ;
+	XMStoreFloat( & length, XMVector3Length( snorm ) );
+	snorm = XMVector3Normalize( snorm );
+	XMStoreFloat3( &tmp, snorm );
+	verts[7].TexC.x = atan( tmp.y / tmp. x );
+	verts[7].TexC.y = asin( tmp.z / length );
+	verts[7].Normal = tmp;
 
  
 	//
@@ -141,53 +210,106 @@ void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 	XMVECTOR topLeft = XMLoadFloat3( &Vertices[node->indices[1]].Position );
 	XMVECTOR topRight = XMLoadFloat3( &Vertices[node->indices[2]].Position );
 	XMVECTOR bottomRight = XMLoadFloat3( &Vertices[node->indices[5]].Position );
-
-	XMFLOAT3 midTop;
-	XMStoreFloat3(&midTop, XMVector3Normalize((topRight - topLeft) / 2.0f + topLeft) * r);
-	
-	XMFLOAT3 midBottom;
-	XMStoreFloat3(&midBottom, XMVector3Normalize((bottomRight - bottomLeft) / 2.0f + bottomLeft) * r);
-	
-	XMFLOAT3 midRight;
-	XMStoreFloat3(&midRight, XMVector3Normalize((bottomRight - topRight) / 2.0f + topRight) * r);
-	
-	XMFLOAT3 midLeft;
-	XMStoreFloat3(&midLeft, XMVector3Normalize((bottomLeft - topLeft) / 2.0f + topLeft) * r);
-	
-	XMFLOAT3 center;
-	XMStoreFloat3(&center, XMVector3Normalize((bottomRight - topLeft) / 2.0f + topLeft) * r);
 	
 	int v0 = node->indices[0];
 	int v1 = node->indices[1];
 	int v2 = node->indices[2];
 	int v3 = node->indices[5];
 
-	Vertex tmp (Vertices[node->indices[0]]);
+	Vertex tmp = Vertices[node->indices[0]];
+
+	XMFLOAT3 oneOverR2(1.0f/(a*a), 1.0f/(b*b), 1.0f/(c*c));
+	XMVECTOR overR2 = XMLoadFloat3( &oneOverR2 );
+	XMFLOAT3 normal;
+	float length;
+	XMVECTOR snorm;
+	XMVECTOR pos;
+	
+	// NEW VERTEX ID 4
+	XMFLOAT3 midLeft;
+	XMStoreFloat3(&midLeft, XMVector3Normalize((bottomLeft - topLeft) / 2.0f + topLeft) * r);
+	
 	tmp.Position = midLeft;		// 4
 	Vertices.push_back( tmp );
+
+	pos = XMLoadFloat3( &Vertices.back().Position );
+	snorm = pos * overR2 ;
+	XMStoreFloat( & length, XMVector3Length( snorm ) );
+	snorm = XMVector3Normalize( snorm );
+	XMStoreFloat3( &normal, snorm );
+	Vertices.back().Normal = normal;
+	Vertices.back().TexC.x = atan( normal.y / normal. x );
+	Vertices.back().TexC.y = asin( normal.z / length );
 	
 	int v4 = Vertices.size() - 1;
 
+	XMFLOAT3 midTop;
+	XMStoreFloat3(&midTop, XMVector3Normalize((topRight - topLeft) / 2.0f + topLeft) * r);
+	
 	tmp.Position = midTop;		// 5
 	Vertices.push_back( tmp );
+
+	pos = XMLoadFloat3( &Vertices.back().Position );
+	snorm = pos * overR2 ;
+	XMStoreFloat( & length, XMVector3Length( snorm ) );
+	snorm = XMVector3Normalize( snorm );
+	XMStoreFloat3( &normal, snorm );
+	Vertices.back().Normal = normal;
+	Vertices.back().TexC.x = atan( normal.y / normal. x );
+	Vertices.back().TexC.y = asin( normal.z / length );
 	
 	int v5 = Vertices.size() - 1;
+		
+	XMFLOAT3 midBottom;
+	XMStoreFloat3(&midBottom, XMVector3Normalize((bottomRight - bottomLeft) / 2.0f + bottomLeft) * r);
 
 	tmp.Position = midBottom;	// 6
 	Vertices.push_back( tmp );
+
+	pos = XMLoadFloat3( &Vertices.back().Position );
+	snorm = pos * overR2 ;
+	XMStoreFloat( & length, XMVector3Length( snorm ) );
+	snorm = XMVector3Normalize( snorm );
+	XMStoreFloat3( &normal, snorm );
+	Vertices.back().Normal = normal;
+	Vertices.back().TexC.x = atan( normal.y / normal. x );
+	Vertices.back().TexC.y = asin( normal.z / length );
 	
 	int v6 = Vertices.size() - 1;
+	
+	XMFLOAT3 center;
+	XMStoreFloat3(&center, XMVector3Normalize((bottomRight - topLeft) / 2.0f + topLeft) * r);
 
 	tmp.Position = center;		// 7
 	Vertices.push_back( tmp );
 
+	pos = XMLoadFloat3( &Vertices.back().Position );
+	snorm = pos * overR2 ;
+	XMStoreFloat( & length, XMVector3Length( snorm ) );
+	snorm = XMVector3Normalize( snorm );
+	XMStoreFloat3( &normal, snorm );
+	Vertices.back().Normal = normal;
+	Vertices.back().TexC.x = atan( normal.y / normal. x );
+	Vertices.back().TexC.y = asin( normal.z / length );
+
 	int v7 = Vertices.size() - 1;
+	
+	XMFLOAT3 midRight;
+	XMStoreFloat3(&midRight, XMVector3Normalize((bottomRight - topRight) / 2.0f + topRight) * r);
 
 	tmp.Position = midRight;	// 8
 	Vertices.push_back( tmp );
 
-	int v8 = Vertices.size() - 1;
+	pos = XMLoadFloat3( &Vertices.back().Position );
+	snorm = pos * overR2 ;
+	XMStoreFloat( & length, XMVector3Length( snorm ) );
+	snorm = XMVector3Normalize( snorm );
+	XMStoreFloat3( &normal, snorm );
+	Vertices.back().Normal = normal;
+	Vertices.back().TexC.x = atan( normal.y / normal. x );
+	Vertices.back().TexC.y = asin( normal.z / length );
 
+	int v8 = Vertices.size() - 1;
 	
 	node->children[0]->indices[0] = v0;
 	node->children[0]->indices[1] = v4;
