@@ -280,7 +280,45 @@ void Renderer::DrawScene()
 	Effects::BasicFX->SetMaterial(mEarthMat);
 	Effects::BasicFX->SetDiffuseMap(mEarthDiffuseMapSRV);
 	
-	activeTech = Effects::BasicFX->Light1TexTech;
+	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+	Effects::DisplacementMapFX->SetEyePosW(control.get_Camera().GetPosition());
+	Effects::DisplacementMapFX->SetPlanetPosW(control.get_earthPosW());
+	Effects::DisplacementMapFX->SetCameraPos(cameraPos);
+	Effects::DisplacementMapFX->SetLightPos(sunPos);
+	Effects::DisplacementMapFX->SetInvWaveLength(invWaveLength);
+	Effects::DisplacementMapFX->SetCameraHeight(height);
+	Effects::DisplacementMapFX->SetCameraHeight2(height*height);
+	Effects::DisplacementMapFX->SetOuterRadius(outerRadius);
+	Effects::DisplacementMapFX->SetOuterRadius2(outerRadius * outerRadius);
+	Effects::DisplacementMapFX->SetInnerRadius(innerRadius);
+	Effects::DisplacementMapFX->SetInnerRadius2(innerRadius * innerRadius);
+	Effects::DisplacementMapFX->SetKrESun(Kr * ESun);
+	Effects::DisplacementMapFX->SetKmESun(Km * ESun);
+	Effects::DisplacementMapFX->SetKr4PI(Kr * 4.0f * MathHelper::Pi);
+	Effects::DisplacementMapFX->SetKm4PI(Km * 4.0f * MathHelper::Pi);
+	Effects::DisplacementMapFX->SetScale( scale );
+	Effects::DisplacementMapFX->SetScaleOverScaleDepth( scale / 0.25f );
+	Effects::DisplacementMapFX->SetG(-0.990f);
+	Effects::DisplacementMapFX->SetG2((-0.990f)*(-0.990f));
+	Effects::DisplacementMapFX->SetDirLights(mDirLights);
+
+	Effects::DisplacementMapFX->SetHeightScale(29.029f);
+	Effects::DisplacementMapFX->SetMaxTessDistance(0.10f);
+	Effects::DisplacementMapFX->SetMinTessDistance(3000.0f);
+	Effects::DisplacementMapFX->SetMinTessFactor(1.0f);
+	Effects::DisplacementMapFX->SetMaxTessFactor(100.0f);
+
+	Effects::DisplacementMapFX->SetWorld(world);
+	Effects::DisplacementMapFX->SetWorldInvTranspose(worldInvTranspose);
+	Effects::DisplacementMapFX->SetViewProj(viewProj);
+	Effects::DisplacementMapFX->SetWorldViewProj(worldViewProj);
+	Effects::DisplacementMapFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
+	Effects::DisplacementMapFX->SetMaterial(mEarthMat);
+	Effects::DisplacementMapFX->SetDiffuseMap(mEarthDiffuseMapSRV);
+	Effects::DisplacementMapFX->SetNormalMap(mEarthNormalTexSRV);
+	
+	//activeTech = Effects::BasicFX->Light1TexTech;
+	activeTech = Effects::DisplacementMapFX->PlanetFromSpaceTech;
 	activeTech->GetDesc( &techDesc );
     for(UINT p = 0; p < techDesc.Passes; ++p)
     {
