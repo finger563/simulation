@@ -14,18 +14,6 @@ std::vector<UINT> Ellipsoid::getIndices() {
 			}
 		}
 	}
-#if 0
-	retInd.clear();
-	for (int i=0;i<6;i++) {
-		for (int n=0;n<6;n++) {
-			retInd.push_back(rootQT->children[i]->indices[n]);
-		}
-	}
-	retInd.clear();
-	for (int i=0;i<36;i++) {
-		retInd.push_back(rootQT->indices[i]);
-	}
-#endif
 	return retInd;
 }
 
@@ -33,17 +21,44 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 	MeshData faces[6];
 
 	Vertex verts[8];
+
+	XMFLOAT3 radius(a,b,c);
+	XMVECTOR r = XMLoadFloat3( &radius );
 	    
 	// Fill in the front face vertex data.
 	verts[0] = Vertex(-a, -c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	XMVECTOR pos = XMVector3Normalize( XMLoadFloat3( & verts[0].Position ) ) * r;
+	XMStoreFloat3( &verts[0].Position, pos );
+
 	verts[1] = Vertex(-a, +c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	pos = XMVector3Normalize( XMLoadFloat3( & verts[1].Position ) ) * r;
+	XMStoreFloat3( &verts[1].Position, pos );
+
 	verts[2] = Vertex(+a, +c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	pos = XMVector3Normalize( XMLoadFloat3( & verts[2].Position ) ) * r;
+	XMStoreFloat3( &verts[2].Position, pos );
+
 	verts[3] = Vertex(+a, -c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+	pos = XMVector3Normalize( XMLoadFloat3( & verts[3].Position ) ) * r;
+	XMStoreFloat3( &verts[3].Position, pos );
+
 	// Fill in the back face vertex data.
 	verts[4] = Vertex(+a, -c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	pos = XMVector3Normalize( XMLoadFloat3( & verts[4].Position ) ) * r;
+	XMStoreFloat3( &verts[4].Position, pos );
+
 	verts[5] = Vertex(+a, +c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	pos = XMVector3Normalize( XMLoadFloat3( & verts[5].Position ) ) * r;
+	XMStoreFloat3( &verts[5].Position, pos );
+
 	verts[6] = Vertex(-a, +c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	pos = XMVector3Normalize( XMLoadFloat3( & verts[6].Position ) ) * r;
+	XMStoreFloat3( &verts[6].Position, pos );
+
 	verts[7] = Vertex(-a, -c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+	pos = XMVector3Normalize( XMLoadFloat3( & verts[7].Position ) ) * r;
+	XMStoreFloat3( &verts[7].Position, pos );
+
  
 	//
 	// Create the indices.
@@ -118,25 +133,27 @@ void Ellipsoid::generateQT( QuadTreeNode* node, int numChildren, int numSubdivis
 }
 
 void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
+	XMFLOAT3 radius(a,b,c);
+	XMVECTOR r = XMLoadFloat3( &radius );
 	XMVECTOR bottomLeft = XMLoadFloat3( &Vertices[node->indices[0]].Position );
 	XMVECTOR topLeft = XMLoadFloat3( &Vertices[node->indices[1]].Position );
 	XMVECTOR topRight = XMLoadFloat3( &Vertices[node->indices[2]].Position );
 	XMVECTOR bottomRight = XMLoadFloat3( &Vertices[node->indices[5]].Position );
 
 	XMFLOAT3 midTop;
-	XMStoreFloat3(&midTop,(topRight - topLeft) / 2.0f + topLeft);
+	XMStoreFloat3(&midTop, XMVector3Normalize((topRight - topLeft) / 2.0f + topLeft) * r);
 	
 	XMFLOAT3 midBottom;
-	XMStoreFloat3(&midBottom,(bottomRight - bottomLeft) / 2.0f + bottomLeft);
+	XMStoreFloat3(&midBottom, XMVector3Normalize((bottomRight - bottomLeft) / 2.0f + bottomLeft) * r);
 	
 	XMFLOAT3 midRight;
-	XMStoreFloat3(&midRight,(bottomRight - topRight) / 2.0f + topRight);
+	XMStoreFloat3(&midRight, XMVector3Normalize((bottomRight - topRight) / 2.0f + topRight) * r);
 	
 	XMFLOAT3 midLeft;
-	XMStoreFloat3(&midLeft,(bottomLeft - topLeft) / 2.0f + topLeft);
+	XMStoreFloat3(&midLeft, XMVector3Normalize((bottomLeft - topLeft) / 2.0f + topLeft) * r);
 	
 	XMFLOAT3 center;
-	XMStoreFloat3(&center,(bottomRight - topLeft) / 2.0f + topLeft);
+	XMStoreFloat3(&center, XMVector3Normalize((bottomRight - topLeft) / 2.0f + topLeft) * r);
 	
 	int v0 = node->indices[0];
 	int v1 = node->indices[1];

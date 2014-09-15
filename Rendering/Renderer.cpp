@@ -515,7 +515,7 @@ void Renderer::DrawScene()
 void Renderer::BuildGeometryBuffers()
 {
 #if USE_QUADTREE
-	earth = Ellipsoid(control.get_earthRadius()/2.0f, control.get_earthRadius()/2.0f, control.get_earthRadius()/2.0f);
+	earth = Ellipsoid(control.get_earthRadius(), control.get_earthRadius(), control.get_earthRadius());
 	earth.generateMeshes( 7 );
 	
 	std::vector<Object::Vertex> earthVerts = earth.getVertices();
