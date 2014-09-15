@@ -101,6 +101,7 @@
     <ClCompile Include="..\Common\Waves.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Ellipsoid.cpp" />
+    <ClCompile Include="Object.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Effects.cpp" />
     <ClCompile Include="RenderStates.cpp" />

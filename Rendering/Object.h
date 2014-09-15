@@ -17,7 +17,9 @@
 class Object
 {
 public:
-	
+
+	static float PI;	
+
 	struct Vertex
 	{
 		Vertex(){}

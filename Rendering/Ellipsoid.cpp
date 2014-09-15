@@ -1,6 +1,26 @@
 
 #include "Ellipsoid.h"
 
+XMFLOAT3 Ellipsoid::surfaceNormal( float lat, float lon ) {
+	float cosLat = cos( lat );
+	return XMFLOAT3 ( cosLat * cos(lon),
+					  sin(lat), 
+					  cosLat * sin(lon) );
+}
+
+XMFLOAT3 Ellipsoid::geodeticToLocal( float lat, float lon, float height ) {
+	XMFLOAT3 n = surfaceNormal( lat, lon );
+	XMFLOAT3 k( radius2.x * n.x,
+				radius2.y * n.y,
+				radius2.z * n.z );
+	float gamma = sqrt( k.x * n.x + 
+						k.y * n.y + 
+						k.z * n.z);
+	return XMFLOAT3( k.x / gamma + height * n.x,
+					 k.y / gamma + height * n.y,
+					 k.z / gamma + height * n.z );
+}
+
 std::vector<UINT> Ellipsoid::getIndices() {
 	std::vector<UINT> retInd;
 	for (int i=0;i<6;i++) {
@@ -16,13 +36,21 @@ std::vector<UINT> Ellipsoid::getIndices() {
 			}
 		}
 	}
+#if 1
+	retInd.clear();
+	for (int i=0;i<6;i++) {
+		for (int n=0;n<6;n++) {
+			retInd.push_back(rootQT->children[i]->indices[n]);
+		}
+	}
+#endif
 	return retInd;
 }
 
 void Ellipsoid::generateMeshes( int qtDepth ) {
 	MeshData faces[6];
 
-	Vertex verts[8];
+	Vertex verts[10];
 
 	XMFLOAT3 radius(a,b,c);
 	XMFLOAT3 oneOverR2(1.0f/(a), 1.0f/(b), 1.0f/(c));
@@ -31,104 +59,110 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 	XMFLOAT3 tmp;
 	float length;
 	XMVECTOR snorm;
-	    
+	XMVECTOR pos;
+		    
 	// Fill in the front face vertex data.
+	// 0
 	verts[0] = Vertex(-a, -c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-	XMVECTOR pos = XMVector3Normalize( XMLoadFloat3( & verts[0].Position ) ) * r;
-	XMStoreFloat3( &verts[0].Position, pos );
+	verts[0].Position = geodeticToLocal( 7.0f * PI / 4.0f, 
+										 0, 
+										 0 );
+	verts[0].Normal = surfaceNormal( 7.0f * PI / 4.0f, 
+									 0 );
+	verts[0].TexC.x = 0;
+	verts[0].TexC.y = 7.0f / 8.0f;
 	
-	snorm = pos * overR2 ;
-	XMStoreFloat( & length, XMVector3Length( snorm ) );
-	snorm = XMVector3Normalize( snorm );
-	XMStoreFloat3( &tmp, snorm );
-	verts[0].TexC.x = atan( tmp.z / tmp. x ) / 3.14159265358f + 0.5f;
-	verts[0].TexC.y = 1.0f - asin( tmp.y / length ) / 3.14159265358f + 0.5f;
-	verts[0].Normal = tmp;
-
+	// 1
 	verts[1] = Vertex(-a, +c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	pos = XMVector3Normalize( XMLoadFloat3( & verts[1].Position ) ) * r;
-	XMStoreFloat3( &verts[1].Position, pos );
-
-	snorm = pos * overR2 ;
-	XMStoreFloat( & length, XMVector3Length( snorm ) );
-	snorm = XMVector3Normalize( snorm );
-	XMStoreFloat3( &tmp, snorm );
-	verts[1].TexC.x = atan( tmp.z / tmp. x ) / 3.14159265358f + 0.5f;
-	verts[1].TexC.y = 1.0f - asin( tmp.y / length ) / 3.14159265358f + 1.0f;
-	verts[1].Normal = tmp;
-
+	verts[1].Position = geodeticToLocal( 1.0f * PI / 4.0f, 
+										 0, 
+										 0 );
+	verts[1].Normal = surfaceNormal( 1.0f * PI / 4.0f, 
+									 0 );
+	verts[1].TexC.x = 0;
+	verts[1].TexC.y = 1.0f / 8.0f;
+	
+	// 2
 	verts[2] = Vertex(+a, +c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-	pos = XMVector3Normalize( XMLoadFloat3( & verts[2].Position ) ) * r;
-	XMStoreFloat3( &verts[2].Position, pos );
-
-	snorm = pos * overR2 ;
-	XMStoreFloat( & length, XMVector3Length( snorm ) );
-	snorm = XMVector3Normalize( snorm );
-	XMStoreFloat3( &tmp, snorm );
-	verts[2].TexC.x = atan( tmp.z / tmp. x ) / 3.14159265358f + 0.5f;
-	verts[2].TexC.y = 1.0f - asin( tmp.y / length ) / 3.14159265358f + 0.5f;
-	verts[2].Normal = tmp;
-
+	verts[2].Position = geodeticToLocal( 1.0f * PI / 4.0f,  
+										 PI / 2.0f, 
+										 0 );
+	verts[2].Normal = surfaceNormal( 1.0f * PI / 4.0f, 
+									 PI / 2.0f );
+	verts[2].TexC.x = 1.0f / 4.0f;
+	verts[2].TexC.y = 1.0f / 8.0f;
+	
+	// 3
 	verts[3] = Vertex(+a, -c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-	pos = XMVector3Normalize( XMLoadFloat3( & verts[3].Position ) ) * r;
-	XMStoreFloat3( &verts[3].Position, pos );
-
-	snorm = pos * overR2 ;
-	XMStoreFloat( & length, XMVector3Length( snorm ) );
-	snorm = XMVector3Normalize( snorm );
-	XMStoreFloat3( &tmp, snorm );
-	verts[3].TexC.x = atan( tmp.z / tmp. x ) / 3.14159265358f + 0.5f;
-	verts[3].TexC.y = 1.0f - asin( tmp.y / length ) / 3.14159265358f + 0.5f;
-	verts[3].Normal = tmp;
+	verts[3].Position = geodeticToLocal( 7.0f * PI / 4.0f,  
+										 PI / 2.0f, 
+										 0 );
+	verts[3].Normal = surfaceNormal( 7.0f * PI / 4.0f, 
+									 PI / 2.0f );
+	verts[3].TexC.x = 1.0f / 4.0f;
+	verts[3].TexC.y = 7.0f / 8.0f;
 
 	// Fill in the back face vertex data.
+	// 4
 	verts[4] = Vertex(+a, -c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-	pos = XMVector3Normalize( XMLoadFloat3( & verts[4].Position ) ) * r;
-	XMStoreFloat3( &verts[4].Position, pos );
-
-	snorm = pos * overR2 ;
-	XMStoreFloat( & length, XMVector3Length( snorm ) );
-	snorm = XMVector3Normalize( snorm );
-	XMStoreFloat3( &tmp, snorm );
-	verts[4].TexC.x = atan( tmp.z / tmp. x ) / 3.14159265358f + 0.5f;
-	verts[4].TexC.y = 1.0f - asin( tmp.y / length ) / 3.14159265358f + 0.5f;
-	verts[4].Normal = tmp;
-
+	verts[4].Position = geodeticToLocal( 7.0f * PI / 4.0f,  
+										 PI , 
+										 0 );
+	verts[4].Normal = surfaceNormal( 7.0f * PI / 4.0f, 
+									 PI );
+	verts[4].TexC.x = 1.0f / 2.0f;
+	verts[4].TexC.y = 7.0f / 8.0f;
+	
+	// 5
 	verts[5] = Vertex(+a, +c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	pos = XMVector3Normalize( XMLoadFloat3( & verts[5].Position ) ) * r;
-	XMStoreFloat3( &verts[5].Position, pos );
-
-	snorm = pos * overR2 ;
-	XMStoreFloat( & length, XMVector3Length( snorm ) );
-	snorm = XMVector3Normalize( snorm );
-	XMStoreFloat3( &tmp, snorm );
-	verts[5].TexC.x = atan( tmp.z / tmp. x ) / 3.14159265358f + 0.5f;
-	verts[5].TexC.y = 1.0f - asin( tmp.y / length ) / 3.14159265358f + 0.5f;
-	verts[5].Normal = tmp;
-
+	verts[5].Position = geodeticToLocal( 1.0f * PI / 4.0f,  
+										 PI , 
+										 0 );
+	verts[5].Normal = surfaceNormal( 1.0f * PI / 4.0f, 
+									 PI );
+	verts[5].TexC.x = 1.0f / 2.0f;
+	verts[5].TexC.y = 1.0f / 8.0f;
+	
+	// 6
 	verts[6] = Vertex(-a, +c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-	pos = XMVector3Normalize( XMLoadFloat3( & verts[6].Position ) ) * r;
-	XMStoreFloat3( &verts[6].Position, pos );
-
-	snorm = pos * overR2 ;
-	XMStoreFloat( & length, XMVector3Length( snorm ) );
-	snorm = XMVector3Normalize( snorm );
-	XMStoreFloat3( &tmp, snorm );
-	verts[6].TexC.x = atan( tmp.z / tmp. x ) / 3.14159265358f + 0.5f;
-	verts[6].TexC.y = 1.0f - asin( tmp.y / length ) / 3.14159265358f + 0.5f;
-	verts[6].Normal = tmp;
-
+	verts[6].Position = geodeticToLocal( 1.0f * PI / 4.0f,  
+										 3.0f * PI / 2.0f, 
+										 0 );
+	verts[6].Normal = surfaceNormal( 1.0f * PI / 4.0f, 
+									 3.0f * PI / 2.0f );
+	verts[6].TexC.x = 3.0f / 4.0f;
+	verts[6].TexC.y = 1.0f / 8.0f;
+	
+	// 7
 	verts[7] = Vertex(-a, -c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-	pos = XMVector3Normalize( XMLoadFloat3( & verts[7].Position ) ) * r;
-	XMStoreFloat3( &verts[7].Position, pos );
+	verts[7].Position = geodeticToLocal( 7.0f * PI / 4.0f,  
+										 3.0f * PI / 2.0f, 
+										 0 );
+	verts[7].Normal = surfaceNormal( 7.0f * PI / 4.0f, 
+									 3.0f * PI / 2.0f );
+	verts[7].TexC.x = 3.0f / 4.0f;
+	verts[7].TexC.y = 7.0f / 8.0f;
 
-	snorm = pos * overR2 ;
-	XMStoreFloat( & length, XMVector3Length( snorm ) );
-	snorm = XMVector3Normalize( snorm );
-	XMStoreFloat3( &tmp, snorm );
-	verts[7].TexC.x = atan( tmp.z / tmp. x ) / 3.14159265358f + 0.5f;
-	verts[7].TexC.y = 1.0f - asin( tmp.y / length ) / 3.14159265358f + 0.5f;
-	verts[7].Normal = tmp;
+	
+	// 8 = 0
+	verts[8] = Vertex(-a, -c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	verts[8].Position = geodeticToLocal( 7.0f * PI / 4.0f, 
+										 0, 
+										 0 );
+	verts[8].Normal = surfaceNormal( 7.0f * PI / 4.0f, 
+									 0 );
+	verts[8].TexC.x = 1.0f;
+	verts[8].TexC.y = 7.0f / 8.0f;
+	
+	// 9 = 1
+	verts[9] = Vertex(-a, +c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	verts[9].Position = geodeticToLocal( 1.0f * PI / 4.0f, 
+										 0, 
+										 0 );
+	verts[9].Normal = surfaceNormal( 1.0f * PI / 4.0f, 
+									 0 );
+	verts[9].TexC.x = 1.0f;
+	verts[9].TexC.y = 1.0f / 8.0f;
 
  
 	//
@@ -150,20 +184,20 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 	faces[1].Indices.assign(&ind[6], &ind[12]);
 
 	// Fill in the top face index data
-	ind[12] = 1; ind[13] =  6; ind[14] = 5;
-	ind[15] = 1; ind[16] = 5; ind[17] = 2;
+	ind[12] = 9; ind[13] =  6; ind[14] = 5;
+	ind[15] = 9; ind[16] = 5; ind[17] = 2;
 
 	faces[2].Indices.assign(&ind[12], &ind[18]);
 
 	// Fill in the bottom face index data
-	ind[18] = 7; ind[19] = 0; ind[20] = 3;
+	ind[18] = 7; ind[19] = 8; ind[20] = 3;
 	ind[21] = 7; ind[22] = 3; ind[23] = 4;
 
 	faces[3].Indices.assign(&ind[18], &ind[24]);
 
 	// Fill in the left face index data
-	ind[24] = 7; ind[25] = 6; ind[26] = 1;
-	ind[27] = 7; ind[28] = 1; ind[29] = 0;
+	ind[24] = 7; ind[25] = 6; ind[26] = 9;
+	ind[27] = 7; ind[28] = 9; ind[29] = 8;
 
 	faces[4].Indices.assign(&ind[24], &ind[30]);
 
@@ -177,7 +211,7 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 		delete rootQT;
 	}
 	rootQT = new QuadTreeNode( NULL, 36, 10.0f, 6);
-	for (int i=0; i < 8; i++)
+	for (int i=0; i < 10; i++)
 		Vertices.push_back(verts[i]);
 	for (int i=0; i < rootQT->numIndices; i++)
 		rootQT->indices[i] = ind[i];
