@@ -7,8 +7,10 @@ std::vector<UINT> Ellipsoid::getIndices() {
 		for (int j=0;j<4;j++) {
 			for (int k=0;k<4;k++) {
 				for (int l=0;l<4;l++) {
-					for (int n=0;n<6;n++) {
-						retInd.push_back(rootQT->children[i]->children[j]->children[k]->children[l]->indices[n]);
+					for (int m=0;m<4;m++) {
+						for (int n=0;n<6;n++) {
+							retInd.push_back(rootQT->children[i]->children[j]->children[k]->children[l]->children[m]->indices[n]);
+						}
 					}
 				}
 			}
