@@ -23,7 +23,7 @@ XMFLOAT3 Ellipsoid::surfaceNormal( XMFLOAT3 surf ) {
 	return n;
 }
 
-XMFLOAT3 Ellipsoid::geodeticToLocal( float lat, float lon, float height ) {
+XMFLOAT3 Ellipsoid::geodeticToLocal( float lon, float lat, float height ) {
 	XMFLOAT3 n = surfaceNormal( lat, lon );
 	XMFLOAT3 k( 
 		radius2.x * n.x,
@@ -51,8 +51,8 @@ XMFLOAT3 Ellipsoid::surfaceToGeodedic( XMFLOAT3 surf ) {
 
 XMFLOAT2 Ellipsoid::geodeticToTexCoord( XMFLOAT3 geo ) {
 	return XMFLOAT2( 
-		geo.x * 2.0f / ( PI ) + 0.5f,
-		1.0f - geo.y / ( PI ) + 0.5f
+		geo.x / ( 2.0f * PI ) + 0.5f,
+		geo.y / ( 2.0f * PI )
 		);
 }
 
@@ -79,7 +79,7 @@ std::vector<UINT> Ellipsoid::getIndices() {
 			}
 		}
 	}
-#if 0
+#if 1
 	retInd.clear();
 	for (int i=0;i<6;i++) {
 		for (int n=0;n<6;n++) {
@@ -122,9 +122,10 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 
 	for (int i=0; i < 10; i++) {
 		verts[i] = Vertex();
-		verts[i].Position = geodeticToLocal( lat[i], lon[i], 0 );
+		verts[i].Position = geodeticToLocal( lon[i], lat[i], 0 );
 		verts[i].Normal = surfaceNormal( lat[i], lon[i] );
-		verts[i].TexC = surfaceToTexCoord( verts[i].Position );
+		//verts[i].TexC = surfaceToTexCoord( verts[i].Position );
+		verts[i].TexC = geodeticToTexCoord( XMFLOAT3( lon[i], lat[i], 0 ) );
 	}
  
 	//
@@ -214,6 +215,9 @@ void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 	v[3] = node->indices[5];
 
 	Vertex tmp = Vertices[node->indices[0]];
+	
+	// NEED TO FIX THIS:
+	// use lat long
 
 	XMFLOAT3 newVerts[5];
 	XMStoreFloat3(&newVerts[0], XMVector3Normalize((bottomLeft - topLeft) / 2.0f + topLeft) * r);
