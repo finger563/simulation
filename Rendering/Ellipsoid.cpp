@@ -12,11 +12,11 @@ XMFLOAT3 Ellipsoid::surfaceNormal( float lat, float lon ) {
 	return n;
 }
 
-XMFLOAT3 Ellipsoid::surfaceNormal( XMFLOAT3 surface ) {
+XMFLOAT3 Ellipsoid::surfaceNormal( XMFLOAT3 surf ) {
 	XMFLOAT3 n(
-		surface.x / radius2.x,
-		surface.y / radius2.y,
-		surface.z / radius2.z
+		surf.x / radius2.x,
+		surf.y / radius2.y,
+		surf.z / radius2.z
 		);
 	XMVECTOR normal = XMLoadFloat3( &n );
 	XMStoreFloat3( &n, XMVector3Normalize( normal ) );
@@ -37,8 +37,8 @@ XMFLOAT3 Ellipsoid::geodeticToLocal( float lat, float lon, float height ) {
 					 k.z / gamma + height * n.z );
 }
 
-XMFLOAT3 Ellipsoid::surfaceToGeodedic( XMFLOAT3 surface ) {
-	XMFLOAT3 n = surfaceNormal( surface );
+XMFLOAT3 Ellipsoid::surfaceToGeodedic( XMFLOAT3 surf ) {
+	XMFLOAT3 n = surfaceNormal( surf );
 	float len;
 	XMStoreFloat( &len, XMVector3Length( XMLoadFloat3( &n ) ) );
 	XMFLOAT3 ret(
@@ -47,6 +47,21 @@ XMFLOAT3 Ellipsoid::surfaceToGeodedic( XMFLOAT3 surface ) {
 		0
 		);
 	return ret;
+}
+
+XMFLOAT2 Ellipsoid::geodeticToTexCoord( XMFLOAT3 geo ) {
+	return XMFLOAT2( 
+		geo.x * 2.0f / ( PI ) + 0.5f,
+		1.0f - geo.y / ( PI ) + 0.5f
+		);
+}
+
+XMFLOAT2 Ellipsoid::surfaceToTexCoord( XMFLOAT3 surf ) {
+	XMFLOAT3 geo = surfaceToGeodedic(surf);
+	XMFLOAT2 t = geodeticToTexCoord(geo);
+	return XMFLOAT2(
+		t
+		);
 }
 
 std::vector<UINT> Ellipsoid::getIndices() {
@@ -79,122 +94,38 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 	MeshData faces[6];
 
 	Vertex verts[10];
-	
-	XMFLOAT3 geodeticPos;
-		    
-	// Fill in the front face vertex data.
-	// 0
-	verts[0] = Vertex(-1, -1, -1, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-	verts[0].Position = geodeticToLocal( 7.0f * PI / 4.0f, 
-										 0, 
-										 0 );
-	verts[0].Normal = surfaceNormal( 7.0f * PI / 4.0f, 
-									 0 );
-	geodeticPos = surfaceToGeodedic( verts[0].Position );
-	verts[0].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
-	verts[0].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
-	
-	// 1
-	verts[1] = Vertex(-1, +1, -1, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	verts[1].Position = geodeticToLocal( 1.0f * PI / 4.0f, 
-										 0, 
-										 0 );
-	verts[1].Normal = surfaceNormal( 1.0f * PI / 4.0f, 
-									 0 );
-	geodeticPos = surfaceToGeodedic( verts[1].Position );
-	verts[1].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
-	verts[1].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
-	
-	// 2
-	verts[2] = Vertex(+1, +1, -1, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-	verts[2].Position = geodeticToLocal( 1.0f * PI / 4.0f,  
-										 PI / 2.0f, 
-										 0 );
-	verts[2].Normal = surfaceNormal( 1.0f * PI / 4.0f, 
-									 PI / 2.0f );
-	geodeticPos = surfaceToGeodedic( verts[2].Position );
-	verts[2].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
-	verts[2].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
-	
-	// 3
-	verts[3] = Vertex(+1, -1, -1, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-	verts[3].Position = geodeticToLocal( 7.0f * PI / 4.0f,  
-										 PI / 2.0f, 
-										 0 );
-	verts[3].Normal = surfaceNormal( 7.0f * PI / 4.0f, 
-									 PI / 2.0f );
-	geodeticPos = surfaceToGeodedic( verts[3].Position );
-	verts[3].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
-	verts[3].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
 
-	// Fill in the back face vertex data.
-	// 4
-	verts[4] = Vertex(+1, -1, +1, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-	verts[4].Position = geodeticToLocal( 7.0f * PI / 4.0f,  
-										 PI , 
-										 0 );
-	verts[4].Normal = surfaceNormal( 7.0f * PI / 4.0f, 
-									 PI );
-	geodeticPos = surfaceToGeodedic( verts[4].Position );
-	verts[4].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
-	verts[4].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
-	
-	// 5
-	verts[5] = Vertex(+1, +1, +1, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	verts[5].Position = geodeticToLocal( 1.0f * PI / 4.0f,  
-										 PI , 
-										 0 );
-	verts[5].Normal = surfaceNormal( 1.0f * PI / 4.0f, 
-									 PI );
-	geodeticPos = surfaceToGeodedic( verts[5].Position );
-	verts[5].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
-	verts[5].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
-	
-	// 6
-	verts[6] = Vertex(-1, +1, +1, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-	verts[6].Position = geodeticToLocal( 1.0f * PI / 4.0f,  
-										 3.0f * PI / 2.0f, 
-										 0 );
-	verts[6].Normal = surfaceNormal( 1.0f * PI / 4.0f, 
-									 3.0f * PI / 2.0f );
-	geodeticPos = surfaceToGeodedic( verts[6].Position );
-	verts[6].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
-	verts[6].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
-	
-	// 7
-	verts[7] = Vertex(-1, -1, +1, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-	verts[7].Position = geodeticToLocal( 7.0f * PI / 4.0f,  
-										 3.0f * PI / 2.0f, 
-										 0 );
-	verts[7].Normal = surfaceNormal( 7.0f * PI / 4.0f, 
-									 3.0f * PI / 2.0f );
-	geodeticPos = surfaceToGeodedic( verts[7].Position );
-	verts[7].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
-	verts[7].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
+	float lat[10] = { 
+		7.0f * PI / 4.0f,
+		1.0f * PI / 4.0f,
+		1.0f * PI / 4.0f,
+		7.0f * PI / 4.0f,
+		7.0f * PI / 4.0f,
+		1.0f * PI / 4.0f,
+		1.0f * PI / 4.0f,
+		7.0f * PI / 4.0f,
+		7.0f * PI / 4.0f,
+		1.0f * PI / 4.0f
+	};
+	float lon[10] = {
+		0,
+		0,
+		PI / 2.0f,
+		PI / 2.0f,
+		PI,
+		PI,
+		3.0f * PI / 2.0f,
+		3.0f * PI / 2.0f,
+		2.0f * PI,
+		2.0f * PI,
+	};
 
-	
-	// 8 = 0
-	verts[8] = Vertex(-1, -1, -1, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-	verts[8].Position = geodeticToLocal( 7.0f * PI / 4.0f, 
-										 0, 
-										 0 );
-	verts[8].Normal = surfaceNormal( 7.0f * PI / 4.0f, 
-									 0 );
-	geodeticPos = surfaceToGeodedic( verts[8].Position );
-	verts[8].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
-	verts[8].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
-	
-	// 9 = 1
-	verts[9] = Vertex(-1, +1, -1, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	verts[9].Position = geodeticToLocal( 1.0f * PI / 4.0f, 
-										 0, 
-										 0 );
-	verts[9].Normal = surfaceNormal( 1.0f * PI / 4.0f, 
-									 0 );
-	geodeticPos = surfaceToGeodedic( verts[9].Position );
-	verts[9].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
-	verts[9].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
-
+	for (int i=0; i < 10; i++) {
+		verts[i] = Vertex();
+		verts[i].Position = geodeticToLocal( lat[i], lon[i], 0 );
+		verts[i].Normal = surfaceNormal( lat[i], lon[i] );
+		verts[i].TexC = surfaceToTexCoord( verts[i].Position );
+	}
  
 	//
 	// Create the indices.
@@ -274,107 +205,56 @@ void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 	XMVECTOR topLeft = XMLoadFloat3( &Vertices[node->indices[1]].Position );
 	XMVECTOR topRight = XMLoadFloat3( &Vertices[node->indices[2]].Position );
 	XMVECTOR bottomRight = XMLoadFloat3( &Vertices[node->indices[5]].Position );
+
+	int v[9];
 	
-	int v0 = node->indices[0];
-	int v1 = node->indices[1];
-	int v2 = node->indices[2];
-	int v3 = node->indices[5];
+	v[0] = node->indices[0];
+	v[1] = node->indices[1];
+	v[2] = node->indices[2];
+	v[3] = node->indices[5];
 
 	Vertex tmp = Vertices[node->indices[0]];
 
-	XMFLOAT3 geodeticPos;
-	
-	// NEW VERTEX ID 4
-	XMFLOAT3 midLeft;
-	XMStoreFloat3(&midLeft, XMVector3Normalize((bottomLeft - topLeft) / 2.0f + topLeft) * r);
-	
-	tmp.Position = midLeft;		// 4
-	Vertices.push_back( tmp );
-
-	Vertices.back().Normal = surfaceNormal( Vertices.back().Position );
-	geodeticPos = surfaceToGeodedic( Vertices.back().Position );
-	Vertices.back().TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
-	Vertices.back().TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
-	
-	int v4 = Vertices.size() - 1;
-
-	XMFLOAT3 midTop;
-	XMStoreFloat3(&midTop, XMVector3Normalize((topRight - topLeft) / 2.0f + topLeft) * r);
-	
-	tmp.Position = midTop;		// 5
-	Vertices.push_back( tmp );
-
-	Vertices.back().Normal = surfaceNormal( Vertices.back().Position );
-	geodeticPos = surfaceToGeodedic( Vertices.back().Position );
-	Vertices.back().TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
-	Vertices.back().TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
-	
-	int v5 = Vertices.size() - 1;
+	XMFLOAT3 newVerts[5];
+	XMStoreFloat3(&newVerts[0], XMVector3Normalize((bottomLeft - topLeft) / 2.0f + topLeft) * r);
+	XMStoreFloat3(&newVerts[1], XMVector3Normalize((topRight - topLeft) / 2.0f + topLeft) * r);
+	XMStoreFloat3(&newVerts[2], XMVector3Normalize((bottomRight - bottomLeft) / 2.0f + bottomLeft) * r);
+	XMStoreFloat3(&newVerts[3], XMVector3Normalize((bottomRight - topLeft) / 2.0f + topLeft) * r);
+	XMStoreFloat3(&newVerts[4], XMVector3Normalize((bottomRight - topRight) / 2.0f + topRight) * r);
 		
-	XMFLOAT3 midBottom;
-	XMStoreFloat3(&midBottom, XMVector3Normalize((bottomRight - bottomLeft) / 2.0f + bottomLeft) * r);
-
-	tmp.Position = midBottom;	// 6
-	Vertices.push_back( tmp );
-
-	Vertices.back().Normal = surfaceNormal( Vertices.back().Position );
-	geodeticPos = surfaceToGeodedic( Vertices.back().Position );
-	Vertices.back().TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
-	Vertices.back().TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
+	for (int i=0;i<5;i++) {
+		tmp.Position = newVerts[i];
+		Vertices.push_back( tmp );
+		Vertices.back().Normal = surfaceNormal( Vertices.back().Position );
+		Vertices.back().TexC = surfaceToTexCoord( Vertices.back().Position );
+		v[i+4] = Vertices.size() - 1;
+	}
 	
-	int v6 = Vertices.size() - 1;
+	node->children[0]->indices[0] = v[0];
+	node->children[0]->indices[1] = v[4];
+	node->children[0]->indices[2] = v[7];
+	node->children[0]->indices[3] = v[0];
+	node->children[0]->indices[4] = v[7];
+	node->children[0]->indices[5] = v[6];
 	
-	XMFLOAT3 center;
-	XMStoreFloat3(&center, XMVector3Normalize((bottomRight - topLeft) / 2.0f + topLeft) * r);
-
-	tmp.Position = center;		// 7
-	Vertices.push_back( tmp );
-
-	Vertices.back().Normal = surfaceNormal( Vertices.back().Position );
-	geodeticPos = surfaceToGeodedic( Vertices.back().Position );
-	Vertices.back().TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
-	Vertices.back().TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
-
-	int v7 = Vertices.size() - 1;
+	node->children[1]->indices[0] = v[4];
+	node->children[1]->indices[1] = v[1];
+	node->children[1]->indices[2] = v[5];
+	node->children[1]->indices[3] = v[4];
+	node->children[1]->indices[4] = v[5];
+	node->children[1]->indices[5] = v[7];
 	
-	XMFLOAT3 midRight;
-	XMStoreFloat3(&midRight, XMVector3Normalize((bottomRight - topRight) / 2.0f + topRight) * r);
-
-	tmp.Position = midRight;	// 8
-	Vertices.push_back( tmp );
-
-	Vertices.back().Normal = surfaceNormal( Vertices.back().Position );
-	geodeticPos = surfaceToGeodedic( Vertices.back().Position );
-	Vertices.back().TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
-	Vertices.back().TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
-
-	int v8 = Vertices.size() - 1;
+	node->children[2]->indices[0] = v[7];
+	node->children[2]->indices[1] = v[5];
+	node->children[2]->indices[2] = v[2];
+	node->children[2]->indices[3] = v[7];
+	node->children[2]->indices[4] = v[2];
+	node->children[2]->indices[5] = v[8];
 	
-	node->children[0]->indices[0] = v0;
-	node->children[0]->indices[1] = v4;
-	node->children[0]->indices[2] = v7;
-	node->children[0]->indices[3] = v0;
-	node->children[0]->indices[4] = v7;
-	node->children[0]->indices[5] = v6;
-	
-	node->children[1]->indices[0] = v4;
-	node->children[1]->indices[1] = v1;
-	node->children[1]->indices[2] = v5;
-	node->children[1]->indices[3] = v4;
-	node->children[1]->indices[4] = v5;
-	node->children[1]->indices[5] = v7;
-	
-	node->children[2]->indices[0] = v7;
-	node->children[2]->indices[1] = v5;
-	node->children[2]->indices[2] = v2;
-	node->children[2]->indices[3] = v7;
-	node->children[2]->indices[4] = v2;
-	node->children[2]->indices[5] = v8;
-	
-	node->children[3]->indices[0] = v6;
-	node->children[3]->indices[1] = v7;
-	node->children[3]->indices[2] = v8;
-	node->children[3]->indices[3] = v6;
-	node->children[3]->indices[4] = v8;
-	node->children[3]->indices[5] = v3;
+	node->children[3]->indices[0] = v[6];
+	node->children[3]->indices[1] = v[7];
+	node->children[3]->indices[2] = v[8];
+	node->children[3]->indices[3] = v[6];
+	node->children[3]->indices[4] = v[8];
+	node->children[3]->indices[5] = v[3];
 }

@@ -36,9 +36,11 @@ public:
 	}
 
 	XMFLOAT3 surfaceNormal( float lat, float lon );
-	XMFLOAT3 surfaceNormal( XMFLOAT3 surface );
+	XMFLOAT3 surfaceNormal( XMFLOAT3 surf );
 	XMFLOAT3 geodeticToLocal( float lat, float lon, float height );
-	XMFLOAT3 surfaceToGeodedic( XMFLOAT3 pos );
+	XMFLOAT3 surfaceToGeodedic( XMFLOAT3 surf );
+	XMFLOAT2 geodeticToTexCoord( XMFLOAT3 geo );
+	XMFLOAT2 surfaceToTexCoord( XMFLOAT3 surf );
 
 	void generateMeshes( int qtDepth = 10.0f );
 
