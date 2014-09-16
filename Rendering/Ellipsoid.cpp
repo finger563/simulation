@@ -3,22 +3,50 @@
 
 XMFLOAT3 Ellipsoid::surfaceNormal( float lat, float lon ) {
 	float cosLat = cos( lat );
-	return XMFLOAT3 ( cosLat * cos(lon),
-					  sin(lat), 
-					  cosLat * sin(lon) );
+	XMFLOAT3 n( 
+		cosLat * cos(lon),
+		sin(lat), 
+		cosLat * sin(lon) );
+	XMVECTOR normal = XMLoadFloat3( &n );
+	XMStoreFloat3( &n, XMVector3Normalize( normal ) );
+	return n;
+}
+
+XMFLOAT3 Ellipsoid::surfaceNormal( XMFLOAT3 surface ) {
+	XMFLOAT3 n(
+		surface.x / radius2.x,
+		surface.y / radius2.y,
+		surface.z / radius2.z
+		);
+	XMVECTOR normal = XMLoadFloat3( &n );
+	XMStoreFloat3( &n, XMVector3Normalize( normal ) );
+	return n;
 }
 
 XMFLOAT3 Ellipsoid::geodeticToLocal( float lat, float lon, float height ) {
 	XMFLOAT3 n = surfaceNormal( lat, lon );
-	XMFLOAT3 k( radius2.x * n.x,
-				radius2.y * n.y,
-				radius2.z * n.z );
+	XMFLOAT3 k( 
+		radius2.x * n.x,
+		radius2.y * n.y,
+		radius2.z * n.z );
 	float gamma = sqrt( k.x * n.x + 
 						k.y * n.y + 
 						k.z * n.z);
 	return XMFLOAT3( k.x / gamma + height * n.x,
 					 k.y / gamma + height * n.y,
 					 k.z / gamma + height * n.z );
+}
+
+XMFLOAT3 Ellipsoid::surfaceToGeodedic( XMFLOAT3 surface ) {
+	XMFLOAT3 n = surfaceNormal( surface );
+	float len;
+	XMStoreFloat( &len, XMVector3Length( XMLoadFloat3( &n ) ) );
+	XMFLOAT3 ret(
+		atan( n.z / n.x ),
+		asin( n.y / len ),
+		0
+		);
+	return ret;
 }
 
 std::vector<UINT> Ellipsoid::getIndices() {
@@ -36,7 +64,7 @@ std::vector<UINT> Ellipsoid::getIndices() {
 			}
 		}
 	}
-#if 1
+#if 0
 	retInd.clear();
 	for (int i=0;i<6;i++) {
 		for (int n=0;n<6;n++) {
@@ -51,118 +79,121 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 	MeshData faces[6];
 
 	Vertex verts[10];
-
-	XMFLOAT3 radius(a,b,c);
-	XMFLOAT3 oneOverR2(1.0f/(a), 1.0f/(b), 1.0f/(c));
-	XMVECTOR r = XMLoadFloat3( &radius );
-	XMVECTOR overR2 = XMLoadFloat3( &oneOverR2 );
-	XMFLOAT3 tmp;
-	float length;
-	XMVECTOR snorm;
-	XMVECTOR pos;
+	
+	XMFLOAT3 geodeticPos;
 		    
 	// Fill in the front face vertex data.
 	// 0
-	verts[0] = Vertex(-a, -c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	verts[0] = Vertex(-1, -1, -1, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 	verts[0].Position = geodeticToLocal( 7.0f * PI / 4.0f, 
 										 0, 
 										 0 );
 	verts[0].Normal = surfaceNormal( 7.0f * PI / 4.0f, 
 									 0 );
-	verts[0].TexC.x = 0;
-	verts[0].TexC.y = 7.0f / 8.0f;
+	geodeticPos = surfaceToGeodedic( verts[0].Position );
+	verts[0].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
+	verts[0].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
 	
 	// 1
-	verts[1] = Vertex(-a, +c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	verts[1] = Vertex(-1, +1, -1, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 	verts[1].Position = geodeticToLocal( 1.0f * PI / 4.0f, 
 										 0, 
 										 0 );
 	verts[1].Normal = surfaceNormal( 1.0f * PI / 4.0f, 
 									 0 );
-	verts[1].TexC.x = 0;
-	verts[1].TexC.y = 1.0f / 8.0f;
+	geodeticPos = surfaceToGeodedic( verts[1].Position );
+	verts[1].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
+	verts[1].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
 	
 	// 2
-	verts[2] = Vertex(+a, +c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	verts[2] = Vertex(+1, +1, -1, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 	verts[2].Position = geodeticToLocal( 1.0f * PI / 4.0f,  
 										 PI / 2.0f, 
 										 0 );
 	verts[2].Normal = surfaceNormal( 1.0f * PI / 4.0f, 
 									 PI / 2.0f );
-	verts[2].TexC.x = 1.0f / 4.0f;
-	verts[2].TexC.y = 1.0f / 8.0f;
+	geodeticPos = surfaceToGeodedic( verts[2].Position );
+	verts[2].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
+	verts[2].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
 	
 	// 3
-	verts[3] = Vertex(+a, -c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+	verts[3] = Vertex(+1, -1, -1, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
 	verts[3].Position = geodeticToLocal( 7.0f * PI / 4.0f,  
 										 PI / 2.0f, 
 										 0 );
 	verts[3].Normal = surfaceNormal( 7.0f * PI / 4.0f, 
 									 PI / 2.0f );
-	verts[3].TexC.x = 1.0f / 4.0f;
-	verts[3].TexC.y = 7.0f / 8.0f;
+	geodeticPos = surfaceToGeodedic( verts[3].Position );
+	verts[3].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
+	verts[3].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
 
 	// Fill in the back face vertex data.
 	// 4
-	verts[4] = Vertex(+a, -c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	verts[4] = Vertex(+1, -1, +1, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 	verts[4].Position = geodeticToLocal( 7.0f * PI / 4.0f,  
 										 PI , 
 										 0 );
 	verts[4].Normal = surfaceNormal( 7.0f * PI / 4.0f, 
 									 PI );
-	verts[4].TexC.x = 1.0f / 2.0f;
-	verts[4].TexC.y = 7.0f / 8.0f;
+	geodeticPos = surfaceToGeodedic( verts[4].Position );
+	verts[4].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
+	verts[4].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
 	
 	// 5
-	verts[5] = Vertex(+a, +c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	verts[5] = Vertex(+1, +1, +1, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 	verts[5].Position = geodeticToLocal( 1.0f * PI / 4.0f,  
 										 PI , 
 										 0 );
 	verts[5].Normal = surfaceNormal( 1.0f * PI / 4.0f, 
 									 PI );
-	verts[5].TexC.x = 1.0f / 2.0f;
-	verts[5].TexC.y = 1.0f / 8.0f;
+	geodeticPos = surfaceToGeodedic( verts[5].Position );
+	verts[5].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
+	verts[5].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
 	
 	// 6
-	verts[6] = Vertex(-a, +c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	verts[6] = Vertex(-1, +1, +1, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 	verts[6].Position = geodeticToLocal( 1.0f * PI / 4.0f,  
 										 3.0f * PI / 2.0f, 
 										 0 );
 	verts[6].Normal = surfaceNormal( 1.0f * PI / 4.0f, 
 									 3.0f * PI / 2.0f );
-	verts[6].TexC.x = 3.0f / 4.0f;
-	verts[6].TexC.y = 1.0f / 8.0f;
+	geodeticPos = surfaceToGeodedic( verts[6].Position );
+	verts[6].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
+	verts[6].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
 	
 	// 7
-	verts[7] = Vertex(-a, -c, +b, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+	verts[7] = Vertex(-1, -1, +1, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
 	verts[7].Position = geodeticToLocal( 7.0f * PI / 4.0f,  
 										 3.0f * PI / 2.0f, 
 										 0 );
 	verts[7].Normal = surfaceNormal( 7.0f * PI / 4.0f, 
 									 3.0f * PI / 2.0f );
-	verts[7].TexC.x = 3.0f / 4.0f;
-	verts[7].TexC.y = 7.0f / 8.0f;
+	geodeticPos = surfaceToGeodedic( verts[7].Position );
+	verts[7].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
+	verts[7].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
 
 	
 	// 8 = 0
-	verts[8] = Vertex(-a, -c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	verts[8] = Vertex(-1, -1, -1, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 	verts[8].Position = geodeticToLocal( 7.0f * PI / 4.0f, 
 										 0, 
 										 0 );
 	verts[8].Normal = surfaceNormal( 7.0f * PI / 4.0f, 
 									 0 );
-	verts[8].TexC.x = 1.0f;
-	verts[8].TexC.y = 7.0f / 8.0f;
+	geodeticPos = surfaceToGeodedic( verts[8].Position );
+	verts[8].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
+	verts[8].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
 	
 	// 9 = 1
-	verts[9] = Vertex(-a, +c, -b, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	verts[9] = Vertex(-1, +1, -1, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 	verts[9].Position = geodeticToLocal( 1.0f * PI / 4.0f, 
 										 0, 
 										 0 );
 	verts[9].Normal = surfaceNormal( 1.0f * PI / 4.0f, 
 									 0 );
-	verts[9].TexC.x = 1.0f;
-	verts[9].TexC.y = 1.0f / 8.0f;
+	geodeticPos = surfaceToGeodedic( verts[9].Position );
+	verts[9].TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
+	verts[9].TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
 
  
 	//
@@ -238,7 +269,6 @@ void Ellipsoid::generateQT( QuadTreeNode* node, int numChildren, int numSubdivis
 }
 
 void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
-	XMFLOAT3 radius(a,b,c);
 	XMVECTOR r = XMLoadFloat3( &radius );
 	XMVECTOR bottomLeft = XMLoadFloat3( &Vertices[node->indices[0]].Position );
 	XMVECTOR topLeft = XMLoadFloat3( &Vertices[node->indices[1]].Position );
@@ -252,12 +282,7 @@ void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 
 	Vertex tmp = Vertices[node->indices[0]];
 
-	XMFLOAT3 oneOverR2(1.0f/(a), 1.0f/(b), 1.0f/(c));
-	XMVECTOR overR2 = XMLoadFloat3( &oneOverR2 );
-	XMFLOAT3 normal;
-	float length;
-	XMVECTOR snorm;
-	XMVECTOR pos;
+	XMFLOAT3 geodeticPos;
 	
 	// NEW VERTEX ID 4
 	XMFLOAT3 midLeft;
@@ -266,14 +291,10 @@ void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 	tmp.Position = midLeft;		// 4
 	Vertices.push_back( tmp );
 
-	pos = XMLoadFloat3( &Vertices.back().Position );
-	snorm = pos * overR2 ;
-	XMStoreFloat( & length, XMVector3Length( snorm ) );
-	snorm = XMVector3Normalize( snorm );
-	XMStoreFloat3( &normal, snorm );
-	Vertices.back().Normal = normal;
-	Vertices.back().TexC.x = atan( normal.z / normal. x ) / 3.14159265358f + 0.5f;
-	Vertices.back().TexC.y = 1.0f - asin( normal.y / length ) / 3.14159265358f + 0.5f;
+	Vertices.back().Normal = surfaceNormal( Vertices.back().Position );
+	geodeticPos = surfaceToGeodedic( Vertices.back().Position );
+	Vertices.back().TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
+	Vertices.back().TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
 	
 	int v4 = Vertices.size() - 1;
 
@@ -283,14 +304,10 @@ void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 	tmp.Position = midTop;		// 5
 	Vertices.push_back( tmp );
 
-	pos = XMLoadFloat3( &Vertices.back().Position );
-	snorm = pos * overR2 ;
-	XMStoreFloat( & length, XMVector3Length( snorm ) );
-	snorm = XMVector3Normalize( snorm );
-	XMStoreFloat3( &normal, snorm );
-	Vertices.back().Normal = normal;
-	Vertices.back().TexC.x = atan( normal.z / normal. x ) / 3.14159265358f + 0.5f;
-	Vertices.back().TexC.y = 1.0f - asin( normal.y / length ) / 3.14159265358f + 0.5f;
+	Vertices.back().Normal = surfaceNormal( Vertices.back().Position );
+	geodeticPos = surfaceToGeodedic( Vertices.back().Position );
+	Vertices.back().TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
+	Vertices.back().TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
 	
 	int v5 = Vertices.size() - 1;
 		
@@ -300,14 +317,10 @@ void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 	tmp.Position = midBottom;	// 6
 	Vertices.push_back( tmp );
 
-	pos = XMLoadFloat3( &Vertices.back().Position );
-	snorm = pos * overR2 ;
-	XMStoreFloat( & length, XMVector3Length( snorm ) );
-	snorm = XMVector3Normalize( snorm );
-	XMStoreFloat3( &normal, snorm );
-	Vertices.back().Normal = normal;
-	Vertices.back().TexC.x = atan( normal.z / normal. x ) / 3.14159265358f + 0.5f;
-	Vertices.back().TexC.y = 1.0f - asin( normal.y / length ) / 3.14159265358f + 0.5f;
+	Vertices.back().Normal = surfaceNormal( Vertices.back().Position );
+	geodeticPos = surfaceToGeodedic( Vertices.back().Position );
+	Vertices.back().TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
+	Vertices.back().TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
 	
 	int v6 = Vertices.size() - 1;
 	
@@ -317,14 +330,10 @@ void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 	tmp.Position = center;		// 7
 	Vertices.push_back( tmp );
 
-	pos = XMLoadFloat3( &Vertices.back().Position );
-	snorm = pos * overR2 ;
-	XMStoreFloat( & length, XMVector3Length( snorm ) );
-	snorm = XMVector3Normalize( snorm );
-	XMStoreFloat3( &normal, snorm );
-	Vertices.back().Normal = normal;
-	Vertices.back().TexC.x = atan( normal.z / normal. x ) / 3.14159265358f + 0.5f;
-	Vertices.back().TexC.y = 1.0f - asin( normal.y / length ) / 3.14159265358f + 0.5f;
+	Vertices.back().Normal = surfaceNormal( Vertices.back().Position );
+	geodeticPos = surfaceToGeodedic( Vertices.back().Position );
+	Vertices.back().TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
+	Vertices.back().TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
 
 	int v7 = Vertices.size() - 1;
 	
@@ -334,14 +343,10 @@ void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 	tmp.Position = midRight;	// 8
 	Vertices.push_back( tmp );
 
-	pos = XMLoadFloat3( &Vertices.back().Position );
-	snorm = pos * overR2 ;
-	XMStoreFloat( & length, XMVector3Length( snorm ) );
-	snorm = XMVector3Normalize( snorm );
-	XMStoreFloat3( &normal, snorm );
-	Vertices.back().Normal = normal;
-	Vertices.back().TexC.x = atan( normal.z / normal. x ) / 3.14159265358f + 0.5f;
-	Vertices.back().TexC.y = 1.0f - asin( normal.y / length ) / 3.14159265358f + 0.5f;
+	Vertices.back().Normal = surfaceNormal( Vertices.back().Position );
+	geodeticPos = surfaceToGeodedic( Vertices.back().Position );
+	Vertices.back().TexC.x = geodeticPos.x / ( 2.0f * PI ) + 0.5f;
+	Vertices.back().TexC.y = 1.0f - geodeticPos.y / ( PI ) + 0.5f;
 
 	int v8 = Vertices.size() - 1;
 	
