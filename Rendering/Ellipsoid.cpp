@@ -57,11 +57,23 @@ XMFLOAT2 Ellipsoid::geodeticToTexCoord( XMFLOAT3 geo ) {
 }
 
 XMFLOAT2 Ellipsoid::surfaceToTexCoord( XMFLOAT3 surf ) {
-	XMFLOAT3 geo = surfaceToGeodedic(surf);
-	XMFLOAT2 t = geodeticToTexCoord(geo);
-	return XMFLOAT2(
-		t
-		);
+	// convert from cartesion to spherical
+	float r = sqrt( surf.x * surf.x + surf.y * surf.y + surf.z * surf.z );
+	float phi = acos( surf.y / r );
+	float theta = asin( surf.z / ( r * sin(phi) )  );
+
+	if ( surf.x < 0 ) {
+		theta += PI;
+	}
+	else if ( surf.z < 0 ) {
+		theta = 2.0f * PI + theta;
+	}
+
+	float x, y;
+	x = theta / ( 2.0f * PI );
+	y = phi / PI;
+	XMFLOAT2 texCoord( x, y );
+	return texCoord;
 }
 
 std::vector<UINT> Ellipsoid::getIndices() {
@@ -79,7 +91,7 @@ std::vector<UINT> Ellipsoid::getIndices() {
 			}
 		}
 	}
-#if 1
+#if 0
 	retInd.clear();
 	for (int i=0;i<6;i++) {
 		for (int n=0;n<6;n++) {
@@ -123,8 +135,13 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 	for (int i=0; i < 10; i++) {
 		verts[i] = Vertex();
 		verts[i].Position = geodeticToLocal( lon[i], lat[i], 0 );
+		if ( abs(verts[i].Position.x) < 1.0f ) 
+			verts[i].Position.x = 0;
+		if ( abs(verts[i].Position.y) < 1.0f ) 
+			verts[i].Position.y = 0;
+		if ( abs(verts[i].Position.z) < 1.0f ) 
+			verts[i].Position.z = 0;
 		verts[i].Normal = surfaceNormal( lat[i], lon[i] );
-		//verts[i].TexC = surfaceToTexCoord( verts[i].Position );
 		verts[i].TexC = geodeticToTexCoord( XMFLOAT3( lon[i], lat[i], 0 ) );
 	}
  
@@ -201,64 +218,80 @@ void Ellipsoid::generateQT( QuadTreeNode* node, int numChildren, int numSubdivis
 }
 
 void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
-	XMVECTOR r = XMLoadFloat3( &radius );
-	XMVECTOR bottomLeft = XMLoadFloat3( &Vertices[node->indices[0]].Position );
-	XMVECTOR topLeft = XMLoadFloat3( &Vertices[node->indices[1]].Position );
-	XMVECTOR topRight = XMLoadFloat3( &Vertices[node->indices[2]].Position );
-	XMVECTOR bottomRight = XMLoadFloat3( &Vertices[node->indices[5]].Position );
 
-	int v[9];
+	int ind[9]; // 4 original + 5 new verts (mid points & center)
 	
-	v[0] = node->indices[0];
-	v[1] = node->indices[1];
-	v[2] = node->indices[2];
-	v[3] = node->indices[5];
+	ind[0] = node->indices[0];
+	ind[1] = node->indices[1];
+	ind[2] = node->indices[2];
+	ind[3] = node->indices[5];
 
-	Vertex tmp = Vertices[node->indices[0]];
-	
-	// NEED TO FIX THIS:
-	// use lat long
-
-	XMFLOAT3 newVerts[5];
-	XMStoreFloat3(&newVerts[0], XMVector3Normalize((bottomLeft - topLeft) / 2.0f + topLeft) * r);
-	XMStoreFloat3(&newVerts[1], XMVector3Normalize((topRight - topLeft) / 2.0f + topLeft) * r);
-	XMStoreFloat3(&newVerts[2], XMVector3Normalize((bottomRight - bottomLeft) / 2.0f + bottomLeft) * r);
-	XMStoreFloat3(&newVerts[3], XMVector3Normalize((bottomRight - topLeft) / 2.0f + topLeft) * r);
-	XMStoreFloat3(&newVerts[4], XMVector3Normalize((bottomRight - topRight) / 2.0f + topRight) * r);
-		
-	for (int i=0;i<5;i++) {
-		tmp.Position = newVerts[i];
-		Vertices.push_back( tmp );
-		Vertices.back().Normal = surfaceNormal( Vertices.back().Position );
-		Vertices.back().TexC = surfaceToTexCoord( Vertices.back().Position );
-		v[i+4] = Vertices.size() - 1;
+	Vertex originals[4];
+	for (int i=0; i<4;i++) {
+		originals[i] = Vertices[ind[i]];
 	}
 	
-	node->children[0]->indices[0] = v[0];
-	node->children[0]->indices[1] = v[4];
-	node->children[0]->indices[2] = v[7];
-	node->children[0]->indices[3] = v[0];
-	node->children[0]->indices[4] = v[7];
-	node->children[0]->indices[5] = v[6];
+	XMVECTOR r = XMLoadFloat3( &radius );
+	XMVECTOR bottomLeft = XMLoadFloat3( &originals[0].Position );	// bottom left vertex
+	XMVECTOR topLeft = XMLoadFloat3( &originals[1].Position );		// top left vertex
+	XMVECTOR topRight = XMLoadFloat3( &originals[2].Position );		// top right vertex
+	XMVECTOR bottomRight = XMLoadFloat3( &originals[3].Position );	// bottom right vertex
+		
+	Vertex newVerts[5];
+
+	float longitudes[5] = { 
+		originals[0].TexC.x,
+		originals[0].TexC.x + (originals[3].TexC.x - originals[0].TexC.x) / 2.0f,
+		originals[0].TexC.x + (originals[3].TexC.x - originals[0].TexC.x) / 2.0f,
+		originals[0].TexC.x + (originals[3].TexC.x - originals[0].TexC.x) / 2.0f,
+		originals[3].TexC.x
+	};
 	
-	node->children[1]->indices[0] = v[4];
-	node->children[1]->indices[1] = v[1];
-	node->children[1]->indices[2] = v[5];
-	node->children[1]->indices[3] = v[4];
-	node->children[1]->indices[4] = v[5];
-	node->children[1]->indices[5] = v[7];
+	XMStoreFloat3(&newVerts[0].Position, XMVector3Normalize((bottomLeft - topLeft) / 2.0f + topLeft) * r);			// midLeft
+	XMStoreFloat3(&newVerts[1].Position, XMVector3Normalize((topRight - topLeft) / 2.0f + topLeft) * r);			// midTop
+	XMStoreFloat3(&newVerts[2].Position, XMVector3Normalize((bottomRight - bottomLeft) / 2.0f + bottomLeft) * r);	// midBottom
+	XMStoreFloat3(&newVerts[3].Position, XMVector3Normalize((bottomRight - topLeft) / 2.0f + topLeft) * r);			// center
+	XMStoreFloat3(&newVerts[4].Position, XMVector3Normalize((bottomRight - topRight) / 2.0f + topRight) * r);		// midRight
+		
+	for (int i=0;i<5;i++) {
+		if ( abs(newVerts[i].Position.x) < 1.0f ) 
+			newVerts[i].Position.x = 0;
+		if ( abs(newVerts[i].Position.y) < 1.0f ) 
+			newVerts[i].Position.y = 0;
+		if ( abs(newVerts[i].Position.z) < 1.0f ) 
+			newVerts[i].Position.z = 0;
+		newVerts[i].Normal = surfaceNormal( newVerts[i].Position );
+		newVerts[i].TexC = surfaceToTexCoord( newVerts[i].Position );
+		newVerts[i].TexC.x = longitudes[i];
+		Vertices.push_back( newVerts[i] );
+		ind[i+4] = Vertices.size() - 1;
+	}
 	
-	node->children[2]->indices[0] = v[7];
-	node->children[2]->indices[1] = v[5];
-	node->children[2]->indices[2] = v[2];
-	node->children[2]->indices[3] = v[7];
-	node->children[2]->indices[4] = v[2];
-	node->children[2]->indices[5] = v[8];
+	node->children[0]->indices[0] = ind[0];
+	node->children[0]->indices[1] = ind[4];
+	node->children[0]->indices[2] = ind[7];
+	node->children[0]->indices[3] = ind[0];
+	node->children[0]->indices[4] = ind[7];
+	node->children[0]->indices[5] = ind[6];
 	
-	node->children[3]->indices[0] = v[6];
-	node->children[3]->indices[1] = v[7];
-	node->children[3]->indices[2] = v[8];
-	node->children[3]->indices[3] = v[6];
-	node->children[3]->indices[4] = v[8];
-	node->children[3]->indices[5] = v[3];
+	node->children[1]->indices[0] = ind[4];
+	node->children[1]->indices[1] = ind[1];
+	node->children[1]->indices[2] = ind[5];
+	node->children[1]->indices[3] = ind[4];
+	node->children[1]->indices[4] = ind[5];
+	node->children[1]->indices[5] = ind[7];
+	
+	node->children[2]->indices[0] = ind[7];
+	node->children[2]->indices[1] = ind[5];
+	node->children[2]->indices[2] = ind[2];
+	node->children[2]->indices[3] = ind[7];
+	node->children[2]->indices[4] = ind[2];
+	node->children[2]->indices[5] = ind[8];
+	
+	node->children[3]->indices[0] = ind[6];
+	node->children[3]->indices[1] = ind[7];
+	node->children[3]->indices[2] = ind[8];
+	node->children[3]->indices[3] = ind[6];
+	node->children[3]->indices[4] = ind[8];
+	node->children[3]->indices[5] = ind[3];
 }
