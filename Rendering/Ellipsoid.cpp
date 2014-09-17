@@ -1,7 +1,7 @@
 
 #include "Ellipsoid.h"
 
-XMFLOAT3 Ellipsoid::surfaceNormal( float lat, float lon ) {
+XMFLOAT3 Ellipsoid::surfaceNormal( float lon, float lat ) {
 	float cosLat = cos( lat );
 	XMFLOAT3 n( 
 		cosLat * cos(lon),
@@ -24,7 +24,7 @@ XMFLOAT3 Ellipsoid::surfaceNormal( XMFLOAT3 surf ) {
 }
 
 XMFLOAT3 Ellipsoid::geodeticToLocal( float lon, float lat, float height ) {
-	XMFLOAT3 n = surfaceNormal( lat, lon );
+	XMFLOAT3 n = surfaceNormal( lon, lat );
 	XMFLOAT3 k( 
 		radius2.x * n.x,
 		radius2.y * n.y,
@@ -57,7 +57,7 @@ XMFLOAT2 Ellipsoid::geodeticToTexCoord( XMFLOAT3 geo ) {
 }
 
 XMFLOAT2 Ellipsoid::surfaceToTexCoord( XMFLOAT3 surf ) {
-	// convert from cartesion to spherical
+	// convert from cartesian to spherical
 	float r = sqrt( surf.x * surf.x + surf.y * surf.y + surf.z * surf.z );
 	float phi = acos( surf.y / r );
 	float theta = asin( surf.z / ( r * sin(phi) )  );
@@ -141,7 +141,7 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 			verts[i].Position.y = 0;
 		if ( abs(verts[i].Position.z) < 1.0f ) 
 			verts[i].Position.z = 0;
-		verts[i].Normal = surfaceNormal( lat[i], lon[i] );
+		verts[i].Normal = surfaceNormal( lon[i], lat[i] );
 		verts[i].TexC = geodeticToTexCoord( XMFLOAT3( lon[i], lat[i], 0 ) );
 	}
  

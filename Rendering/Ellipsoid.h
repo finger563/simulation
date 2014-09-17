@@ -35,7 +35,7 @@ public:
 			delete rootQT;
 	}
 
-	XMFLOAT3 surfaceNormal( float lat, float lon );
+	XMFLOAT3 surfaceNormal( float lon, float lat );
 	XMFLOAT3 surfaceNormal( XMFLOAT3 surf );
 	XMFLOAT3 geodeticToLocal( float lon, float lat, float height );
 	XMFLOAT3 surfaceToGeodedic( XMFLOAT3 surf );
