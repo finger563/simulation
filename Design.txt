@@ -15,6 +15,21 @@ Questions:
     * Use the partition cubes for frustum culling 
 
 * For Global Rendering:
+  * Books:
+    * GPU PRO 3 CH 1:2
+    * GPU PRO 4 CH 1:1
+    * GPU PRO 4 CH 1:3
+    * GPU PRO 5 CH 6:3 (quadtrees on GPU)
+  * Docs: 
+    * ROAM
+    * Under the hood of virtual globes
+    * Rendering massive terrains
+    * High performance terrain rendering
+    * globe
+    * cdlod
+    * Adaptive terrain tessellation
+    * spherical worlds
+    * adaptive terrain rendering 
   * Binary Space Partitioning
     * Octree/Quadtree
   * Subdivided Meshes
@@ -27,6 +42,13 @@ Questions:
     * Coordinate transforms to get
       * world positions (x,y,z)
       * local positions ( latitude, longitude, altitude )
+
+* Frustum culling:
+  * test mesh points for inclusion into the rendering
+  * XNA math functions all throughout
+* Cube subdivision into ellipsoid
+  * when frustum tests each vertex against the frustum, the included meshes are subdivided based on distance
+  * Need to ensure backfaces are removed prior to subdivision ( early point*normal rejection )
 
 Goals:
 ------
@@ -112,6 +134,11 @@ Next Steps:
   * Scale so all values are [0,1] based on max value
   * render quad to screen with texture from FP texture
 * Water Layer for earth:
+  * Books:
+    * GPU PRO 2 CH 1:1
+    * GPU PRO 2 CH 5:3
+    * GPU PRO 3 CH 2:3
+    * GPU PRO 5 CH 1:4
   * sphere mesh at sea level
   * with some sort of reflection effect?
   * Effects:
@@ -122,6 +149,9 @@ Next Steps:
 * Terrain Generation 2:
   * generate based on biome data instead of heightmap (similar terrain as found in GPU gems)
 * Atmosphere 2:
+  * Books:
+    * GPU PRO 3 CH 2:2
+    * GPU PRO 5 CH 2:2
   * More realistic scattering, better effects (sky not exactly right color yet)
 * Sun Rendering 1:
   * Render light source (sun) as object viewable outside atmosphere
@@ -132,7 +162,13 @@ Next Steps:
   * Simulation: motion (planetary bodies)
   * gravity
   * collision
+* Trees 1:
+* Grass 1:
+  * Books:
+    * GPU PRO 5 CH 3:1
 * Physics:
+  * Books:
+    * GPU PRO 5 CH 6:4
   * Gravity (n-body)
   * Aero (JSBSim)
   * fluid mechanics (water, air?)

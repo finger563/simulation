@@ -19,6 +19,33 @@
     <Filter Include="FX">
       <UniqueIdentifier>{ec19f0a8-c849-4dd6-8149-ed3bcacc7af6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Object">
+      <UniqueIdentifier>{09c17776-aae6-4faa-9c89-f803394c3476}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Math">
+      <UniqueIdentifier>{fe4dd337-3d7d-4e18-93b5-e83f16f42b94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BVH">
+      <UniqueIdentifier>{251f7d1c-a4e8-404e-b61a-dbea151875e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BSP">
+      <UniqueIdentifier>{6c77004b-6f06-4b82-af16-3528705b516e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Object\Ellipsoid">
+      <UniqueIdentifier>{2388d9c4-2518-435f-8d5e-b10424089c45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Object">
+      <UniqueIdentifier>{21566673-7ffb-446f-b540-618c81b4ea49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Object\Ellipsoid">
+      <UniqueIdentifier>{e1741410-4a36-468b-8a0f-ed9f6fabc8e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\BVH">
+      <UniqueIdentifier>{54ccd5e8-2c2f-442f-ad42-7decda0089b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Math">
+      <UniqueIdentifier>{f34bafb9-f88d-4bac-adaa-d9fdadf3d6be}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vertex.cpp">
@@ -39,9 +66,6 @@
     <ClCompile Include="..\Common\LightHelper.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\GeometryGenerator.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
     <ClCompile Include="..\Common\GameTimer.cpp">
       <Filter>Common</Filter>
     </ClCompile>
@@ -59,6 +83,15 @@
     </ClCompile>
     <ClCompile Include="RenderStates.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Ellipsoid.cpp">
+      <Filter>Source Files\Object\Ellipsoid</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\GeometryGenerator.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Source Files\Object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -78,9 +111,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\GameTimer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\GeometryGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\LightHelper.h">
@@ -103,6 +133,21 @@
     </ClInclude>
     <ClInclude Include="RenderStates.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Ellipsoid.h">
+      <Filter>Header Files\Object\Ellipsoid</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Header Files\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="QuadTreeNode.h">
+      <Filter>Header Files\BVH</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\GeometryGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector.h">
+      <Filter>Header Files\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

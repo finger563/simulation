@@ -3,12 +3,16 @@
 //***************************************************************************************
 
 #include "d3dx11Effect.h"
-#include "GeometryGenerator.h"
 #include "MathHelper.h"
 #include "LightHelper.h"
 #include "Effects.h"
 #include "Vertex.h"
 #include "Renderer.h"
+
+#if USE_QUADTREE
+#else
+#include "GeometryGenerator.h"
+#endif
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 				   PSTR cmdLine, int showCmd)
@@ -193,13 +197,21 @@ void Renderer::DrawScene()
 	XMMATRIX viewProj	= control.get_Camera().ViewProj();
 	
 	float blendFactor[] = {0.0f, 0.0f, 0.0f, 0.0f};
-
-	// Set per frame constants.
-	Effects::BasicFX->SetDirLights(mDirLights);
-	Effects::BasicFX->SetEyePosW(control.get_Camera().GetPosition());
 	
-	Effects::NormalMapFX->SetDirLights(mDirLights);
-	Effects::NormalMapFX->SetEyePosW(control.get_Camera().GetPosition());
+	ID3DX11EffectTechnique* activeTech;
+    D3DX11_TECHNIQUE_DESC techDesc;
+
+	XMMATRIX world;
+	XMMATRIX worldInvTranspose;
+	XMMATRIX worldViewProj;
+	
+	world = XMLoadFloat4x4(&mEarthWorld);
+	worldInvTranspose = MathHelper::InverseTranspose(world);
+	worldViewProj = world*view*proj;
+	
+	UINT stride = sizeof(Vertex::PosNormalTexTan);
+    UINT offset = 0;
+	
 	
 	float wavelength[3] = {0.650f, 0.570f, 0.475f};
 	XMFLOAT3 invWaveLength = XMFLOAT3( 1.0f/powf(wavelength[0],4.0f),
@@ -226,6 +238,101 @@ void Renderer::DrawScene()
 	XMVECTOR light = XMLoadFloat3(&mDirLights[0].Direction);
 	XMFLOAT3 sunPos;
 	XMStoreFloat3(&sunPos,-light);
+
+
+	// Set per frame constants.
+	Effects::BasicFX->SetDirLights(mDirLights);
+	Effects::BasicFX->SetEyePosW(control.get_Camera().GetPosition());
+	
+#if USE_QUADTREE
+
+	ID3D11Buffer* mIB_test;
+	
+	std::vector<UINT> indices = earth.getIndices();
+
+	//
+	// Pack the indices of all the meshes into one index buffer.
+	//
+
+	D3D11_BUFFER_DESC ibd;
+    ibd.Usage = D3D11_USAGE_IMMUTABLE;
+    ibd.ByteWidth = sizeof(UINT) * indices.size();
+    ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+    ibd.CPUAccessFlags = 0;
+    ibd.MiscFlags = 0;
+    D3D11_SUBRESOURCE_DATA iinitData;
+    iinitData.pSysMem = &indices[0];
+    HR(md3dDevice->CreateBuffer(&ibd, &iinitData, &mIB_test));
+
+	md3dImmediateContext->IASetInputLayout(InputLayouts::PosNormalTexTan);
+	md3dImmediateContext->IASetVertexBuffers(0, 1, &mVB, &stride, &offset);
+	md3dImmediateContext->IASetIndexBuffer(mIB_test, DXGI_FORMAT_R32_UINT, 0);
+	
+	if( GetAsyncKeyState('1') & 0x8000 )
+		md3dImmediateContext->RSSetState(RenderStates::WireframeRS);
+
+	Effects::BasicFX->SetWorld(world);
+	Effects::BasicFX->SetDirLights(mDirLights);
+	Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
+	Effects::BasicFX->SetWorldViewProj(worldViewProj);
+	Effects::BasicFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
+	Effects::BasicFX->SetMaterial(mEarthMat);
+	Effects::BasicFX->SetDiffuseMap(mEarthDiffuseMapSRV);
+	
+	Effects::DisplacementMapFX->SetEyePosW(control.get_Camera().GetPosition());
+	Effects::DisplacementMapFX->SetPlanetPosW(control.get_earthPosW());
+	Effects::DisplacementMapFX->SetCameraPos(cameraPos);
+	Effects::DisplacementMapFX->SetLightPos(sunPos);
+	Effects::DisplacementMapFX->SetInvWaveLength(invWaveLength);
+	Effects::DisplacementMapFX->SetCameraHeight(height);
+	Effects::DisplacementMapFX->SetCameraHeight2(height*height);
+	Effects::DisplacementMapFX->SetOuterRadius(outerRadius);
+	Effects::DisplacementMapFX->SetOuterRadius2(outerRadius * outerRadius);
+	Effects::DisplacementMapFX->SetInnerRadius(innerRadius);
+	Effects::DisplacementMapFX->SetInnerRadius2(innerRadius * innerRadius);
+	Effects::DisplacementMapFX->SetKrESun(Kr * ESun);
+	Effects::DisplacementMapFX->SetKmESun(Km * ESun);
+	Effects::DisplacementMapFX->SetKr4PI(Kr * 4.0f * MathHelper::Pi);
+	Effects::DisplacementMapFX->SetKm4PI(Km * 4.0f * MathHelper::Pi);
+	Effects::DisplacementMapFX->SetScale( scale );
+	Effects::DisplacementMapFX->SetScaleOverScaleDepth( scale / 0.25f );
+	Effects::DisplacementMapFX->SetG(-0.990f);
+	Effects::DisplacementMapFX->SetG2((-0.990f)*(-0.990f));
+	Effects::DisplacementMapFX->SetDirLights(mDirLights);
+
+	Effects::DisplacementMapFX->SetHeightScale(29.029f);
+	Effects::DisplacementMapFX->SetMaxTessDistance(0.10f);
+	Effects::DisplacementMapFX->SetMinTessDistance(3000.0f);
+	Effects::DisplacementMapFX->SetMinTessFactor(1.0f);
+	Effects::DisplacementMapFX->SetMaxTessFactor(100.0f);
+
+	Effects::DisplacementMapFX->SetWorld(world);
+	Effects::DisplacementMapFX->SetWorldInvTranspose(worldInvTranspose);
+	Effects::DisplacementMapFX->SetViewProj(viewProj);
+	Effects::DisplacementMapFX->SetWorldViewProj(worldViewProj);
+	Effects::DisplacementMapFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
+	Effects::DisplacementMapFX->SetMaterial(mEarthMat);
+	Effects::DisplacementMapFX->SetDiffuseMap(mEarthDiffuseMapSRV);
+	Effects::DisplacementMapFX->SetNormalMap(mEarthNormalTexSRV);
+	
+#if 0
+	activeTech = Effects::BasicFX->Light1TexTech;
+	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+#else
+	activeTech = Effects::DisplacementMapFX->PlanetFromSpaceTech;
+	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+#endif
+	activeTech->GetDesc( &techDesc );
+    for(UINT p = 0; p < techDesc.Passes; ++p)
+    {
+		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+		md3dImmediateContext->DrawIndexed(indices.size(), 0, 0);
+	}
+
+	ReleaseCOM(mIB_test);
+#else
+	Effects::NormalMapFX->SetDirLights(mDirLights);
+	Effects::NormalMapFX->SetEyePosW(control.get_Camera().GetPosition());
 	
 	// SKY EFFECTS
 	Effects::SkyFX->SetEyePosW(control.get_Camera().GetPosition());
@@ -314,20 +421,6 @@ void Renderer::DrawScene()
 	Effects::CloudsFX->SetG2((-0.990f)*(-0.990f));
 	Effects::CloudsFX->SetDirLights(mDirLights);
 	 
-	ID3DX11EffectTechnique* activeTech;
-    D3DX11_TECHNIQUE_DESC techDesc;
-
-	XMMATRIX world;
-	XMMATRIX worldInvTranspose;
-	XMMATRIX worldViewProj;
-	
-	world = XMLoadFloat4x4(&mEarthWorld);
-	worldInvTranspose = MathHelper::InverseTranspose(world);
-	worldViewProj = world*view*proj;
-	
-	UINT stride = sizeof(Vertex::PosNormalTexTan);
-    UINT offset = 0;
-
 	md3dImmediateContext->IASetInputLayout(InputLayouts::PosNormalTexTan);
 	md3dImmediateContext->IASetVertexBuffers(0, 1, &mVB, &stride, &offset);
 	md3dImmediateContext->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
@@ -453,6 +546,8 @@ void Renderer::DrawScene()
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(mSkyIndexCount, mSkyIndexOffset, mSkyVertexOffset);
     }
+#endif
+	
 	// restore default states
 	md3dImmediateContext->RSSetState(0);
 	md3dImmediateContext->OMSetDepthStencilState(0, 0);
@@ -462,6 +557,34 @@ void Renderer::DrawScene()
 
 void Renderer::BuildGeometryBuffers()
 {
+#if USE_QUADTREE
+	earth = Ellipsoid(control.get_earthRadius(), control.get_earthRadius(), 6356.752f);
+	earth.generateMeshes( 5 );
+	
+	std::vector<Object::Vertex> earthVerts = earth.getVertices();
+	std::vector<Vertex::PosNormalTexTan> vertices( earthVerts.size() );
+	
+	UINT k = 0;
+	for(size_t i = 0; i < earthVerts.size(); ++i, ++k)
+	{
+		vertices[k].Pos			= XMFLOAT3( earthVerts[i].Position.x, earthVerts[i].Position.y, earthVerts[i].Position.z );
+		vertices[k].Normal		= XMFLOAT3( earthVerts[i].Normal.x, earthVerts[i].Normal.y, earthVerts[i].Normal.z );
+		vertices[k].Tex			= XMFLOAT2( (float)earthVerts[i].TexC.x, (float)earthVerts[i].TexC.y );
+		vertices[k].TangentU	= XMFLOAT3( earthVerts[i].TangentU.x, earthVerts[i].TangentU.y, earthVerts[i].TangentU.z );
+	}
+	
+	
+    D3D11_BUFFER_DESC vbd;
+    vbd.Usage = D3D11_USAGE_IMMUTABLE;
+    vbd.ByteWidth = sizeof(Vertex::PosNormalTexTan) * vertices.size();
+    vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    vbd.CPUAccessFlags = 0;
+    vbd.MiscFlags = 0;
+    D3D11_SUBRESOURCE_DATA vinitData;
+    vinitData.pSysMem = &vertices[0];
+    HR(md3dDevice->CreateBuffer(&vbd, &vinitData, &mVB));
+
+#else
 	GeometryGenerator::MeshData earthMesh;
 	GeometryGenerator::MeshData skyMesh;
 	GeometryGenerator::MeshData cloudMesh;
@@ -552,5 +675,6 @@ void Renderer::BuildGeometryBuffers()
     D3D11_SUBRESOURCE_DATA iinitData;
     iinitData.pSysMem = &indices[0];
     HR(md3dDevice->CreateBuffer(&ibd, &iinitData, &mIB));
+#endif
 }
  

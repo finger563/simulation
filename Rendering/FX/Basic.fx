@@ -76,6 +76,7 @@ float4 PS(VertexOut pin,
 		  uniform bool gFogEnabled, 
 		  uniform bool gReflectionEnabled) : SV_Target
 {
+	//return float4(1,1,1,1);
 	// Interpolating normal can unnormalize it, so normalize it.
     pin.NormalW = normalize(pin.NormalW);
 

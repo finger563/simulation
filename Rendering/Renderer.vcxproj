@@ -100,6 +100,8 @@
     <ClCompile Include="..\Common\MathHelper.cpp" />
     <ClCompile Include="..\Common\Waves.cpp" />
     <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="Ellipsoid.cpp" />
+    <ClCompile Include="Object.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Effects.cpp" />
     <ClCompile Include="RenderStates.cpp" />
@@ -116,9 +118,13 @@
     <ClInclude Include="..\Common\MathHelper.h" />
     <ClInclude Include="..\Common\Waves.h" />
     <ClInclude Include="Effects.h" />
+    <ClInclude Include="Ellipsoid.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="QuadTreeNode.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="RenderStates.h" />
+    <ClInclude Include="Vector.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
