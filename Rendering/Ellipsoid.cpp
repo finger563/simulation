@@ -99,7 +99,7 @@ std::vector<UINT> Ellipsoid::getIndices() {
 			}
 		}
 	}
-#elif 0
+#elif 1
 	for (int i=0;i<rootQT->numChildren;i++) {
 		for (int j=0;j<rootQT->children[i]->numChildren;j++) {
 			for (int k=0;k<rootQT->children[i]->children[j]->numChildren;k++) {
@@ -312,32 +312,35 @@ void Ellipsoid::subdivideEquilateralTriangle( QuadTreeNode* node ) {
 	oldVerts[0] = Vertices[ind[0]];
 	oldVerts[1] = Vertices[ind[1]];
 	oldVerts[2] = Vertices[ind[2]];
-
-	if ( fmod( Vertices[ind[0]].Geodetic.longitude, PI / 2.0 ) != 0 ) {
-		newVerts[0] = midpoint( Vertices[ind[1]], Vertices[ind[0]] );	// midLeft
-	}
-	else {
-		newVerts[0].Geodetic.latitude = ( Vertices[ind[0]].Geodetic.latitude - Vertices[ind[1]].Geodetic.latitude ) / 2.0 + Vertices[ind[1]].Geodetic.latitude;
-		newVerts[0].Geodetic.longitude = Vertices[ind[0]].Geodetic.longitude;
-		newVerts[0].Position = geodeticToLocal( newVerts[0].Geodetic );
-		newVerts[0].Normal = geodeticToNormal( newVerts[0].Geodetic );
-		newVerts[0].TexC = geodeticToTexCoord( newVerts[0].Geodetic );
-		newVerts[0].TangentU = surfaceTangent( newVerts[0].Normal );
-	}
 	
-	if ( fmod( Vertices[ind[2]].Geodetic.longitude, PI / 2.0 ) != 0 ) {
-		newVerts[1] = midpoint( Vertices[ind[2]], Vertices[ind[1]] );	// midRight
-	}
-	else {
-		newVerts[1].Geodetic.latitude = ( Vertices[ind[1]].Geodetic.latitude - Vertices[ind[2]].Geodetic.latitude ) / 2.0 + Vertices[ind[2]].Geodetic.latitude;
-		newVerts[1].Geodetic.longitude = Vertices[ind[2]].Geodetic.longitude;
-		newVerts[1].Position = geodeticToLocal( newVerts[1].Geodetic );
-		newVerts[1].Normal = geodeticToNormal( newVerts[1].Geodetic );
-		newVerts[1].TexC = geodeticToTexCoord( newVerts[1].Geodetic );
-		newVerts[1].TangentU = surfaceTangent( newVerts[1].Normal );
-	}
-
+	newVerts[0] = midpoint( Vertices[ind[1]], Vertices[ind[0]] );	// midLeft
+	newVerts[1] = midpoint( Vertices[ind[2]], Vertices[ind[1]] );	// midRight
 	newVerts[2] = midpoint( Vertices[ind[0]], Vertices[ind[2]] );	// midBottom
+
+	if ( (Vertices[ind[0]].Geodetic.latitude < Vertices[ind[1]].Geodetic.latitude && Vertices[ind[0]].Geodetic.latitude > 0) ||
+		 (Vertices[ind[0]].Geodetic.latitude > Vertices[ind[1]].Geodetic.latitude && Vertices[ind[0]].Geodetic.latitude < 0) ) {
+		if ( fmod( Vertices[ind[0]].Geodetic.longitude, PI / 2.0 ) != 0 ) {
+		}
+		else {
+			newVerts[0].Geodetic.latitude = ( Vertices[ind[0]].Geodetic.latitude - Vertices[ind[1]].Geodetic.latitude ) / 2.0 + Vertices[ind[1]].Geodetic.latitude;
+			newVerts[0].Geodetic.longitude = Vertices[ind[0]].Geodetic.longitude;
+			newVerts[0].Position = geodeticToLocal( newVerts[0].Geodetic );
+			newVerts[0].Normal = geodeticToNormal( newVerts[0].Geodetic );
+			newVerts[0].TexC = geodeticToTexCoord( newVerts[0].Geodetic );
+			newVerts[0].TangentU = surfaceTangent( newVerts[0].Normal );
+		}
+	
+		if ( fmod( Vertices[ind[2]].Geodetic.longitude, PI / 2.0 ) != 0 ) {
+		}
+		else {
+			newVerts[1].Geodetic.latitude = ( Vertices[ind[1]].Geodetic.latitude - Vertices[ind[2]].Geodetic.latitude ) / 2.0 + Vertices[ind[2]].Geodetic.latitude;
+			newVerts[1].Geodetic.longitude = Vertices[ind[2]].Geodetic.longitude;
+			newVerts[1].Position = geodeticToLocal( newVerts[1].Geodetic );
+			newVerts[1].Normal = geodeticToNormal( newVerts[1].Geodetic );
+			newVerts[1].TexC = geodeticToTexCoord( newVerts[1].Geodetic );
+			newVerts[1].TangentU = surfaceTangent( newVerts[1].Normal );
+		}
+	}
 	
 	for (int i=0;i<3;i++) {
 		Vertices.push_back( newVerts[i] );

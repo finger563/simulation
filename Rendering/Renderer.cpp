@@ -121,7 +121,7 @@ void Renderer::UpdateScene(float dt)
 		control.set_earthAngle( control.get_earthAngle() + dt );
 		XMVECTOR trans = XMLoadFloat3(&control.get_earthPosW());
 		XMMATRIX T = XMMatrixTranslationFromVector(trans);
-		XMMATRIX R = XMMatrixRotationZ(control.get_earthAngle());
+		XMMATRIX R = XMMatrixRotationY(control.get_earthAngle());
 	
 		XMStoreFloat4x4(&mEarthWorld, R*T);
 	}
@@ -130,7 +130,7 @@ void Renderer::UpdateScene(float dt)
 		control.set_earthAngle( control.get_earthAngle() - dt );
 		XMVECTOR trans = XMLoadFloat3(&control.get_earthPosW());
 		XMMATRIX T = XMMatrixTranslationFromVector(trans);
-		XMMATRIX R = XMMatrixRotationZ(control.get_earthAngle());
+		XMMATRIX R = XMMatrixRotationY(control.get_earthAngle());
 	
 		XMStoreFloat4x4(&mEarthWorld, R*T);
 	}
