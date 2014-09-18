@@ -1,6 +1,9 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+#include <Windows.h>
+#include <D3DX11.h>
+#include <xnamath.h>
 #include <math.h>
 
 struct Vector3D {  // 3-dimensional vector of doubles
@@ -21,6 +24,20 @@ struct Vector3D {  // 3-dimensional vector of doubles
 	}
 	double Length() const { return sqrt(x*x + y*y + z*z); }
 	Vector3D Normalized() const { return Vector3D( x / Length(), y / Length(), z / Length() ); }
+
+	XMFLOAT3 toXMFloat3() const { return XMFLOAT3( x, y, z ); }
+	
+	bool operator==(const Vector3D& other) const {
+		for (int i=0;i<3;i++) {
+			if ( this->vals[i] != other.vals[i] )
+				return false;
+		}
+		return true;
+	}
+
+	bool operator!=(const Vector3D& other) const {
+		return !( *this == other );
+	}
 
 	Vector3D operator+(const Vector3D& other) const {
 		return Vector3D( 
@@ -71,6 +88,8 @@ struct Vector2D { // 2-dimensional vector of doubles
 		x = _x;
 		y = _y;
 	}
+
+	XMFLOAT2 toXMFloat2() { return XMFLOAT2( x, y ); }
 };
 
 #endif	// VECTOR_H

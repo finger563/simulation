@@ -559,7 +559,7 @@ void Renderer::BuildGeometryBuffers()
 {
 #if USE_QUADTREE
 	earth = Ellipsoid(control.get_earthRadius(), control.get_earthRadius(), 6356.752f);
-	earth.generateMeshes( 5 );
+	earth.generateMeshes( 7 );
 	
 	std::vector<Object::Vertex> earthVerts = earth.getVertices();
 	std::vector<Vertex::PosNormalTexTan> vertices( earthVerts.size() );

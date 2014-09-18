@@ -36,6 +36,7 @@ public:
 	}
 
 	Vector3D surfaceNormal( double lon, double lat );
+	Vector3D geodeticToNormal( const Vector3D& geo );
 	Vector3D surfaceTangent( const Vector3D& normal );
 	Vector3D surfaceNormal( const Vector3D& surf );
 	Vector3D geodeticToLocal( const Vector3D& geo );

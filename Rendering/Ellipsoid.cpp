@@ -10,6 +10,15 @@ Vector3D Ellipsoid::surfaceNormal( double lon, double lat ) {
 	return n.Normalized();
 }
 
+Vector3D Ellipsoid::geodeticToNormal( const Vector3D& geo ) {
+	double cosLat = cos( geo.latitude );
+	Vector3D n( 
+		cosLat * cos(geo.longitude),
+		sin(geo.latitude), 
+		cosLat * sin(geo.longitude) );
+	return n.Normalized();
+}
+
 Vector3D Ellipsoid::surfaceTangent( const Vector3D& normal ) {
 
 	XMVECTOR n = XMLoadFloat3(&XMFLOAT3(normal.x, 0, normal.z));
@@ -30,12 +39,12 @@ Vector3D Ellipsoid::surfaceNormal( const Vector3D& surf ) {
 }
 
 Vector3D Ellipsoid::geodeticToLocal( const Vector3D& geo ) {
-	Vector3D n = surfaceNormal( geo.longitude, geo.latitude );
+	Vector3D n = geodeticToNormal( geo );
 	Vector3D k( 
 		radius2.x * n.x,
 		radius2.y * n.y,
 		radius2.z * n.z );
-	float gamma = sqrt( k.x * n.x + 
+	double gamma = sqrt( k.x * n.x + 
 						k.y * n.y + 
 						k.z * n.z);
 	return Vector3D( k.x / gamma + geo.height * n.x,
@@ -56,7 +65,7 @@ Vector3D Ellipsoid::surfaceToGeodedic( const Vector3D& surf ) {
 Vector2D Ellipsoid::geodeticToTexCoord( const Vector3D& geo ) {
 	return Vector2D( 
 		geo.x / ( 2.0 * PI ),
-		geo.y / ( 2.0 * PI )
+		1.0 - (geo.y / ( PI ) + 0.5)
 		);
 }
 
@@ -82,7 +91,7 @@ Vector2D Ellipsoid::surfaceToTexCoord( const Vector3D& surf ) {
 
 std::vector<UINT> Ellipsoid::getIndices() {
 	std::vector<UINT> retInd;
-#if 1
+#if 0
 	for (int i=0;i<6;i++) {
 		for (int j=0;j<4;j++) {
 			for (int n=0;n<6;n++) {
@@ -90,7 +99,7 @@ std::vector<UINT> Ellipsoid::getIndices() {
 			}
 		}
 	}
-#else
+#elif 1
 	for (int i=0;i<6;i++) {
 		for (int j=0;j<4;j++) {
 			for (int k=0;k<4;k++) {
@@ -104,6 +113,7 @@ std::vector<UINT> Ellipsoid::getIndices() {
 			}
 		}
 	}
+#else
 	for (int i=0;i<6;i++) {
 		for (int n=0;n<6;n++) {
 			retInd.push_back(rootQT->children[i]->indices[n]);
@@ -119,15 +129,15 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 	Vertex verts[10];
 
 	double lat[10] = { 
-		7.0f * PI / 4.0f,
+		-1.0f * PI / 4.0f,
 		1.0f * PI / 4.0f,
 		1.0f * PI / 4.0f,
-		7.0f * PI / 4.0f,
-		7.0f * PI / 4.0f,
+		-1.0f * PI / 4.0f,
+		-1.0f * PI / 4.0f,
 		1.0f * PI / 4.0f,
 		1.0f * PI / 4.0f,
-		7.0f * PI / 4.0f,
-		7.0f * PI / 4.0f,
+		-1.0f * PI / 4.0f,
+		-1.0f * PI / 4.0f,
 		1.0f * PI / 4.0f
 	};
 	double lon[10] = {
@@ -147,7 +157,7 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 		verts[i] = Vertex();
 		verts[i].Geodetic = Vector3D( lon[i], lat[i], 0 );
 		verts[i].Position = geodeticToLocal( verts[i].Geodetic );
-		verts[i].Normal = surfaceNormal( verts[i].Geodetic.longitude, verts[i].Geodetic.latitude );
+		verts[i].Normal = geodeticToNormal( verts[i].Geodetic );
 		verts[i].TexC = geodeticToTexCoord( verts[i].Geodetic );
 		verts[i].TangentU = surfaceTangent( verts[i].Normal );
 	}
@@ -237,8 +247,8 @@ Vector3D Ellipsoid::midpoint( const Vector3D& start, const Vector3D& end ) {
 Object::Vertex Ellipsoid::midpoint( const Vertex& start, const Vertex& end ) {
 	Vertex retVert;
 	retVert.Geodetic = ( end.Geodetic - start.Geodetic ) / 2.0 + start.Geodetic;
-	retVert.Normal = surfaceNormal( retVert.Geodetic.longitude, retVert.Geodetic.latitude );
 	retVert.Position = geodeticToLocal( retVert.Geodetic );
+	retVert.Normal = geodeticToNormal( retVert.Geodetic );
 	retVert.TexC = geodeticToTexCoord( retVert.Geodetic );
 	retVert.TangentU = surfaceTangent( retVert.Normal );
 	return retVert;
@@ -255,12 +265,73 @@ void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 		
 	Vertex newVerts[5];
 
+	Vertex oldVerts[4];
+	for (int i=0;i<4;i++) {
+		oldVerts[i] = Vertices[ind[i]];
+	}
+
 	newVerts[0] = midpoint( Vertices[ind[1]], Vertices[ind[0]] );	// midLeft
 	newVerts[1] = midpoint( Vertices[ind[1]], Vertices[ind[2]] );	// midTop
 	newVerts[2] = midpoint( Vertices[ind[0]], Vertices[ind[3]] );	// midBottom
 	newVerts[3] = midpoint( Vertices[ind[1]], Vertices[ind[3]] );	// center
 	newVerts[4] = midpoint( Vertices[ind[2]], Vertices[ind[3]] );	// midRight
-		
+
+	if ( Vertices[ind[1]].Geodetic.latitude == Vertices[ind[3]].Geodetic.latitude ) {
+		// center vertex should always lie on a non-zero diagonal
+		if ( Vertices[ind[1]].Geodetic.latitude > 0 ) {
+			newVerts[3].Geodetic = Vector3D(0, PI / 2.0, 0 );
+			newVerts[3].Position = Vector3D( 0, radius.y, 0 );
+			newVerts[3].Normal = Vector3D( 0, 1, 0 );
+			newVerts[3].TexC = Vector2D( 0, 0 );
+			newVerts[3].TangentU = Vector3D( 0, 0, 1 );
+		}
+		else {
+			newVerts[3].Geodetic = Vector3D(0, -PI / 2.0, 0 );
+			newVerts[3].Position = Vector3D( 0, -radius.y, 0 );
+			newVerts[3].Normal = Vector3D( 0, -1, 0 );
+			newVerts[3].TexC = Vector2D( 0, 1 );
+			newVerts[3].TangentU = Vector3D( 0, 0, -1 );
+		}
+	}
+#if 1
+	Vertex tmp;
+	if ( abs(Vertices[ind[0]].Geodetic.latitude) == PI / 2.0 ) {
+		// if the lower left vertex is at a pole
+		// need to fix midLeft && midBottom
+		tmp = Vertices[ind[0]];
+		tmp.Geodetic.longitude = Vertices[ind[1]].Geodetic.longitude;
+		newVerts[0] = midpoint( Vertices[ind[1]], tmp );	// midLeft
+		tmp.Geodetic.longitude = Vertices[ind[3]].Geodetic.longitude;
+		newVerts[2] = midpoint( tmp, Vertices[ind[3]] );	// midBottom
+	}
+	if ( abs(Vertices[ind[1]].Geodetic.latitude) == PI / 2.0 ) {
+		// if the upper left vertex is at a pole
+		// need to fix midLeft && midTop
+		tmp = Vertices[ind[1]];
+		tmp.Geodetic.longitude = Vertices[ind[0]].Geodetic.longitude;
+		newVerts[0] = midpoint( tmp, Vertices[ind[0]] );	// midLeft
+		tmp.Geodetic.longitude = Vertices[ind[2]].Geodetic.longitude;
+		newVerts[1] = midpoint( tmp, Vertices[ind[2]] );	// midTop
+	}
+	if ( abs(Vertices[ind[2]].Geodetic.latitude) == PI / 2.0 ) {
+		// if the upper right vertex is at a pole
+		// need to fix midTop && midRight
+		tmp = Vertices[ind[2]];
+		tmp.Geodetic.longitude = Vertices[ind[3]].Geodetic.longitude;
+		newVerts[4] = midpoint( tmp, Vertices[ind[3]] );	// midRight
+		tmp.Geodetic.longitude = Vertices[ind[1]].Geodetic.longitude;
+		newVerts[1] = midpoint( Vertices[ind[1]], tmp );	// midTop
+	}
+	if ( abs(Vertices[ind[3]].Geodetic.latitude) == PI / 2.0 ) {
+		// if the lower right vertex is at a pole
+		// need to fix midRight && midBottom
+		tmp = Vertices[ind[3]];
+		tmp.Geodetic.longitude = Vertices[ind[2]].Geodetic.longitude;
+		newVerts[4] = midpoint( Vertices[ind[2]], tmp );	// midRight
+		tmp.Geodetic.longitude = Vertices[ind[0]].Geodetic.longitude;
+		newVerts[2] = midpoint( Vertices[ind[0]], tmp );	// midBottom
+	}
+#endif
 	for (int i=0;i<5;i++) {
 		Vertices.push_back( newVerts[i] );
 		ind[i+4] = Vertices.size() - 1;
