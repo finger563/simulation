@@ -49,7 +49,7 @@ public:
 	std::vector<UINT> getIndices();
 	
 private:
-	void generateQT( QuadTreeNode* node, int numChildren, int numSubdivisions );
+	void generateQT( QuadTreeNode* node, int numChildren, int numSubdivisions, bool polarFace );
 	void subdividePlanarQuad( QuadTreeNode* node );
 	void subdivideEquilateralTriangle( QuadTreeNode* node );
 	Vector3D midpoint( const Vector3D& start, const Vector3D& end );

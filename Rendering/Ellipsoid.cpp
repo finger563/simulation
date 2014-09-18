@@ -92,20 +92,20 @@ Vector2D Ellipsoid::surfaceToTexCoord( const Vector3D& surf ) {
 std::vector<UINT> Ellipsoid::getIndices() {
 	std::vector<UINT> retInd;
 #if 0
-	for (int i=0;i<6;i++) {
-		for (int j=0;j<4;j++) {
+	for (int i=0;i<rootQT->numChildren;i++) {
+		for (int j=0;j<rootQT->children[i]->numChildren;j++) {
 			for (int n=0;n<6;n++) {
 				retInd.push_back(rootQT->children[i]->children[j]->indices[n]);
 			}
 		}
 	}
-#elif 1
-	for (int i=0;i<6;i++) {
-		for (int j=0;j<4;j++) {
-			for (int k=0;k<4;k++) {
-				for (int l=0;l<4;l++) {
-					for (int m=0;m<4;m++) {
-						for (int n=0;n<6;n++) {
+#elif 0
+	for (int i=0;i<rootQT->numChildren;i++) {
+		for (int j=0;j<rootQT->children[i]->numChildren;j++) {
+			for (int k=0;k<rootQT->children[i]->children[j]->numChildren;k++) {
+				for (int l=0;l<rootQT->children[i]->children[j]->children[k]->numChildren;l++) {
+					for (int m=0;m<rootQT->children[i]->children[j]->children[k]->children[l]->numChildren;m++) {
+						for (int n=0;n<rootQT->children[i]->children[j]->children[k]->children[l]->children[m]->numIndices;n++) {
 							retInd.push_back(rootQT->children[i]->children[j]->children[k]->children[l]->children[m]->indices[n]);
 						}
 					}
@@ -113,9 +113,19 @@ std::vector<UINT> Ellipsoid::getIndices() {
 			}
 		}
 	}
+#elif 1
+	for (int i=0;i<rootQT->numChildren;i++) {
+		for (int j=0;j<rootQT->children[i]->numChildren;j++) {
+			for (int k=0;k<rootQT->children[i]->children[j]->numChildren;k++) {
+				for (int n=0;n<rootQT->children[i]->children[j]->children[k]->numIndices;n++) {
+					retInd.push_back(rootQT->children[i]->children[j]->children[k]->indices[n]);
+				}
+			}
+		}
+	}
 #else
-	for (int i=0;i<6;i++) {
-		for (int n=0;n<6;n++) {
+	for (int i=0;i<rootQT->numChildren;i++) {
+		for (int n=0;n<rootQT->children[i]->numIndices;n++) {
 			retInd.push_back(rootQT->children[i]->indices[n]);
 		}
 	}
@@ -126,7 +136,8 @@ std::vector<UINT> Ellipsoid::getIndices() {
 void Ellipsoid::generateMeshes( int qtDepth ) {
 	MeshData faces[6];
 
-	Vertex verts[10];
+	const int numVerts = 12;
+	Vertex verts[numVerts];
 
 	double lat[10] = { 
 		-1.0f * PI / 4.0f,
@@ -161,12 +172,27 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 		verts[i].TexC = geodeticToTexCoord( verts[i].Geodetic );
 		verts[i].TangentU = surfaceTangent( verts[i].Normal );
 	}
+
+	verts[10] = Vertex();
+	verts[10].Geodetic = Vector3D( 0, PI / 2.0 , 0 );
+	verts[10].Position = Vector3D( 0, radius.y, 0 );
+	verts[10].Normal = Vector3D( 0, 1, 0 );
+	verts[10].TexC = Vector2D( 0, 0 );
+	verts[10].TangentU = Vector3D( 1, 0, 0 );;
+
+	verts[11] = Vertex();
+	verts[11].Geodetic = Vector3D( 0, - PI / 2.0 , 0 );
+	verts[11].Position = Vector3D( 0, - radius.y, 0 );
+	verts[11].Normal = Vector3D( 0, -1, 0 );
+	verts[11].TexC = Vector2D( 0, 1 );
+	verts[11].TangentU = Vector3D( -1, 0, 0 );
  
 	//
 	// Create the indices.
 	//
 
-	UINT ind[36];
+	const int numIndices = 48;
+	UINT ind[numIndices];
 
 	// Fill in the front face index data
 	ind[0] = 0; ind[1] = 1; ind[2] = 2;
@@ -180,53 +206,69 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 
 	faces[1].Indices.assign(&ind[6], &ind[12]);
 
-	// Fill in the top face index data
-	ind[12] = 9; ind[13] =  6; ind[14] = 5;
-	ind[15] = 9; ind[16] = 5; ind[17] = 2;
+	// Fill in the left face index data
+	ind[12] = 7; ind[13] = 6; ind[14] = 9;
+	ind[15] = 7; ind[16] = 9; ind[17] = 8;
 
 	faces[2].Indices.assign(&ind[12], &ind[18]);
 
-	// Fill in the bottom face index data
-	ind[18] = 7; ind[19] = 8; ind[20] = 3;
-	ind[21] = 7; ind[22] = 3; ind[23] = 4;
+	// Fill in the right face index data
+	ind[18] = 3; ind[19] = 2; ind[20] = 5;
+	ind[21] = 3; ind[22] = 5; ind[23] = 4;
 
 	faces[3].Indices.assign(&ind[18], &ind[24]);
 
-	// Fill in the left face index data
-	ind[24] = 7; ind[25] = 6; ind[26] = 9;
-	ind[27] = 7; ind[28] = 9; ind[29] = 8;
+	// Fill in the top face index data
+	ind[24] = 6; ind[25] =  10; ind[26] = 9;
+	ind[27] = 5; ind[28] = 10; ind[29] = 6;
+	ind[30] = 2; ind[31] =  10; ind[32] = 5;
+	ind[33] = 1; ind[34] = 10; ind[35] = 2;
 
-	faces[4].Indices.assign(&ind[24], &ind[30]);
+	faces[4].Indices.assign(&ind[24], &ind[36]);
 
-	// Fill in the right face index data
-	ind[30] = 3; ind[31] = 2; ind[32] = 5;
-	ind[33] = 3; ind[34] = 5; ind[35] = 4;
+	// Fill in the bottom face index data
+	ind[36] = 7; ind[37] = 11; ind[38] = 4;
+	ind[39] = 8; ind[40] = 11; ind[41] = 7;
+	ind[42] = 3; ind[43] = 11; ind[44] = 0;
+	ind[45] = 4; ind[46] = 11; ind[47] = 3;
 
-	faces[5].Indices.assign(&ind[30], &ind[36]);
+	faces[5].Indices.assign(&ind[36], &ind[48]);
 
 	if ( rootQT ) {
 		delete rootQT;
 	}
-	rootQT = new QuadTreeNode( NULL, 36, 10.0f, 6);
-	for (int i=0; i < 10; i++)
+	rootQT = new QuadTreeNode( NULL, numIndices, 10.0f, 12);
+	for (int i=0; i < numVerts; i++)
 		Vertices.push_back(verts[i]);
 	for (int i=0; i < rootQT->numIndices; i++)
 		rootQT->indices[i] = ind[i];
 
-	for (int i=0; i < 6; i++) {
+	for (int i=0; i < 4; i++) {
 		rootQT->children[i] = new QuadTreeNode( rootQT, 6, rootQT->error/2.0f, 4 );
 		for (int n=0; n < rootQT->children[i]->numIndices; n++)
 			rootQT->children[i]->indices[n] = faces[i].Indices[n];
-		generateQT( rootQT->children[i], 4, qtDepth );
+		generateQT( rootQT->children[i], 4, qtDepth, false );
+	}
+	// now for top and bottom face children
+	// these are not 1 face = 1 child, but instead are 4 children per face (triangles)
+	for (int i=0; i< 8; i++) {
+		rootQT->children[i + 4] = new QuadTreeNode( rootQT, 3, rootQT->error/2.0f, 4 );
+
+		for (int n=0;n<3;n++)
+			rootQT->children[i + 4]->indices[n] = faces[i / 4 + 4].Indices[n+ (i%4)*3];
+		generateQT( rootQT->children[i + 4], 4, qtDepth, true );
 	}
 }
 
-void Ellipsoid::generateQT( QuadTreeNode* node, int numChildren, int numSubdivisions ) {
+void Ellipsoid::generateQT( QuadTreeNode* node, int numChildren, int numSubdivisions, bool polarFace ) {
 	int remainingSubdivisions = numSubdivisions - 1;
-	subdividePlanarQuad( node );
+	if ( polarFace )
+		subdivideEquilateralTriangle( node );
+	else
+		subdividePlanarQuad( node );
 	if ( remainingSubdivisions > 0 ) {
 		for (int i=0; i < numChildren; i++) {
-			generateQT( node->children[i], numChildren, remainingSubdivisions );
+			generateQT( node->children[i], numChildren, remainingSubdivisions, polarFace );
 		}
 	}
 }
@@ -266,8 +308,35 @@ void Ellipsoid::subdivideEquilateralTriangle( QuadTreeNode* node ) {
 		
 	Vertex newVerts[3];
 
-	newVerts[0] = midpoint( Vertices[ind[1]], Vertices[ind[0]] );	// midLeft
-	newVerts[1] = midpoint( Vertices[ind[2]], Vertices[ind[1]] );	// midRight
+	Vertex oldVerts[3];
+	oldVerts[0] = Vertices[ind[0]];
+	oldVerts[1] = Vertices[ind[1]];
+	oldVerts[2] = Vertices[ind[2]];
+
+	if ( fmod( Vertices[ind[0]].Geodetic.longitude, PI / 2.0 ) != 0 ) {
+		newVerts[0] = midpoint( Vertices[ind[1]], Vertices[ind[0]] );	// midLeft
+	}
+	else {
+		newVerts[0].Geodetic.latitude = ( Vertices[ind[0]].Geodetic.latitude - Vertices[ind[1]].Geodetic.latitude ) / 2.0 + Vertices[ind[1]].Geodetic.latitude;
+		newVerts[0].Geodetic.longitude = Vertices[ind[0]].Geodetic.longitude;
+		newVerts[0].Position = geodeticToLocal( newVerts[0].Geodetic );
+		newVerts[0].Normal = geodeticToNormal( newVerts[0].Geodetic );
+		newVerts[0].TexC = geodeticToTexCoord( newVerts[0].Geodetic );
+		newVerts[0].TangentU = surfaceTangent( newVerts[0].Normal );
+	}
+	
+	if ( fmod( Vertices[ind[2]].Geodetic.longitude, PI / 2.0 ) != 0 ) {
+		newVerts[1] = midpoint( Vertices[ind[2]], Vertices[ind[1]] );	// midRight
+	}
+	else {
+		newVerts[1].Geodetic.latitude = ( Vertices[ind[1]].Geodetic.latitude - Vertices[ind[2]].Geodetic.latitude ) / 2.0 + Vertices[ind[2]].Geodetic.latitude;
+		newVerts[1].Geodetic.longitude = Vertices[ind[2]].Geodetic.longitude;
+		newVerts[1].Position = geodeticToLocal( newVerts[1].Geodetic );
+		newVerts[1].Normal = geodeticToNormal( newVerts[1].Geodetic );
+		newVerts[1].TexC = geodeticToTexCoord( newVerts[1].Geodetic );
+		newVerts[1].TangentU = surfaceTangent( newVerts[1].Normal );
+	}
+
 	newVerts[2] = midpoint( Vertices[ind[0]], Vertices[ind[2]] );	// midBottom
 	
 	for (int i=0;i<3;i++) {
