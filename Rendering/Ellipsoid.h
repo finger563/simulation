@@ -51,6 +51,7 @@ public:
 private:
 	void generateQT( QuadTreeNode* node, int numChildren, int numSubdivisions );
 	void subdividePlanarQuad( QuadTreeNode* node );
+	void subdivideEquilateralTriangle( QuadTreeNode* node );
 	Vector3D midpoint( const Vector3D& start, const Vector3D& end );
 	Vertex midpoint( const Vertex& start, const Vertex& end );
 };

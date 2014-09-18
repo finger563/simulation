@@ -223,9 +223,6 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 
 void Ellipsoid::generateQT( QuadTreeNode* node, int numChildren, int numSubdivisions ) {
 	int remainingSubdivisions = numSubdivisions - 1;
-	for (int i=0; i < numChildren; i++) {
-		node->children[i] = new QuadTreeNode(node, 6, node->error/2.0f, numChildren);
-	}
 	subdividePlanarQuad( node );
 	if ( remainingSubdivisions > 0 ) {
 		for (int i=0; i < numChildren; i++) {
@@ -254,7 +251,52 @@ Object::Vertex Ellipsoid::midpoint( const Vertex& start, const Vertex& end ) {
 	return retVert;
 }
 
+void Ellipsoid::subdivideEquilateralTriangle( QuadTreeNode* node ) {
+	
+	node->numChildren = 4;
+	for (int i=0; i < node->numChildren; i++) {
+		node->children[i] = new QuadTreeNode(node, 3, node->error/2.0f, node->numChildren);
+	}
+
+	int ind[6]; // 3 original + 3 new verts (mid points)
+	
+	ind[0] = node->indices[0];
+	ind[1] = node->indices[1];
+	ind[2] = node->indices[2];
+		
+	Vertex newVerts[3];
+
+	newVerts[0] = midpoint( Vertices[ind[1]], Vertices[ind[0]] );	// midLeft
+	newVerts[1] = midpoint( Vertices[ind[2]], Vertices[ind[1]] );	// midRight
+	newVerts[2] = midpoint( Vertices[ind[0]], Vertices[ind[2]] );	// midBottom
+	
+	for (int i=0;i<3;i++) {
+		Vertices.push_back( newVerts[i] );
+		ind[i+3] = Vertices.size() - 1;
+	}
+	
+	node->children[0]->indices[0] = ind[0];
+	node->children[0]->indices[1] = ind[3];
+	node->children[0]->indices[2] = ind[5];
+	
+	node->children[1]->indices[0] = ind[3];
+	node->children[1]->indices[1] = ind[1];
+	node->children[1]->indices[2] = ind[4];
+	
+	node->children[2]->indices[0] = ind[4];
+	node->children[2]->indices[1] = ind[5];
+	node->children[2]->indices[2] = ind[3];
+	
+	node->children[3]->indices[0] = ind[5];
+	node->children[3]->indices[1] = ind[4];
+	node->children[3]->indices[2] = ind[2];
+}
+
 void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
+	node->numChildren = 4;
+	for (int i=0; i < node->numChildren; i++) {
+		node->children[i] = new QuadTreeNode(node, 6, node->error/2.0f, node->numChildren);
+	}
 
 	int ind[9]; // 4 original + 5 new verts (mid points & center)
 	
@@ -265,73 +307,12 @@ void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 		
 	Vertex newVerts[5];
 
-	Vertex oldVerts[4];
-	for (int i=0;i<4;i++) {
-		oldVerts[i] = Vertices[ind[i]];
-	}
-
 	newVerts[0] = midpoint( Vertices[ind[1]], Vertices[ind[0]] );	// midLeft
 	newVerts[1] = midpoint( Vertices[ind[1]], Vertices[ind[2]] );	// midTop
 	newVerts[2] = midpoint( Vertices[ind[0]], Vertices[ind[3]] );	// midBottom
 	newVerts[3] = midpoint( Vertices[ind[1]], Vertices[ind[3]] );	// center
 	newVerts[4] = midpoint( Vertices[ind[2]], Vertices[ind[3]] );	// midRight
-
-	if ( Vertices[ind[1]].Geodetic.latitude == Vertices[ind[3]].Geodetic.latitude ) {
-		// center vertex should always lie on a non-zero diagonal
-		if ( Vertices[ind[1]].Geodetic.latitude > 0 ) {
-			newVerts[3].Geodetic = Vector3D(0, PI / 2.0, 0 );
-			newVerts[3].Position = Vector3D( 0, radius.y, 0 );
-			newVerts[3].Normal = Vector3D( 0, 1, 0 );
-			newVerts[3].TexC = Vector2D( 0, 0 );
-			newVerts[3].TangentU = Vector3D( 0, 0, 1 );
-		}
-		else {
-			newVerts[3].Geodetic = Vector3D(0, -PI / 2.0, 0 );
-			newVerts[3].Position = Vector3D( 0, -radius.y, 0 );
-			newVerts[3].Normal = Vector3D( 0, -1, 0 );
-			newVerts[3].TexC = Vector2D( 0, 1 );
-			newVerts[3].TangentU = Vector3D( 0, 0, -1 );
-		}
-	}
-#if 1
-	Vertex tmp;
-	if ( abs(Vertices[ind[0]].Geodetic.latitude) == PI / 2.0 ) {
-		// if the lower left vertex is at a pole
-		// need to fix midLeft && midBottom
-		tmp = Vertices[ind[0]];
-		tmp.Geodetic.longitude = Vertices[ind[1]].Geodetic.longitude;
-		newVerts[0] = midpoint( Vertices[ind[1]], tmp );	// midLeft
-		tmp.Geodetic.longitude = Vertices[ind[3]].Geodetic.longitude;
-		newVerts[2] = midpoint( tmp, Vertices[ind[3]] );	// midBottom
-	}
-	if ( abs(Vertices[ind[1]].Geodetic.latitude) == PI / 2.0 ) {
-		// if the upper left vertex is at a pole
-		// need to fix midLeft && midTop
-		tmp = Vertices[ind[1]];
-		tmp.Geodetic.longitude = Vertices[ind[0]].Geodetic.longitude;
-		newVerts[0] = midpoint( tmp, Vertices[ind[0]] );	// midLeft
-		tmp.Geodetic.longitude = Vertices[ind[2]].Geodetic.longitude;
-		newVerts[1] = midpoint( tmp, Vertices[ind[2]] );	// midTop
-	}
-	if ( abs(Vertices[ind[2]].Geodetic.latitude) == PI / 2.0 ) {
-		// if the upper right vertex is at a pole
-		// need to fix midTop && midRight
-		tmp = Vertices[ind[2]];
-		tmp.Geodetic.longitude = Vertices[ind[3]].Geodetic.longitude;
-		newVerts[4] = midpoint( tmp, Vertices[ind[3]] );	// midRight
-		tmp.Geodetic.longitude = Vertices[ind[1]].Geodetic.longitude;
-		newVerts[1] = midpoint( Vertices[ind[1]], tmp );	// midTop
-	}
-	if ( abs(Vertices[ind[3]].Geodetic.latitude) == PI / 2.0 ) {
-		// if the lower right vertex is at a pole
-		// need to fix midRight && midBottom
-		tmp = Vertices[ind[3]];
-		tmp.Geodetic.longitude = Vertices[ind[2]].Geodetic.longitude;
-		newVerts[4] = midpoint( Vertices[ind[2]], tmp );	// midRight
-		tmp.Geodetic.longitude = Vertices[ind[0]].Geodetic.longitude;
-		newVerts[2] = midpoint( Vertices[ind[0]], tmp );	// midBottom
-	}
-#endif
+	
 	for (int i=0;i<5;i++) {
 		Vertices.push_back( newVerts[i] );
 		ind[i+4] = Vertices.size() - 1;
