@@ -71,6 +71,7 @@ Vector2D Ellipsoid::geodeticToTexCoord( const Vector3D& geo ) {
 
 Vector2D Ellipsoid::surfaceToTexCoord( const Vector3D& surf ) {
 	// convert from cartesian to spherical
+	// doesnt solve the discontinuity at international dateline
 	double r = surf.Length();
 	double phi = acos( surf.y / r );
 	double theta = asin( surf.z / ( r * sin(phi) )  );
@@ -91,15 +92,7 @@ Vector2D Ellipsoid::surfaceToTexCoord( const Vector3D& surf ) {
 
 std::vector<UINT> Ellipsoid::getIndices() {
 	std::vector<UINT> retInd;
-#if 0
-	for (int i=0;i<rootQT->numChildren;i++) {
-		for (int j=0;j<rootQT->children[i]->numChildren;j++) {
-			for (int n=0;n<6;n++) {
-				retInd.push_back(rootQT->children[i]->children[j]->indices[n]);
-			}
-		}
-	}
-#elif 1
+
 	for (int i=0;i<rootQT->numChildren;i++) {
 		for (int j=0;j<rootQT->children[i]->numChildren;j++) {
 			for (int k=0;k<rootQT->children[i]->children[j]->numChildren;k++) {
@@ -113,23 +106,7 @@ std::vector<UINT> Ellipsoid::getIndices() {
 			}
 		}
 	}
-#elif 1
-	for (int i=0;i<rootQT->numChildren;i++) {
-		for (int j=0;j<rootQT->children[i]->numChildren;j++) {
-			for (int k=0;k<rootQT->children[i]->children[j]->numChildren;k++) {
-				for (int n=0;n<rootQT->children[i]->children[j]->children[k]->numIndices;n++) {
-					retInd.push_back(rootQT->children[i]->children[j]->children[k]->indices[n]);
-				}
-			}
-		}
-	}
-#else
-	for (int i=0;i<rootQT->numChildren;i++) {
-		for (int n=0;n<rootQT->children[i]->numIndices;n++) {
-			retInd.push_back(rootQT->children[i]->indices[n]);
-		}
-	}
-#endif
+
 	return retInd;
 }
 
@@ -307,18 +284,13 @@ void Ellipsoid::subdivideEquilateralTriangle( QuadTreeNode* node ) {
 	ind[2] = node->indices[2];
 		
 	Vertex newVerts[3];
-
-	Vertex oldVerts[3];
-	oldVerts[0] = Vertices[ind[0]];
-	oldVerts[1] = Vertices[ind[1]];
-	oldVerts[2] = Vertices[ind[2]];
-	
+		
 	newVerts[0] = midpoint( Vertices[ind[1]], Vertices[ind[0]] );	// midLeft
 	newVerts[1] = midpoint( Vertices[ind[2]], Vertices[ind[1]] );	// midRight
 	newVerts[2] = midpoint( Vertices[ind[0]], Vertices[ind[2]] );	// midBottom
 
-	if ( (Vertices[ind[0]].Geodetic.latitude < Vertices[ind[1]].Geodetic.latitude && Vertices[ind[0]].Geodetic.latitude > 0) ||
-		 (Vertices[ind[0]].Geodetic.latitude > Vertices[ind[1]].Geodetic.latitude && Vertices[ind[0]].Geodetic.latitude < 0) ) {
+	if ( (Vertices[ind[0]].Geodetic.latitude < Vertices[ind[1]].Geodetic.latitude && Vertices[ind[0]].Geodetic.latitude > 0) || // not upside down triangle in north pole
+		 (Vertices[ind[0]].Geodetic.latitude > Vertices[ind[1]].Geodetic.latitude && Vertices[ind[0]].Geodetic.latitude < 0) ) { // not upside down triangle in south pole
 		if ( fmod( Vertices[ind[0]].Geodetic.longitude, PI / 2.0 ) != 0 ) {
 		}
 		else {
