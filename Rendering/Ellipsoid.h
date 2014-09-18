@@ -8,8 +8,8 @@
 class Ellipsoid : public Object
 {
 private:
-	XMFLOAT3 radius;  // c is towards poles & is therefore y dimension
-	XMFLOAT3 radius2;  // c is towards poles & is therefore y dimension
+	Vector3D radius;  // c is towards poles & is therefore y dimension
+	Vector3D radius2;  // c is towards poles & is therefore y dimension
 
 	QuadTreeNode*	rootQT;
 public:
@@ -17,16 +17,16 @@ public:
 
 		rootQT = NULL;
 
-		radius = XMFLOAT3(1,1,1);	// y dimension (c) is towards poles
-		radius2 = XMFLOAT3( 1, 1, 1 );
+		radius = Vector3D(1,1,1);	// y dimension (c) is towards poles
+		radius2 = Vector3D( 1, 1, 1 );
 	}
 
-	Ellipsoid( float _a, float _b, float _c ) : Object() {
+	Ellipsoid( double _a, double _b, double _c ) : Object() {
 
 		rootQT = NULL;
 		if ( _a > 0 && _b > 0 && _c > 0 ) {
-			radius = XMFLOAT3(_a,_c,_b);
-			radius2 = XMFLOAT3( _a*_a, _c*_c, _b*_b );
+			radius = Vector3D(_a,_c,_b);
+			radius2 = Vector3D( _a*_a, _c*_c, _b*_b );
 		}
 	}
 
@@ -35,12 +35,13 @@ public:
 			delete rootQT;
 	}
 
-	XMFLOAT3 surfaceNormal( float lon, float lat );
-	XMFLOAT3 surfaceNormal( XMFLOAT3 surf );
-	XMFLOAT3 geodeticToLocal( float lon, float lat, float height );
-	XMFLOAT3 surfaceToGeodedic( XMFLOAT3 surf );
-	XMFLOAT2 geodeticToTexCoord( XMFLOAT3 geo );
-	XMFLOAT2 surfaceToTexCoord( XMFLOAT3 surf );
+	Vector3D surfaceNormal( double lon, double lat );
+	Vector3D surfaceTangent( const Vector3D& normal );
+	Vector3D surfaceNormal( const Vector3D& surf );
+	Vector3D geodeticToLocal( const Vector3D& geo );
+	Vector3D surfaceToGeodedic( const Vector3D& surf );
+	Vector2D geodeticToTexCoord( const Vector3D& geo );
+	Vector2D surfaceToTexCoord( const Vector3D& surf );
 
 	void generateMeshes( int qtDepth = 10.0f );
 
@@ -49,6 +50,8 @@ public:
 private:
 	void generateQT( QuadTreeNode* node, int numChildren, int numSubdivisions );
 	void subdividePlanarQuad( QuadTreeNode* node );
+	Vector3D midpoint( const Vector3D& start, const Vector3D& end );
+	Vertex midpoint( const Vertex& start, const Vertex& end );
 };
 
 #endif // ELLIPSOID_H

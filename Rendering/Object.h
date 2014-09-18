@@ -14,6 +14,8 @@
 #include <fstream>
 #include <vector>
 
+#include "Vector.h"
+
 class Object
 {
 public:
@@ -23,20 +25,22 @@ public:
 	struct Vertex
 	{
 		Vertex(){}
-		Vertex(const XMFLOAT3& p, const XMFLOAT3& n, const XMFLOAT3& t, const XMFLOAT2& uv)
-			: Position(p), Normal(n), TangentU(t), TexC(uv){}
+		Vertex(const Vector3D& p, const Vector3D& n, const Vector3D& t, const Vector2D& uv, const Vector3D& geo)
+			: Position(p), Normal(n), TangentU(t), TexC(uv), Geodetic(geo){}
 		Vertex(
-			float px, float py, float pz, 
-			float nx, float ny, float nz,
-			float tx, float ty, float tz,
-			float u, float v)
+			double px, double py, double pz, 
+			double nx, double ny, double nz,
+			double tx, double ty, double tz,
+			double u, double v,
+			double lon, double lat, double h)
 			: Position(px,py,pz), Normal(nx,ny,nz),
-				TangentU(tx, ty, tz), TexC(u,v){}
+				TangentU(tx, ty, tz), TexC(u,v), Geodetic(lon,lat,h){}
 
-		XMFLOAT3 Position;
-		XMFLOAT3 Normal;
-		XMFLOAT3 TangentU;
-		XMFLOAT2 TexC;
+		Vector3D Position;
+		Vector3D Normal;
+		Vector3D TangentU;
+		Vector2D TexC;
+		Vector3D Geodetic;
 	};
 
 	struct MeshData

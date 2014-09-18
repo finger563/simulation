@@ -1,83 +1,96 @@
 
 #include "Ellipsoid.h"
 
-XMFLOAT3 Ellipsoid::surfaceNormal( float lon, float lat ) {
-	float cosLat = cos( lat );
-	XMFLOAT3 n( 
+Vector3D Ellipsoid::surfaceNormal( double lon, double lat ) {
+	double cosLat = cos( lat );
+	Vector3D n( 
 		cosLat * cos(lon),
 		sin(lat), 
 		cosLat * sin(lon) );
-	XMVECTOR normal = XMLoadFloat3( &n );
-	XMStoreFloat3( &n, XMVector3Normalize( normal ) );
-	return n;
+	return n.Normalized();
 }
 
-XMFLOAT3 Ellipsoid::surfaceNormal( XMFLOAT3 surf ) {
-	XMFLOAT3 n(
+Vector3D Ellipsoid::surfaceTangent( const Vector3D& normal ) {
+
+	XMVECTOR n = XMLoadFloat3(&XMFLOAT3(normal.x, 0, normal.z));
+	XMMATRIX R = XMMatrixRotationY( 90.0f );
+	XMFLOAT3 result;
+	XMStoreFloat3(&result, XMVector3Transform(n,R));
+	Vector3D tangent(result.x, result.y, result.z );
+	return tangent.Normalized();
+}
+
+Vector3D Ellipsoid::surfaceNormal( const Vector3D& surf ) {
+	Vector3D n(
 		surf.x / radius2.x,
 		surf.y / radius2.y,
 		surf.z / radius2.z
 		);
-	XMVECTOR normal = XMLoadFloat3( &n );
-	XMStoreFloat3( &n, XMVector3Normalize( normal ) );
-	return n;
+	return n.Normalized();
 }
 
-XMFLOAT3 Ellipsoid::geodeticToLocal( float lon, float lat, float height ) {
-	XMFLOAT3 n = surfaceNormal( lon, lat );
-	XMFLOAT3 k( 
+Vector3D Ellipsoid::geodeticToLocal( const Vector3D& geo ) {
+	Vector3D n = surfaceNormal( geo.longitude, geo.latitude );
+	Vector3D k( 
 		radius2.x * n.x,
 		radius2.y * n.y,
 		radius2.z * n.z );
 	float gamma = sqrt( k.x * n.x + 
 						k.y * n.y + 
 						k.z * n.z);
-	return XMFLOAT3( k.x / gamma + height * n.x,
-					 k.y / gamma + height * n.y,
-					 k.z / gamma + height * n.z );
+	return Vector3D( k.x / gamma + geo.height * n.x,
+					 k.y / gamma + geo.height * n.y,
+					 k.z / gamma + geo.height * n.z );
 }
 
-XMFLOAT3 Ellipsoid::surfaceToGeodedic( XMFLOAT3 surf ) {
-	XMFLOAT3 n = surfaceNormal( surf );
-	float len;
-	XMStoreFloat( &len, XMVector3Length( XMLoadFloat3( &n ) ) );
-	XMFLOAT3 ret(
+Vector3D Ellipsoid::surfaceToGeodedic( const Vector3D& surf ) {
+	Vector3D n = surfaceNormal( surf );
+	Vector3D ret(
 		atan( n.z / n.x ),
-		asin( n.y / len ),
+		asin( n.y / n.Length() ),
 		0
 		);
 	return ret;
 }
 
-XMFLOAT2 Ellipsoid::geodeticToTexCoord( XMFLOAT3 geo ) {
-	return XMFLOAT2( 
-		geo.x / ( 2.0f * PI ) + 0.5f,
-		geo.y / ( 2.0f * PI )
+Vector2D Ellipsoid::geodeticToTexCoord( const Vector3D& geo ) {
+	return Vector2D( 
+		geo.x / ( 2.0 * PI ),
+		geo.y / ( 2.0 * PI )
 		);
 }
 
-XMFLOAT2 Ellipsoid::surfaceToTexCoord( XMFLOAT3 surf ) {
+Vector2D Ellipsoid::surfaceToTexCoord( const Vector3D& surf ) {
 	// convert from cartesian to spherical
-	float r = sqrt( surf.x * surf.x + surf.y * surf.y + surf.z * surf.z );
-	float phi = acos( surf.y / r );
-	float theta = asin( surf.z / ( r * sin(phi) )  );
+	double r = surf.Length();
+	double phi = acos( surf.y / r );
+	double theta = asin( surf.z / ( r * sin(phi) )  );
 
 	if ( surf.x < 0 ) {
 		theta += PI;
 	}
 	else if ( surf.z < 0 ) {
-		theta = 2.0f * PI + theta;
+		theta = 2.0 * PI + theta;
 	}
 
-	float x, y;
-	x = theta / ( 2.0f * PI );
+	double x, y;
+	x = theta / ( 2.0 * PI );
 	y = phi / PI;
-	XMFLOAT2 texCoord( x, y );
+	Vector2D texCoord( x, y );
 	return texCoord;
 }
 
 std::vector<UINT> Ellipsoid::getIndices() {
 	std::vector<UINT> retInd;
+#if 1
+	for (int i=0;i<6;i++) {
+		for (int j=0;j<4;j++) {
+			for (int n=0;n<6;n++) {
+				retInd.push_back(rootQT->children[i]->children[j]->indices[n]);
+			}
+		}
+	}
+#else
 	for (int i=0;i<6;i++) {
 		for (int j=0;j<4;j++) {
 			for (int k=0;k<4;k++) {
@@ -91,8 +104,6 @@ std::vector<UINT> Ellipsoid::getIndices() {
 			}
 		}
 	}
-#if 0
-	retInd.clear();
 	for (int i=0;i<6;i++) {
 		for (int n=0;n<6;n++) {
 			retInd.push_back(rootQT->children[i]->indices[n]);
@@ -107,7 +118,7 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 
 	Vertex verts[10];
 
-	float lat[10] = { 
+	double lat[10] = { 
 		7.0f * PI / 4.0f,
 		1.0f * PI / 4.0f,
 		1.0f * PI / 4.0f,
@@ -119,7 +130,7 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 		7.0f * PI / 4.0f,
 		1.0f * PI / 4.0f
 	};
-	float lon[10] = {
+	double lon[10] = {
 		0,
 		0,
 		PI / 2.0f,
@@ -134,15 +145,11 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 
 	for (int i=0; i < 10; i++) {
 		verts[i] = Vertex();
-		verts[i].Position = geodeticToLocal( lon[i], lat[i], 0 );
-		if ( abs(verts[i].Position.x) < 1.0f ) 
-			verts[i].Position.x = 0;
-		if ( abs(verts[i].Position.y) < 1.0f ) 
-			verts[i].Position.y = 0;
-		if ( abs(verts[i].Position.z) < 1.0f ) 
-			verts[i].Position.z = 0;
-		verts[i].Normal = surfaceNormal( lon[i], lat[i] );
-		verts[i].TexC = geodeticToTexCoord( XMFLOAT3( lon[i], lat[i], 0 ) );
+		verts[i].Geodetic = Vector3D( lon[i], lat[i], 0 );
+		verts[i].Position = geodeticToLocal( verts[i].Geodetic );
+		verts[i].Normal = surfaceNormal( verts[i].Geodetic.longitude, verts[i].Geodetic.latitude );
+		verts[i].TexC = geodeticToTexCoord( verts[i].Geodetic );
+		verts[i].TangentU = surfaceTangent( verts[i].Normal );
 	}
  
 	//
@@ -217,6 +224,26 @@ void Ellipsoid::generateQT( QuadTreeNode* node, int numChildren, int numSubdivis
 	}
 }
 
+Vector3D Ellipsoid::midpoint( const Vector3D& start, const Vector3D& end ) {
+	Vector3D mid = ( end - start ) / 2.0 + start;
+	double beta = 1.0 / sqrt( 
+		mid.x * mid.x / radius2.x +
+		mid.y * mid.y / radius2.y +
+		mid.z * mid.z / radius2.z
+		);
+	return mid * beta;
+}
+
+Object::Vertex Ellipsoid::midpoint( const Vertex& start, const Vertex& end ) {
+	Vertex retVert;
+	retVert.Geodetic = ( end.Geodetic - start.Geodetic ) / 2.0 + start.Geodetic;
+	retVert.Normal = surfaceNormal( retVert.Geodetic.longitude, retVert.Geodetic.latitude );
+	retVert.Position = geodeticToLocal( retVert.Geodetic );
+	retVert.TexC = geodeticToTexCoord( retVert.Geodetic );
+	retVert.TangentU = surfaceTangent( retVert.Normal );
+	return retVert;
+}
+
 void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 
 	int ind[9]; // 4 original + 5 new verts (mid points & center)
@@ -225,44 +252,16 @@ void Ellipsoid::subdividePlanarQuad( QuadTreeNode* node ) {
 	ind[1] = node->indices[1];
 	ind[2] = node->indices[2];
 	ind[3] = node->indices[5];
-
-	Vertex originals[4];
-	for (int i=0; i<4;i++) {
-		originals[i] = Vertices[ind[i]];
-	}
-	
-	XMVECTOR r = XMLoadFloat3( &radius );
-	XMVECTOR bottomLeft = XMLoadFloat3( &originals[0].Position );	// bottom left vertex
-	XMVECTOR topLeft = XMLoadFloat3( &originals[1].Position );		// top left vertex
-	XMVECTOR topRight = XMLoadFloat3( &originals[2].Position );		// top right vertex
-	XMVECTOR bottomRight = XMLoadFloat3( &originals[3].Position );	// bottom right vertex
 		
 	Vertex newVerts[5];
 
-	float longitudes[5] = { 
-		originals[0].TexC.x,
-		originals[0].TexC.x + (originals[3].TexC.x - originals[0].TexC.x) / 2.0f,
-		originals[0].TexC.x + (originals[3].TexC.x - originals[0].TexC.x) / 2.0f,
-		originals[0].TexC.x + (originals[3].TexC.x - originals[0].TexC.x) / 2.0f,
-		originals[3].TexC.x
-	};
-	
-	XMStoreFloat3(&newVerts[0].Position, XMVector3Normalize((bottomLeft - topLeft) / 2.0f + topLeft) * r);			// midLeft
-	XMStoreFloat3(&newVerts[1].Position, XMVector3Normalize((topRight - topLeft) / 2.0f + topLeft) * r);			// midTop
-	XMStoreFloat3(&newVerts[2].Position, XMVector3Normalize((bottomRight - bottomLeft) / 2.0f + bottomLeft) * r);	// midBottom
-	XMStoreFloat3(&newVerts[3].Position, XMVector3Normalize((bottomRight - topLeft) / 2.0f + topLeft) * r);			// center
-	XMStoreFloat3(&newVerts[4].Position, XMVector3Normalize((bottomRight - topRight) / 2.0f + topRight) * r);		// midRight
+	newVerts[0] = midpoint( Vertices[ind[1]], Vertices[ind[0]] );	// midLeft
+	newVerts[1] = midpoint( Vertices[ind[1]], Vertices[ind[2]] );	// midTop
+	newVerts[2] = midpoint( Vertices[ind[0]], Vertices[ind[3]] );	// midBottom
+	newVerts[3] = midpoint( Vertices[ind[1]], Vertices[ind[3]] );	// center
+	newVerts[4] = midpoint( Vertices[ind[2]], Vertices[ind[3]] );	// midRight
 		
 	for (int i=0;i<5;i++) {
-		if ( abs(newVerts[i].Position.x) < 1.0f ) 
-			newVerts[i].Position.x = 0;
-		if ( abs(newVerts[i].Position.y) < 1.0f ) 
-			newVerts[i].Position.y = 0;
-		if ( abs(newVerts[i].Position.z) < 1.0f ) 
-			newVerts[i].Position.z = 0;
-		newVerts[i].Normal = surfaceNormal( newVerts[i].Position );
-		newVerts[i].TexC = surfaceToTexCoord( newVerts[i].Position );
-		newVerts[i].TexC.x = longitudes[i];
 		Vertices.push_back( newVerts[i] );
 		ind[i+4] = Vertices.size() - 1;
 	}

@@ -271,7 +271,6 @@ void Renderer::DrawScene()
 	if( GetAsyncKeyState('1') & 0x8000 )
 		md3dImmediateContext->RSSetState(RenderStates::WireframeRS);
 
-	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	Effects::BasicFX->SetWorld(world);
 	Effects::BasicFX->SetDirLights(mDirLights);
 	Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
@@ -280,7 +279,6 @@ void Renderer::DrawScene()
 	Effects::BasicFX->SetMaterial(mEarthMat);
 	Effects::BasicFX->SetDiffuseMap(mEarthDiffuseMapSRV);
 	
-	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 	Effects::DisplacementMapFX->SetEyePosW(control.get_Camera().GetPosition());
 	Effects::DisplacementMapFX->SetPlanetPosW(control.get_earthPosW());
 	Effects::DisplacementMapFX->SetCameraPos(cameraPos);
@@ -317,8 +315,13 @@ void Renderer::DrawScene()
 	Effects::DisplacementMapFX->SetDiffuseMap(mEarthDiffuseMapSRV);
 	Effects::DisplacementMapFX->SetNormalMap(mEarthNormalTexSRV);
 	
-	//activeTech = Effects::BasicFX->Light1TexTech;
+#if 0
+	activeTech = Effects::BasicFX->Light1TexTech;
+	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+#else
 	activeTech = Effects::DisplacementMapFX->PlanetFromSpaceTech;
+	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+#endif
 	activeTech->GetDesc( &techDesc );
     for(UINT p = 0; p < techDesc.Passes; ++p)
     {
@@ -556,7 +559,7 @@ void Renderer::BuildGeometryBuffers()
 {
 #if USE_QUADTREE
 	earth = Ellipsoid(control.get_earthRadius(), control.get_earthRadius(), 6356.752f);
-	earth.generateMeshes( 7 );
+	earth.generateMeshes( 5 );
 	
 	std::vector<Object::Vertex> earthVerts = earth.getVertices();
 	std::vector<Vertex::PosNormalTexTan> vertices( earthVerts.size() );
@@ -564,10 +567,10 @@ void Renderer::BuildGeometryBuffers()
 	UINT k = 0;
 	for(size_t i = 0; i < earthVerts.size(); ++i, ++k)
 	{
-		vertices[k].Pos			= earthVerts[i].Position;
-		vertices[k].Normal		= earthVerts[i].Normal;
-		vertices[k].Tex			= earthVerts[i].TexC;
-		vertices[k].TangentU	= earthVerts[i].TangentU;
+		vertices[k].Pos			= XMFLOAT3( earthVerts[i].Position.x, earthVerts[i].Position.y, earthVerts[i].Position.z );
+		vertices[k].Normal		= XMFLOAT3( earthVerts[i].Normal.x, earthVerts[i].Normal.y, earthVerts[i].Normal.z );
+		vertices[k].Tex			= XMFLOAT2( (float)earthVerts[i].TexC.x, (float)earthVerts[i].TexC.y );
+		vertices[k].TangentU	= XMFLOAT3( earthVerts[i].TangentU.x, earthVerts[i].TangentU.y, earthVerts[i].TangentU.z );
 	}
 	
 	

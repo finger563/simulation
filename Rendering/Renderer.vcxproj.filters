@@ -43,6 +43,9 @@
     <Filter Include="Header Files\BVH">
       <UniqueIdentifier>{54ccd5e8-2c2f-442f-ad42-7decda0089b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Math">
+      <UniqueIdentifier>{f34bafb9-f88d-4bac-adaa-d9fdadf3d6be}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vertex.cpp">
@@ -142,6 +145,9 @@
     </ClInclude>
     <ClInclude Include="..\Common\GeometryGenerator.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector.h">
+      <Filter>Header Files\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

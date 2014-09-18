@@ -124,6 +124,7 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="RenderStates.h" />
+    <ClInclude Include="Vector.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
