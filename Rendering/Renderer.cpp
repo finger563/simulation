@@ -571,6 +571,7 @@ void Renderer::BuildGeometryBuffers()
 		vertices[k].Normal		= XMFLOAT3( earthVerts[i].Normal.x, earthVerts[i].Normal.y, earthVerts[i].Normal.z );
 		vertices[k].Tex			= XMFLOAT2( (float)earthVerts[i].TexC.x, (float)earthVerts[i].TexC.y );
 		vertices[k].TangentU	= XMFLOAT3( earthVerts[i].TangentU.x, earthVerts[i].TangentU.y, earthVerts[i].TangentU.z );
+		vertices[k].Geodetic	= XMFLOAT3( earthVerts[i].Geodetic.toXMFloat3() );
 	}
 	
 	

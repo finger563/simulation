@@ -31,19 +31,21 @@ SamplerState samLinear
 
 struct VertexIn
 {
-	float3 PosL     : POSITION;
+	float3 PosL     : POSITION0;
 	float3 NormalL  : NORMAL;
 	float2 Tex      : TEXCOORD;
 	float3 TangentL : TANGENT;
+	float3 Geodetic	: POSITION1;
 };
 
 struct VertexOut
 {
-    float3 PosW       : POSITION;
+    float3 PosW       : POSITION0;
     float3 NormalW    : NORMAL;
 	float3 TangentW   : TANGENT;
 	float2 Tex        : TEXCOORD;
 	float  TessFactor : TESS;
+	float3 Geodetic	  : POSITION1;
 	
 	float4 c0		  : COLOR0;
 	float4 c1		  : COLOR1;
@@ -57,6 +59,7 @@ VertexOut VS_PlanetFromSpace(VertexIn vin)
 	vout.PosW     = mul(float4(vin.PosL, 1.0f), gWorld).xyz;
 	vout.NormalW  = mul(vin.NormalL, (float3x3)gWorldInvTranspose);
 	vout.TangentW = mul(vin.TangentL, (float3x3)gWorld);
+	vout.Geodetic = vin.Geodetic;
 
 	// Output vertex attributes for interpolation across triangle.
 	vout.Tex = mul(float4(vin.Tex, 0.0f, 1.0f), gTexTransform).xy;
@@ -128,6 +131,7 @@ VertexOut VS_PlanetFromAtmo(VertexIn vin)
 	vout.PosW     = mul(float4(vin.PosL, 1.0f), gWorld).xyz;
 	vout.NormalW  = mul(vin.NormalL, (float3x3)gWorldInvTranspose);
 	vout.TangentW = mul(vin.TangentL, (float3x3)gWorld);
+	vout.Geodetic = vin.Geodetic;
 
 	// Output vertex attributes for interpolation across triangle.
 	vout.Tex = mul(float4(vin.Tex, 0.0f, 1.0f), gTexTransform).xy;
@@ -216,10 +220,11 @@ PatchTess PatchHS(InputPatch<VertexOut,3> patch,
 
 struct HullOut
 {
-	float3 PosW     : POSITION;
+	float3 PosW     : POSITION0;
     float3 NormalW  : NORMAL;
 	float3 TangentW : TANGENT;
 	float2 Tex      : TEXCOORD;
+	float3 Geodetic	: POSITION1;
 	
 	float4 c0		  : COLOR0;
 	float4 c1		  : COLOR1;
@@ -241,6 +246,7 @@ HullOut HS(InputPatch<VertexOut,3> p,
 	hout.NormalW  = p[i].NormalW;
 	hout.TangentW = p[i].TangentW;
 	hout.Tex      = p[i].Tex;
+	hout.Geodetic = p[i].Geodetic;
 
 	hout.c0		  = p[i].c0;
 	hout.c1		  = p[i].c1;
@@ -250,10 +256,11 @@ HullOut HS(InputPatch<VertexOut,3> p,
 struct DomainOut
 {
 	float4 PosH     : SV_POSITION;
-    float3 PosW     : POSITION;
+    float3 PosW     : POSITION0;
     float3 NormalW  : NORMAL;
 	float3 TangentW : TANGENT;
 	float2 Tex      : TEXCOORD;
+	float3 Geodetic	: POSITION1;
 	
 	float4 c0		  : COLOR0;
 	float4 c1		  : COLOR1;
@@ -269,6 +276,7 @@ DomainOut DS(PatchTess patchTess,
 	DomainOut dout;
 	
 	// Interpolate patch attributes to generated vertices.
+	dout.Geodetic = bary.x*tri[0].Geodetic + bary.y*tri[1].Geodetic + bary.z*tri[2].Geodetic;
 	dout.PosW     = bary.x*tri[0].PosW     + bary.y*tri[1].PosW     + bary.z*tri[2].PosW;
 	dout.NormalW  = bary.x*tri[0].NormalW  + bary.y*tri[1].NormalW  + bary.z*tri[2].NormalW;
 	dout.TangentW = bary.x*tri[0].TangentW + bary.y*tri[1].TangentW + bary.z*tri[2].TangentW;
