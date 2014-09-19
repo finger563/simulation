@@ -266,6 +266,55 @@ struct DomainOut
 	float4 c1		  : COLOR1;
 };
 
+static const float PI = 3.14159265358f;
+
+float3 surfaceTangent( float3 normal )
+{
+	float3 n = float3( normal.x, 0, normal.z );
+	float angle = PI / 2.0f;
+	float3x3 R = float3x3(
+	cos(angle), 0, sin(angle),
+	0,1,0,
+	-sin(angle),0,cos(angle)
+	);// = XMMatrixRotationY( 90.0f );
+	float3 result = mul(n,R);
+	return normalize(result);
+}
+
+float2 geoToTex( float3 geo )
+{
+	return float2( 
+		geo.x / ( 2.0 * PI ),
+		1.0 - (geo.y / ( PI ) + 0.5)
+		);
+}
+
+float3 geoToNormal( float3 geo )
+{
+	float cosLat = cos( geo.y );
+	float3 n = float3( 
+		cosLat * cos(geo.x),
+		sin(geo.y), 
+		cosLat * sin(geo.x) );
+	return normalize(n);
+}
+
+float3 geoToSurface( float3 geo )
+{
+	float3 n = geoToNormal( geo );
+	float3 radius2 = float3( 6378.140f*6378.140f, 6356.752f* 6356.752f , 6378.140f*6378.140f );
+	float3 k = float3( 
+		radius2.x * n.x,
+		radius2.y * n.y,
+		radius2.z * n.z );
+	float gamma = sqrt( k.x * n.x + 
+						k.y * n.y + 
+						k.z * n.z);
+	return float3( k.x / gamma + geo.z * n.x,
+					 k.y / gamma + geo.z * n.y,
+					 k.z / gamma + geo.z * n.z );
+}
+
 // The domain shader is called for every vertex created by the tessellator.  
 // It is like the vertex shader after tessellation.
 [domain("tri")]
@@ -284,7 +333,12 @@ DomainOut DS(PatchTess patchTess,
 	
 	dout.c0      = bary.x*tri[0].c0      + bary.y*tri[1].c0      + bary.z*tri[2].c0;
 	dout.c1      = bary.x*tri[0].c1      + bary.y*tri[1].c1      + bary.z*tri[2].c1;
-	
+
+	//dout.PosW = mul(float4(geoToSurface(dout.Geodetic), 1.0f), gWorld).xyz;
+	//dout.NormalW  = mul(geoToNormal(dout.Geodetic), (float3x3)gWorldInvTranspose);
+	//dout.TangentW = mul(surfaceTangent(geoToNormal(dout.Geodetic)), (float3x3)gWorld);
+	//dout.Tex = mul(float4(geoToTex(dout.Geodetic), 0.0f, 1.0f), gTexTransform).xy;
+		
 	// Interpolating normal can unnormalize it, so normalize it.
 	dout.NormalW = normalize(dout.NormalW);
 	
