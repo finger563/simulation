@@ -270,14 +270,33 @@ static const float PI = 3.14159265358f;
 
 float3 surfaceTangent( float3 normal )
 {
-	float3 n = float3( normal.x, 0, normal.z );
-	float angle = PI / 2.0f;
-	float3x3 R = float3x3(
-	cos(angle), 0, sin(angle),
-	0,1,0,
-	-sin(angle),0,cos(angle)
-	);// = XMMatrixRotationY( 90.0f );
-	float3 result = mul(n,R);
+	float4 n = float4( normal.x, 0, normal.z , 1.0 );
+	float angle = 90.0f;
+	float fCosAngle = cos(angle);
+	float fSinAngle = sin(angle);
+	float4x4 R;// = XMMatrixRotationY( 90.0f );
+	
+    R[0][0] = fCosAngle;
+    R[0][1] = 0.0f;
+    R[0][2] = -fSinAngle;
+    R[0][3] = 0.0f;
+
+    R[1][0] = 0.0f;
+    R[1][1] = 1.0f;
+    R[1][2] = 0.0f;
+    R[1][3] = 0.0f;
+
+    R[2][0] = fSinAngle;
+    R[2][1] = 0.0f;
+    R[2][2] = fCosAngle;
+    R[2][3] = 0.0f;
+
+    R[3][0] = 0.0f;
+    R[3][1] = 0.0f;
+    R[3][2] = 0.0f;
+    R[3][3] = 1.0f;
+
+	float3 result = mul(n,R).xyz;
 	return normalize(result);
 }
 
@@ -309,7 +328,7 @@ float3 geoToSurface( float3 geo )
 		radius2.z * n.z );
 	float gamma = sqrt( k.x * n.x + 
 						k.y * n.y + 
-						k.z * n.z);
+						k.z * n.z );
 	return float3( k.x / gamma + geo.z * n.x,
 					 k.y / gamma + geo.z * n.y,
 					 k.z / gamma + geo.z * n.z );
@@ -325,19 +344,20 @@ DomainOut DS(PatchTess patchTess,
 	DomainOut dout;
 	
 	// Interpolate patch attributes to generated vertices.
-	dout.Geodetic = bary.x*tri[0].Geodetic + bary.y*tri[1].Geodetic + bary.z*tri[2].Geodetic;
-	dout.PosW     = bary.x*tri[0].PosW     + bary.y*tri[1].PosW     + bary.z*tri[2].PosW;
-	dout.NormalW  = bary.x*tri[0].NormalW  + bary.y*tri[1].NormalW  + bary.z*tri[2].NormalW;
-	dout.TangentW = bary.x*tri[0].TangentW + bary.y*tri[1].TangentW + bary.z*tri[2].TangentW;
-	dout.Tex      = bary.x*tri[0].Tex      + bary.y*tri[1].Tex      + bary.z*tri[2].Tex;
+	dout.Geodetic = tri[2].Geodetic;
+	//dout.Geodetic = bary.x*tri[0].Geodetic + bary.y*tri[1].Geodetic + bary.z*tri[2].Geodetic;
+	//dout.PosW     = bary.x*tri[0].PosW     + bary.y*tri[1].PosW     + bary.z*tri[2].PosW;
+	//dout.NormalW  = bary.x*tri[0].NormalW  + bary.y*tri[1].NormalW  + bary.z*tri[2].NormalW;
+	//dout.TangentW = bary.x*tri[0].TangentW + bary.y*tri[1].TangentW + bary.z*tri[2].TangentW;
+	//dout.Tex      = bary.x*tri[0].Tex      + bary.y*tri[1].Tex      + bary.z*tri[2].Tex;
 	
 	dout.c0      = bary.x*tri[0].c0      + bary.y*tri[1].c0      + bary.z*tri[2].c0;
 	dout.c1      = bary.x*tri[0].c1      + bary.y*tri[1].c1      + bary.z*tri[2].c1;
 
-	//dout.PosW = mul(float4(geoToSurface(dout.Geodetic), 1.0f), gWorld).xyz;
-	//dout.NormalW  = mul(geoToNormal(dout.Geodetic), (float3x3)gWorldInvTranspose);
-	//dout.TangentW = mul(surfaceTangent(geoToNormal(dout.Geodetic)), (float3x3)gWorld);
-	//dout.Tex = mul(float4(geoToTex(dout.Geodetic), 0.0f, 1.0f), gTexTransform).xy;
+	dout.PosW = mul(float4(geoToSurface(dout.Geodetic), 1.0f), gWorld).xyz;
+	dout.NormalW  = mul(geoToNormal(dout.Geodetic), (float3x3)gWorldInvTranspose);
+	dout.TangentW = mul(surfaceTangent(geoToNormal(dout.Geodetic)), (float3x3)gWorld);
+	dout.Tex = mul(float4(geoToTex(dout.Geodetic), 0.0f, 1.0f), gTexTransform).xy;
 		
 	// Interpolating normal can unnormalize it, so normalize it.
 	dout.NormalW = normalize(dout.NormalW);
@@ -431,9 +451,9 @@ float4 PS(DomainOut pin,
 			spec    += S;
 		}
 
-		litColor = texColor*(ambient + diffuse) + spec;
-		litColor = litColor * pin.c1;
-		litColor += pin.c0;
+		//litColor = texColor*(ambient + diffuse) + spec;
+		//litColor = litColor * pin.c1;
+		//litColor += pin.c0;
 
 	}
 
