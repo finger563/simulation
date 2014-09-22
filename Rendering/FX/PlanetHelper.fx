@@ -7,6 +7,8 @@ const float fSamples = 5.0;
 const float fScaleDepth = 0.25;
 const float fInvScaleDepth = 4.0;
 
+static const float PI = 3.14159265358f;
+
 struct VertexIn
 {
 	float3 PosL     : POSITION0;
@@ -52,8 +54,6 @@ cbuffer cbPerObject
 	float4x4 gTexTransform;
 	Material gMaterial;
 }; 
-
-static const float PI = 3.14159265358f;
 
 float3 surfaceTangent( float3 normal )
 {

@@ -242,18 +242,18 @@ void Renderer::DrawScene()
 	ID3D11Buffer* mIB_test;
 	
 	std::vector<UINT> indices;
-	std::vector<UINT> earthIndices = earth.getIndices();
+	std::vector<UINT> earthIndices = earth.getIndices( 4 );
 	// Cache the starting index for each object in the concatenated index buffer.
 	mEarthIndexOffset  = 0;
 	mEarthIndexCount   = earthIndices.size();
 	indices.insert(indices.end(), earthIndices.begin(), earthIndices.end());
 	
-	std::vector<UINT> skyIndices = sky.getIndices();
+	std::vector<UINT> skyIndices = sky.getIndices( 6 );
 	mSkyIndexCount	= skyIndices.size();
 	mSkyIndexOffset = indices.size();
 	indices.insert(indices.end(), skyIndices.begin(), skyIndices.end());
 
-	std::vector<UINT> cloudsIndices = clouds.getIndices();
+	std::vector<UINT> cloudsIndices = clouds.getIndices( 3 );
 	mCloudsIndexCount  = cloudsIndices.size();
 	mCloudsIndexOffset = indices.size();
 	indices.insert(indices.end(), cloudsIndices.begin(), cloudsIndices.end());
@@ -322,7 +322,7 @@ void Renderer::DrawScene()
     for(UINT p = 0; p < techDesc.Passes; ++p)
     {
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
-		md3dImmediateContext->DrawIndexed(indices.size(), 0, 0);
+		md3dImmediateContext->DrawIndexed(mEarthIndexCount, mEarthIndexOffset, mEarthVertexOffset);
 	}
 	
 	// DRAW THE CLOUDS

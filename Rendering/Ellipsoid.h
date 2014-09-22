@@ -45,10 +45,11 @@ public:
 	Vector2D surfaceToTexCoord( const Vector3D& surf );
 
 	void generateMeshes( int qtDepth = 10.0f );
-
-	std::vector<UINT> getIndices();
+	
+	std::vector<UINT> getIndices( int depth );
 	
 private:
+	void getQT( QuadTreeNode* node, int depth, std::vector<UINT>& inds );
 	void generateQT( QuadTreeNode* node, int numChildren, int numSubdivisions, bool polarFace );
 	void subdividePlanarQuad( QuadTreeNode* node );
 	void subdivideEquilateralTriangle( QuadTreeNode* node );

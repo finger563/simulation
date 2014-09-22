@@ -90,24 +90,21 @@ Vector2D Ellipsoid::surfaceToTexCoord( const Vector3D& surf ) {
 	return texCoord;
 }
 
-std::vector<UINT> Ellipsoid::getIndices() {
-	std::vector<UINT> retInd;
+std::vector<UINT> Ellipsoid::getIndices( int depth ) {
+	std::vector<UINT> retVec;
+	getQT( rootQT, depth, retVec );
+	return retVec;
+}
 
-	for (int i=0;i<rootQT->numChildren;i++) {
-		for (int j=0;j<rootQT->children[i]->numChildren;j++) {
-			for (int k=0;k<rootQT->children[i]->children[j]->numChildren;k++) {
-				for (int l=0;l<rootQT->children[i]->children[j]->children[k]->numChildren;l++) {
-					for (int m=0;m<rootQT->children[i]->children[j]->children[k]->children[l]->numChildren;m++) {
-						for (int n=0;n<rootQT->children[i]->children[j]->children[k]->children[l]->children[m]->numIndices;n++) {
-							retInd.push_back(rootQT->children[i]->children[j]->children[k]->children[l]->children[m]->indices[n]);
-						}
-					}
-				}
-			}
-		}
+void Ellipsoid::getQT( QuadTreeNode* node, int depth, std::vector<UINT>& inds ) {
+	if ( depth == 0 || node->numChildren == 0 || node->children == NULL ) {
+		for (int i=0;i<node->numIndices;i++)
+			inds.push_back(node->indices[i]);
 	}
-
-	return retInd;
+	else {
+		for (int i=0;i<node->numChildren;i++)
+			getQT(node->children[i], depth - 1, inds );
+	}
 }
 
 void Ellipsoid::generateMeshes( int qtDepth ) {
