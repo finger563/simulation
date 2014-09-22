@@ -29,14 +29,6 @@ SamplerState samLinear
 	AddressV = WRAP;
 };
 
-struct VertexIn
-{
-	float3 PosL     : POSITION;
-	float3 NormalL  : NORMAL;
-	float2 Tex      : TEXCOORD;
-	float3 TangentL : TANGENT;
-};
-
 struct VertexOut
 {
     float3 PosW       : POSITION;
@@ -45,11 +37,10 @@ struct VertexOut
 	float2 Tex        : TEXCOORD;
 	float  TessFactor : TESS;
 	
-	float4 c0		  : COLOR0;
-	float4 c1		  : COLOR1;
+	float3 Geodetic	: POSITION1;
 };
 
-VertexOut VS_CloudsFromSpace(VertexIn vin)
+VertexOut VS(VertexIn vin)
 {
 	VertexOut vout;
 	
@@ -57,6 +48,7 @@ VertexOut VS_CloudsFromSpace(VertexIn vin)
 	vout.PosW     = mul(float4(vin.PosL, 1.0f), gWorld).xyz;
 	vout.NormalW  = mul(vin.NormalL, (float3x3)gWorldInvTranspose);
 	vout.TangentW = mul(vin.TangentL, (float3x3)gWorld);
+	vout.Geodetic = vin.Geodetic;
 
 	// Output vertex attributes for interpolation across triangle.
 	vout.Tex = mul(float4(vin.Tex, 0.0f, 1.0f), gTexTransform).xy;
@@ -71,8 +63,117 @@ VertexOut VS_CloudsFromSpace(VertexIn vin)
 	
 	// Rescale [0,1] --> [gMinTessFactor, gMaxTessFactor].
 	vout.TessFactor = gMinTessFactor + tess*(gMaxTessFactor-gMinTessFactor);
+
+	return vout;
+}
+
+struct PatchTess
+{
+	float EdgeTess[3] : SV_TessFactor;
+	float InsideTess  : SV_InsideTessFactor;
+};
+
+PatchTess PatchHS(InputPatch<VertexOut,3> patch, 
+                  uint patchID : SV_PrimitiveID)
+{
+	PatchTess pt;
 	
-	float3 v3Pos = vout.PosW - gPlanetPosW;
+	// Average tess factors along edges, and pick an edge tess factor for 
+	// the interior tessellation.  It is important to do the tess factor
+	// calculation based on the edge properties so that edges shared by 
+	// more than one triangle will have the same tessellation factor.  
+	// Otherwise, gaps can appear.
+	pt.EdgeTess[0] = 0.5f*(patch[1].TessFactor + patch[2].TessFactor);
+	pt.EdgeTess[1] = 0.5f*(patch[2].TessFactor + patch[0].TessFactor);
+	pt.EdgeTess[2] = 0.5f*(patch[0].TessFactor + patch[1].TessFactor);
+	pt.InsideTess  = pt.EdgeTess[0];
+	
+	return pt;
+}
+
+struct HullOut
+{
+	float3 PosW     : POSITION0;
+    float3 NormalW  : NORMAL;
+	float3 TangentW : TANGENT;
+	float2 Tex      : TEXCOORD;
+
+	float3 Geodetic	: POSITION1;
+};
+
+[domain("tri")]
+[partitioning("fractional_odd")]
+[outputtopology("triangle_cw")]
+[outputcontrolpoints(3)]
+[patchconstantfunc("PatchHS")]
+HullOut HS(InputPatch<VertexOut,3> p, 
+           uint i : SV_OutputControlPointID,
+           uint patchId : SV_PrimitiveID)
+{
+	HullOut hout;
+	
+	// Pass through shader.
+	hout.PosW     = p[i].PosW;
+	hout.NormalW  = p[i].NormalW;
+	hout.TangentW = p[i].TangentW;
+	hout.Tex      = p[i].Tex;
+	hout.Geodetic = p[i].Geodetic;
+	return hout;
+}
+
+struct DomainOut
+{
+	float4 PosH     : SV_POSITION;
+    float3 PosW     : POSITION0;
+    float3 NormalW  : NORMAL;
+	float3 TangentW : TANGENT;
+	float2 Tex      : TEXCOORD;
+
+	float3 Geodetic	: POSITION1;
+	
+	float4 c0		  : COLOR0;
+	float4 c1		  : COLOR1;
+};
+
+// The domain shader is called for every vertex created by the tessellator.  
+// It is like the vertex shader after tessellation.
+[domain("tri")]
+DomainOut DS_fromSpace(PatchTess patchTess, 
+             float3 bary : SV_DomainLocation, 
+             const OutputPatch<HullOut,3> tri)
+{
+	DomainOut dout;
+	
+	// Interpolate patch attributes to generated vertices.
+	dout.Geodetic = bary.x*tri[0].Geodetic + bary.y*tri[1].Geodetic + bary.z*tri[2].Geodetic;
+
+	dout.PosW = mul(float4(geoToSurface(dout.Geodetic), 1.0f), gWorld).xyz;
+	dout.NormalW  = mul(geoToNormal(dout.Geodetic), (float3x3)gWorldInvTranspose);
+	dout.TangentW = mul(surfaceTangent(geoToNormal(dout.Geodetic)), (float3x3)gWorld);
+	dout.Tex = geoToTex(dout.Geodetic);
+	
+	// Interpolating normal can unnormalize it, so normalize it.
+	dout.NormalW = normalize(dout.NormalW);
+	
+	//
+	// Displacement mapping.
+	//
+	
+	// Choose the mipmap level based on distance to the eye; specifically, choose
+	// the next miplevel every MipInterval units, and clamp the miplevel in [0,6].
+	const float MipInterval = 20.0f;
+	float mipLevel = clamp( (distance(dout.PosW, gEyePosW) - MipInterval) / MipInterval, 0.0f, 6.0f);
+	
+	// Sample height map (stored in alpha channel).
+	float h = gNormalMap.SampleLevel(samLinear, dout.Tex, mipLevel).a;
+	
+	// Offset vertex along normal.
+	dout.PosW += (gHeightScale*h)*dout.NormalW;
+	
+	// Project to homogeneous clip space.
+	dout.PosH = mul(float4(dout.PosW, 1.0f), gViewProj);
+
+	float3 v3Pos = dout.PosW - gPlanetPosW;
 	float3 v3Ray = v3Pos - v3CameraPos;
 	v3Pos = normalize(v3Pos);
 	float fFar = length(v3Ray);
@@ -112,39 +213,53 @@ VertexOut VS_CloudsFromSpace(VertexIn vin)
 		v3SamplePoint += v3SampleRay;
 	}
 
-	vout.c0.rgb = v3FrontColor * (v3InvWavelength * fKrESun + fKmESun);
-	vout.c1.rgb = v3Attenuate;
-	vout.c1.a = 1;
-	vout.c0.a = 1;
-
-	return vout;
+	dout.c0.rgb = v3FrontColor * (v3InvWavelength * fKrESun + fKmESun);
+	dout.c1.rgb = v3Attenuate;
+	dout.c1.a = 1;
+	dout.c0.a = 1;
+	
+	return dout;
 }
 
-VertexOut VS_CloudsFromAtmo(VertexIn vin)
+[domain("tri")]
+DomainOut DS_fromAtmo(PatchTess patchTess, 
+             float3 bary : SV_DomainLocation, 
+             const OutputPatch<HullOut,3> tri)
 {
-	VertexOut vout;
+	DomainOut dout;
 	
-	// Transform to world space space.
-	vout.PosW     = mul(float4(vin.PosL, 1.0f), gWorld).xyz;
-	vout.NormalW  = mul(vin.NormalL, (float3x3)gWorldInvTranspose);
-	vout.TangentW = mul(vin.TangentL, (float3x3)gWorld);
+	// Interpolate patch attributes to generated vertices.
+	dout.Geodetic = bary.x*tri[0].Geodetic + bary.y*tri[1].Geodetic + bary.z*tri[2].Geodetic;
 
-	// Output vertex attributes for interpolation across triangle.
-	vout.Tex = mul(float4(vin.Tex, 0.0f, 1.0f), gTexTransform).xy;
-
-	float d = distance(vout.PosW, gEyePosW);
-
-	// Normalized tessellation factor. 
-	// The tessellation is 
-	//   0 if d >= gMinTessDistance and
-	//   1 if d <= gMaxTessDistance.  
-	float tess = saturate( (gMinTessDistance - d) / (gMinTessDistance - gMaxTessDistance) );
+	dout.PosW = mul(float4(geoToSurface(dout.Geodetic), 1.0f), gWorld).xyz;
+	dout.NormalW  = mul(geoToNormal(dout.Geodetic), (float3x3)gWorldInvTranspose);
+	dout.TangentW = mul(surfaceTangent(geoToNormal(dout.Geodetic)), (float3x3)gWorld);
+	dout.Tex = geoToTex(dout.Geodetic);
 	
-	// Rescale [0,1] --> [gMinTessFactor, gMaxTessFactor].
-	vout.TessFactor = gMinTessFactor + tess*(gMaxTessFactor-gMinTessFactor);
+	// Interpolating normal can unnormalize it, so normalize it.
+	dout.NormalW = normalize(dout.NormalW);
+	
+	//
+	// Displacement mapping.
+	//
+	
+	// Choose the mipmap level based on distance to the eye; specifically, choose
+	// the next miplevel every MipInterval units, and clamp the miplevel in [0,6].
+	const float MipInterval = 20.0f;
+	float mipLevel = clamp( (distance(dout.PosW, gEyePosW) - MipInterval) / MipInterval, 0.0f, 6.0f);
+	
+	// Sample height map (stored in alpha channel).
+	float h = gNormalMap.SampleLevel(samLinear, dout.Tex, mipLevel).a;
+	
+	// Offset vertex along normal.
+	dout.PosW += (gHeightScale*h)*dout.NormalW;
+	
+	// Project to homogeneous clip space.
+	dout.PosH = mul(float4(dout.PosW, 1.0f), gViewProj);
+	
 	
 	// Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)
-	float3 v3Pos = vout.PosW - gPlanetPosW;
+	float3 v3Pos = dout.PosW - gPlanetPosW;
 	float3 v3Ray = v3Pos - v3CameraPos;
 	v3Pos = normalize(v3Pos);
 	float fFar = length(v3Ray);
@@ -180,124 +295,14 @@ VertexOut VS_CloudsFromAtmo(VertexIn vin)
 		v3SamplePoint += v3SampleRay;
 	}
 
-	vout.c0.rgb = v3FrontColor * (v3InvWavelength * fKrESun + fKmESun);
-	vout.c1.rgb = v3Attenuate;
-	vout.c1.a = 1;
-	vout.c0.a = 1;
-
-	return vout;
-}
-
-struct PatchTess
-{
-	float EdgeTess[3] : SV_TessFactor;
-	float InsideTess  : SV_InsideTessFactor;
-};
-
-PatchTess PatchHS(InputPatch<VertexOut,3> patch, 
-                  uint patchID : SV_PrimitiveID)
-{
-	PatchTess pt;
-	
-	// Average tess factors along edges, and pick an edge tess factor for 
-	// the interior tessellation.  It is important to do the tess factor
-	// calculation based on the edge properties so that edges shared by 
-	// more than one triangle will have the same tessellation factor.  
-	// Otherwise, gaps can appear.
-	pt.EdgeTess[0] = 0.5f*(patch[1].TessFactor + patch[2].TessFactor);
-	pt.EdgeTess[1] = 0.5f*(patch[2].TessFactor + patch[0].TessFactor);
-	pt.EdgeTess[2] = 0.5f*(patch[0].TessFactor + patch[1].TessFactor);
-	pt.InsideTess  = pt.EdgeTess[0];
-	
-	return pt;
-}
-
-struct HullOut
-{
-	float3 PosW     : POSITION;
-    float3 NormalW  : NORMAL;
-	float3 TangentW : TANGENT;
-	float2 Tex      : TEXCOORD;
-	
-	float4 c0		  : COLOR0;
-	float4 c1		  : COLOR1;
-};
-
-[domain("tri")]
-[partitioning("fractional_odd")]
-[outputtopology("triangle_cw")]
-[outputcontrolpoints(3)]
-[patchconstantfunc("PatchHS")]
-HullOut HS(InputPatch<VertexOut,3> p, 
-           uint i : SV_OutputControlPointID,
-           uint patchId : SV_PrimitiveID)
-{
-	HullOut hout;
-	
-	// Pass through shader.
-	hout.PosW     = p[i].PosW;
-	hout.NormalW  = p[i].NormalW;
-	hout.TangentW = p[i].TangentW;
-	hout.Tex      = p[i].Tex;
-
-	hout.c0		  = p[i].c0;
-	hout.c1		  = p[i].c1;
-	return hout;
-}
-
-struct DomainOut
-{
-	float4 PosH     : SV_POSITION;
-    float3 PosW     : POSITION;
-    float3 NormalW  : NORMAL;
-	float3 TangentW : TANGENT;
-	float2 Tex      : TEXCOORD;
-	
-	float4 c0		  : COLOR0;
-	float4 c1		  : COLOR1;
-};
-
-// The domain shader is called for every vertex created by the tessellator.  
-// It is like the vertex shader after tessellation.
-[domain("tri")]
-DomainOut DS(PatchTess patchTess, 
-             float3 bary : SV_DomainLocation, 
-             const OutputPatch<HullOut,3> tri)
-{
-	DomainOut dout;
-	
-	// Interpolate patch attributes to generated vertices.
-	dout.PosW     = bary.x*tri[0].PosW     + bary.y*tri[1].PosW     + bary.z*tri[2].PosW;
-	dout.NormalW  = bary.x*tri[0].NormalW  + bary.y*tri[1].NormalW  + bary.z*tri[2].NormalW;
-	dout.TangentW = bary.x*tri[0].TangentW + bary.y*tri[1].TangentW + bary.z*tri[2].TangentW;
-	dout.Tex      = bary.x*tri[0].Tex      + bary.y*tri[1].Tex      + bary.z*tri[2].Tex;
-	
-	dout.c0      = bary.x*tri[0].c0      + bary.y*tri[1].c0      + bary.z*tri[2].c0;
-	dout.c1      = bary.x*tri[0].c1      + bary.y*tri[1].c1      + bary.z*tri[2].c1;
-	
-	// Interpolating normal can unnormalize it, so normalize it.
-	dout.NormalW = normalize(dout.NormalW);
-	
-	//
-	// Displacement mapping.
-	//
-	
-	// Choose the mipmap level based on distance to the eye; specifically, choose
-	// the next miplevel every MipInterval units, and clamp the miplevel in [0,6].
-	const float MipInterval = 20.0f;
-	float mipLevel = clamp( (distance(dout.PosW, gEyePosW) - MipInterval) / MipInterval, 0.0f, 6.0f);
-	
-	// Sample height map (stored in alpha channel).
-	float h = gNormalMap.SampleLevel(samLinear, dout.Tex, mipLevel).a;
-	
-	// Offset vertex along normal.
-	dout.PosW += (gHeightScale*h)*dout.NormalW;
-	
-	// Project to homogeneous clip space.
-	dout.PosH = mul(float4(dout.PosW, 1.0f), gViewProj);
+	dout.c0.rgb = v3FrontColor * (v3InvWavelength * fKrESun + fKmESun);
+	dout.c1.rgb = v3Attenuate;
+	dout.c1.a = 1;
+	dout.c0.a = 1;
 	
 	return dout;
 }
+ 
  
 float4 PS(DomainOut pin, 
           uniform int gLightCount, 
@@ -382,9 +387,9 @@ technique11 CloudsFromSpace
 {
     pass P0
     {
-        SetVertexShader( CompileShader( vs_5_0, VS_CloudsFromSpace() ) );
+        SetVertexShader( CompileShader( vs_5_0, VS() ) );
         SetHullShader( CompileShader( hs_5_0, HS() ) );
-        SetDomainShader( CompileShader( ds_5_0, DS() ) );
+        SetDomainShader( CompileShader( ds_5_0, DS_fromSpace() ) );
 		SetGeometryShader( NULL );
         SetPixelShader( CompileShader( ps_5_0, PS(1, true, false, false, false) ) );
     }
@@ -394,9 +399,9 @@ technique11 CloudsFromAtmo
 {
     pass P0
     {
-        SetVertexShader( CompileShader( vs_5_0, VS_CloudsFromAtmo() ) );
+        SetVertexShader( CompileShader( vs_5_0, VS() ) );
         SetHullShader( CompileShader( hs_5_0, HS() ) );
-        SetDomainShader( CompileShader( ds_5_0, DS() ) );
+        SetDomainShader( CompileShader( ds_5_0, DS_fromAtmo() ) );
 		SetGeometryShader( NULL );
         SetPixelShader( CompileShader( ps_5_0, PS(1, true, false, false, false) ) );
     }

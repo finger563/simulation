@@ -16,14 +16,6 @@ SamplerState samLinear
 	AddressV = WRAP;
 };
 
-struct VertexIn
-{
-	float3 PosL     : POSITION;
-	float3 NormalL  : NORMAL;
-	float2 Tex      : TEXCOORD;
-	float3 TangentL : TANGENT;
-};
-
 struct VertexOut
 {
 	float4 PosH		  : SV_POSITION;
@@ -157,11 +149,6 @@ float4 PS(VertexOut pin) : SV_Target
 	color.a = color.b;
 	return color;
 }
-
-BlendState blend
-{
-
-};
 
 technique11 SkyFromSpace
 {

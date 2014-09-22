@@ -9,11 +9,6 @@
 #include "Vertex.h"
 #include "Renderer.h"
 
-#if USE_QUADTREE
-#else
-#include "GeometryGenerator.h"
-#endif
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 				   PSTR cmdLine, int showCmd)
 {
@@ -34,7 +29,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 Renderer::Renderer(HINSTANCE hInstance)
 : D3DApp(hInstance), mVB(0), mIB(0), mEarthDiffuseMapSRV(0), mEarthNormalTexSRV(0), control(hInstance),  mRenderOptions(RenderOptionsDisplacementMap)
 {
-	mMainWndCaption = L"Crate Demo";
+	mMainWndCaption = L"Earth Demo";
 	control.Init();
 	
 	XMMATRIX I = XMMatrixIdentity();
@@ -121,7 +116,7 @@ void Renderer::UpdateScene(float dt)
 		control.set_earthAngle( control.get_earthAngle() + dt );
 		XMVECTOR trans = XMLoadFloat3(&control.get_earthPosW());
 		XMMATRIX T = XMMatrixTranslationFromVector(trans);
-		XMMATRIX R = XMMatrixRotationZ(control.get_earthAngle());
+		XMMATRIX R = XMMatrixRotationY(control.get_earthAngle());
 	
 		XMStoreFloat4x4(&mEarthWorld, R*T);
 	}
@@ -130,7 +125,7 @@ void Renderer::UpdateScene(float dt)
 		control.set_earthAngle( control.get_earthAngle() - dt );
 		XMVECTOR trans = XMLoadFloat3(&control.get_earthPosW());
 		XMMATRIX T = XMMatrixTranslationFromVector(trans);
-		XMMATRIX R = XMMatrixRotationZ(control.get_earthAngle());
+		XMMATRIX R = XMMatrixRotationY(control.get_earthAngle());
 	
 		XMStoreFloat4x4(&mEarthWorld, R*T);
 	}
@@ -244,15 +239,24 @@ void Renderer::DrawScene()
 	Effects::BasicFX->SetDirLights(mDirLights);
 	Effects::BasicFX->SetEyePosW(control.get_Camera().GetPosition());
 	
-#if USE_QUADTREE
-
 	ID3D11Buffer* mIB_test;
 	
-	std::vector<UINT> indices = earth.getIndices();
+	std::vector<UINT> indices;
+	std::vector<UINT> earthIndices = earth.getIndices();
+	// Cache the starting index for each object in the concatenated index buffer.
+	mEarthIndexOffset  = 0;
+	mEarthIndexCount   = earthIndices.size();
+	indices.insert(indices.end(), earthIndices.begin(), earthIndices.end());
+	
+	std::vector<UINT> skyIndices = sky.getIndices();
+	mSkyIndexCount	= skyIndices.size();
+	mSkyIndexOffset = indices.size();
+	indices.insert(indices.end(), skyIndices.begin(), skyIndices.end());
 
-	//
-	// Pack the indices of all the meshes into one index buffer.
-	//
+	std::vector<UINT> cloudsIndices = clouds.getIndices();
+	mCloudsIndexCount  = cloudsIndices.size();
+	mCloudsIndexOffset = indices.size();
+	indices.insert(indices.end(), cloudsIndices.begin(), cloudsIndices.end());
 
 	D3D11_BUFFER_DESC ibd;
     ibd.Usage = D3D11_USAGE_IMMUTABLE;
@@ -270,15 +274,7 @@ void Renderer::DrawScene()
 	
 	if( GetAsyncKeyState('1') & 0x8000 )
 		md3dImmediateContext->RSSetState(RenderStates::WireframeRS);
-
-	Effects::BasicFX->SetWorld(world);
-	Effects::BasicFX->SetDirLights(mDirLights);
-	Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
-	Effects::BasicFX->SetWorldViewProj(worldViewProj);
-	Effects::BasicFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
-	Effects::BasicFX->SetMaterial(mEarthMat);
-	Effects::BasicFX->SetDiffuseMap(mEarthDiffuseMapSRV);
-	
+		
 	Effects::DisplacementMapFX->SetEyePosW(control.get_Camera().GetPosition());
 	Effects::DisplacementMapFX->SetPlanetPosW(control.get_earthPosW());
 	Effects::DisplacementMapFX->SetCameraPos(cameraPos);
@@ -315,91 +311,21 @@ void Renderer::DrawScene()
 	Effects::DisplacementMapFX->SetDiffuseMap(mEarthDiffuseMapSRV);
 	Effects::DisplacementMapFX->SetNormalMap(mEarthNormalTexSRV);
 	
-#if 0
-	activeTech = Effects::BasicFX->Light1TexTech;
-	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-#else
-	activeTech = Effects::DisplacementMapFX->PlanetFromSpaceTech;
 	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-#endif
+	md3dImmediateContext->OMSetDepthStencilState(RenderStates::PlanetDSS,255);
+	if ( height > outerRadius )
+		activeTech = Effects::DisplacementMapFX->PlanetFromSpaceTech;
+	else
+		activeTech = Effects::DisplacementMapFX->PlanetFromAtmoTech;
+
 	activeTech->GetDesc( &techDesc );
     for(UINT p = 0; p < techDesc.Passes; ++p)
     {
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(indices.size(), 0, 0);
 	}
-
-	ReleaseCOM(mIB_test);
-#else
-	Effects::NormalMapFX->SetDirLights(mDirLights);
-	Effects::NormalMapFX->SetEyePosW(control.get_Camera().GetPosition());
 	
-	// SKY EFFECTS
-	Effects::SkyFX->SetEyePosW(control.get_Camera().GetPosition());
-	Effects::SkyFX->SetPlanetPosW(control.get_earthPosW());
-	Effects::SkyFX->SetDirLights(mDirLights);
-	Effects::SkyFX->SetCameraPos(cameraPos);
-	Effects::SkyFX->SetLightPos(sunPos);
-	Effects::SkyFX->SetInvWaveLength(invWaveLength);
-	Effects::SkyFX->SetCameraHeight(height);
-	Effects::SkyFX->SetCameraHeight2(height*height);
-	Effects::SkyFX->SetOuterRadius(outerRadius);
-	Effects::SkyFX->SetOuterRadius2(outerRadius * outerRadius);
-	Effects::SkyFX->SetInnerRadius(innerRadius);
-	Effects::SkyFX->SetInnerRadius2(innerRadius * innerRadius);
-	Effects::SkyFX->SetKrESun(Kr * ESun);
-	Effects::SkyFX->SetKmESun(Km * ESun);
-	Effects::SkyFX->SetKr4PI(Kr * 4.0f * MathHelper::Pi);
-	Effects::SkyFX->SetKm4PI(Km * 4.0f * MathHelper::Pi);
-	Effects::SkyFX->SetScale( scale );
-	Effects::SkyFX->SetScaleOverScaleDepth( scale / 0.25f );
-	Effects::SkyFX->SetG(-0.990f);
-	Effects::SkyFX->SetG2((-0.990f)*(-0.990f));
-	
-	// SPACE EFFECTS
-	Effects::SpaceFX->SetEyePosW(control.get_Camera().GetPosition());
-	Effects::SpaceFX->SetPlanetPosW(control.get_earthPosW());
-	Effects::SpaceFX->SetCameraPos(cameraPos);
-	Effects::SpaceFX->SetLightPos(sunPos);
-	Effects::SpaceFX->SetInvWaveLength(invWaveLength);
-	Effects::SpaceFX->SetCameraHeight(height);
-	Effects::SpaceFX->SetCameraHeight2(height*height);
-	Effects::SpaceFX->SetOuterRadius(outerRadius);
-	Effects::SpaceFX->SetOuterRadius2(outerRadius * outerRadius);
-	Effects::SpaceFX->SetInnerRadius(innerRadius);
-	Effects::SpaceFX->SetInnerRadius2(innerRadius * innerRadius);
-	Effects::SpaceFX->SetKrESun(Kr * ESun);
-	Effects::SpaceFX->SetKmESun(Km * ESun);
-	Effects::SpaceFX->SetKr4PI(Kr * 4.0f * MathHelper::Pi);
-	Effects::SpaceFX->SetKm4PI(Km * 4.0f * MathHelper::Pi);
-	Effects::SpaceFX->SetScale( scale );
-	Effects::SpaceFX->SetScaleOverScaleDepth( scale / 0.25f );
-	Effects::SpaceFX->SetG(-0.990f);
-	Effects::SpaceFX->SetG2((-0.990f)*(-0.990f));
-	
-	// DISPLACEMENT MAPPING EFFECTS
-	Effects::DisplacementMapFX->SetEyePosW(control.get_Camera().GetPosition());
-	Effects::DisplacementMapFX->SetPlanetPosW(control.get_earthPosW());
-	Effects::DisplacementMapFX->SetCameraPos(cameraPos);
-	Effects::DisplacementMapFX->SetLightPos(sunPos);
-	Effects::DisplacementMapFX->SetInvWaveLength(invWaveLength);
-	Effects::DisplacementMapFX->SetCameraHeight(height);
-	Effects::DisplacementMapFX->SetCameraHeight2(height*height);
-	Effects::DisplacementMapFX->SetOuterRadius(outerRadius);
-	Effects::DisplacementMapFX->SetOuterRadius2(outerRadius * outerRadius);
-	Effects::DisplacementMapFX->SetInnerRadius(innerRadius);
-	Effects::DisplacementMapFX->SetInnerRadius2(innerRadius * innerRadius);
-	Effects::DisplacementMapFX->SetKrESun(Kr * ESun);
-	Effects::DisplacementMapFX->SetKmESun(Km * ESun);
-	Effects::DisplacementMapFX->SetKr4PI(Kr * 4.0f * MathHelper::Pi);
-	Effects::DisplacementMapFX->SetKm4PI(Km * 4.0f * MathHelper::Pi);
-	Effects::DisplacementMapFX->SetScale( scale );
-	Effects::DisplacementMapFX->SetScaleOverScaleDepth( scale / 0.25f );
-	Effects::DisplacementMapFX->SetG(-0.990f);
-	Effects::DisplacementMapFX->SetG2((-0.990f)*(-0.990f));
-	Effects::DisplacementMapFX->SetDirLights(mDirLights);
-	
-	// CLOUDS EFFECTS
+	// DRAW THE CLOUDS
 	Effects::CloudsFX->SetEyePosW(control.get_Camera().GetPosition());
 	Effects::CloudsFX->SetPlanetPosW(control.get_earthPosW());
 	Effects::CloudsFX->SetCameraPos(cameraPos);
@@ -420,65 +346,6 @@ void Renderer::DrawScene()
 	Effects::CloudsFX->SetG(-0.990f);
 	Effects::CloudsFX->SetG2((-0.990f)*(-0.990f));
 	Effects::CloudsFX->SetDirLights(mDirLights);
-	 
-	md3dImmediateContext->IASetInputLayout(InputLayouts::PosNormalTexTan);
-	md3dImmediateContext->IASetVertexBuffers(0, 1, &mVB, &stride, &offset);
-	md3dImmediateContext->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
-	
-	if( GetAsyncKeyState('1') & 0x8000 )
-		md3dImmediateContext->RSSetState(RenderStates::WireframeRS);
-		
-	// DRAW THE EARTH
-	md3dImmediateContext->OMSetDepthStencilState(RenderStates::PlanetDSS,255);
-	if ( height > outerRadius )
-		activeTech = Effects::DisplacementMapFX->PlanetFromSpaceTech;
-	else
-		activeTech = Effects::DisplacementMapFX->PlanetFromAtmoTech;
-	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-	Effects::DisplacementMapFX->SetHeightScale(29.029f);
-	Effects::DisplacementMapFX->SetMaxTessDistance(0.10f);
-	Effects::DisplacementMapFX->SetMinTessDistance(3000.0f);
-	Effects::DisplacementMapFX->SetMinTessFactor(1.0f);
-	Effects::DisplacementMapFX->SetMaxTessFactor(100.0f);
-	activeTech->GetDesc( &techDesc );
-    for(UINT p = 0; p < techDesc.Passes; ++p)
-    {
-		switch(mRenderOptions)
-		{
-		case RenderOptionsBasic:
-			Effects::BasicFX->SetWorld(world);
-			Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
-			Effects::BasicFX->SetWorldViewProj(worldViewProj);
-			Effects::BasicFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
-			Effects::BasicFX->SetMaterial(mEarthMat);
-			Effects::BasicFX->SetDiffuseMap(mEarthDiffuseMapSRV);
-			break;
-		case RenderOptionsNormalMap:
-			Effects::NormalMapFX->SetWorld(world);
-			Effects::NormalMapFX->SetWorldInvTranspose(worldInvTranspose);
-			Effects::NormalMapFX->SetWorldViewProj(worldViewProj);
-			Effects::NormalMapFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
-			Effects::NormalMapFX->SetMaterial(mEarthMat);
-			Effects::NormalMapFX->SetDiffuseMap(mEarthDiffuseMapSRV);
-			Effects::NormalMapFX->SetNormalMap(mEarthNormalTexSRV);
-			break;
-		case RenderOptionsDisplacementMap:
-			Effects::DisplacementMapFX->SetWorld(world);
-			Effects::DisplacementMapFX->SetWorldInvTranspose(worldInvTranspose);
-			Effects::DisplacementMapFX->SetViewProj(viewProj);
-			Effects::DisplacementMapFX->SetWorldViewProj(worldViewProj);
-			Effects::DisplacementMapFX->SetTexTransform(reinterpret_cast<CXMMATRIX>(mTexTransform));
-			Effects::DisplacementMapFX->SetMaterial(mEarthMat);
-			Effects::DisplacementMapFX->SetDiffuseMap(mEarthDiffuseMapSRV);
-			Effects::DisplacementMapFX->SetNormalMap(mEarthNormalTexSRV);
-			break;
-		}
-		
-		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
-		md3dImmediateContext->DrawIndexed(mEarthIndexCount, mEarthIndexOffset, mEarthVertexOffset);
-    }
-	
-	// DRAW THE CLOUDS
 	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 	md3dImmediateContext->OMSetBlendState(RenderStates::TransparentBS, blendFactor, 0xffffffff);
 	if ( height > outerRadius ) {
@@ -524,6 +391,27 @@ void Renderer::DrawScene()
 	md3dImmediateContext->DSSetShader(0, 0, 0);	
 
 	// DRAW THE SKY
+	// SKY EFFECTS
+	Effects::SkyFX->SetEyePosW(control.get_Camera().GetPosition());
+	Effects::SkyFX->SetPlanetPosW(control.get_earthPosW());
+	Effects::SkyFX->SetDirLights(mDirLights);
+	Effects::SkyFX->SetCameraPos(cameraPos);
+	Effects::SkyFX->SetLightPos(sunPos);
+	Effects::SkyFX->SetInvWaveLength(invWaveLength);
+	Effects::SkyFX->SetCameraHeight(height);
+	Effects::SkyFX->SetCameraHeight2(height*height);
+	Effects::SkyFX->SetOuterRadius(outerRadius);
+	Effects::SkyFX->SetOuterRadius2(outerRadius * outerRadius);
+	Effects::SkyFX->SetInnerRadius(innerRadius);
+	Effects::SkyFX->SetInnerRadius2(innerRadius * innerRadius);
+	Effects::SkyFX->SetKrESun(Kr * ESun);
+	Effects::SkyFX->SetKmESun(Km * ESun);
+	Effects::SkyFX->SetKr4PI(Kr * 4.0f * MathHelper::Pi);
+	Effects::SkyFX->SetKm4PI(Km * 4.0f * MathHelper::Pi);
+	Effects::SkyFX->SetScale( scale );
+	Effects::SkyFX->SetScaleOverScaleDepth( scale / 0.25f );
+	Effects::SkyFX->SetG(-0.990f);
+	Effects::SkyFX->SetG2((-0.990f)*(-0.990f));
 	if ( height > outerRadius ) {
 		activeTech = Effects::SkyFX->SkyFromSpaceTech;
 	}
@@ -546,7 +434,8 @@ void Renderer::DrawScene()
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(mSkyIndexCount, mSkyIndexOffset, mSkyVertexOffset);
     }
-#endif
+
+	ReleaseCOM(mIB_test);
 	
 	// restore default states
 	md3dImmediateContext->RSSetState(0);
@@ -557,21 +446,52 @@ void Renderer::DrawScene()
 
 void Renderer::BuildGeometryBuffers()
 {
-#if USE_QUADTREE
 	earth = Ellipsoid(control.get_earthRadius(), control.get_earthRadius(), 6356.752f);
 	earth.generateMeshes( 5 );
 	
-	std::vector<Object::Vertex> earthVerts = earth.getVertices();
-	std::vector<Vertex::PosNormalTexTan> vertices( earthVerts.size() );
+	sky = Ellipsoid(control.get_earthRadius() + control.get_skyAltitude(), control.get_earthRadius() + control.get_skyAltitude(), 6356.752f + control.get_skyAltitude());
+	sky.generateMeshes( 7 );
 	
+	clouds = Ellipsoid(control.get_earthRadius(), control.get_earthRadius(), 6356.752f);
+	clouds.generateMeshes( 5 );
+	
+	std::vector<Object::Vertex> earthVerts = earth.getVertices();
+	std::vector<Object::Vertex> skyVerts = sky.getVertices();
+	std::vector<Object::Vertex> cloudsVerts = clouds.getVertices();
+	std::vector<Vertex::PosNormalTexTan> vertices( earthVerts.size() + skyVerts.size() + cloudsVerts.size() );
+	
+	// Cache the vertex offsets to each object in the concatenated vertex buffer.
+	mEarthVertexOffset      = 0;
 	UINT k = 0;
-	for(size_t i = 0; i < earthVerts.size(); i++, k++)
+	for(size_t i = 0; i < earthVerts.size(); ++i, ++k)
 	{
 		vertices[k].Pos			= earthVerts[i].Position.toXMFloat3();
 		vertices[k].Geodetic	= earthVerts[i].Geodetic.toXMFloat3();
 		vertices[k].Normal		= earthVerts[i].Normal.toXMFloat3();
 		vertices[k].Tex			= earthVerts[i].TexC.toXMFloat2();
 		vertices[k].TangentU	= earthVerts[i].TangentU.toXMFloat3();
+	}
+	
+	mSkyVertexOffset = k;
+
+	for(size_t i = 0; i < skyVerts.size(); ++i, ++k)
+	{
+		vertices[k].Pos			= skyVerts[i].Position.toXMFloat3();
+		vertices[k].Geodetic	= skyVerts[i].Geodetic.toXMFloat3();
+		vertices[k].Normal		= skyVerts[i].Normal.toXMFloat3();
+		vertices[k].Tex			= skyVerts[i].TexC.toXMFloat2();
+		vertices[k].TangentU	= skyVerts[i].TangentU.toXMFloat3();
+	}
+
+	mCloudsVertexOffset = k;
+
+	for(size_t i = 0; i < cloudsVerts.size(); ++i, ++k)
+	{
+		vertices[k].Pos			= cloudsVerts[i].Position.toXMFloat3();
+		vertices[k].Geodetic	= cloudsVerts[i].Geodetic.toXMFloat3();
+		vertices[k].Normal		= cloudsVerts[i].Normal.toXMFloat3();
+		vertices[k].Tex			= cloudsVerts[i].TexC.toXMFloat2();
+		vertices[k].TangentU	= cloudsVerts[i].TangentU.toXMFloat3();
 	}
 	
 	
@@ -587,98 +507,5 @@ void Renderer::BuildGeometryBuffers()
 	vinitData.SysMemPitch = 0;
 	vinitData.SysMemSlicePitch = 0;
     HR(md3dDevice->CreateBuffer(&vbd, &vinitData, &mVB));
-
-#else
-	GeometryGenerator::MeshData earthMesh;
-	GeometryGenerator::MeshData skyMesh;
-	GeometryGenerator::MeshData cloudMesh;
-
-	GeometryGenerator geoGen;
-	
-	geoGen.CreateGeosphere(control.get_earthRadius() + control.get_skyAltitude(), 7.0f, skyMesh);
-	geoGen.CreateGeosphere(control.get_earthRadius(), 4.0f, cloudMesh);
-	geoGen.CreateGeosphere(control.get_earthRadius(),5.0f,earthMesh);
-	
-	// Cache the vertex offsets to each object in the concatenated vertex buffer.
-	mEarthVertexOffset      = 0;
-	// Cache the starting index for each object in the concatenated index buffer.
-	mEarthIndexOffset      = 0;
-
-	// Cache the index count of each object.
-	mEarthIndexCount      = earthMesh.Indices.size();
-	mSkyIndexCount		  = skyMesh.Indices.size();
-	mCloudsIndexCount	  = cloudMesh.Indices.size();
-	
-	UINT totalVertexCount = earthMesh.Vertices.size() + skyMesh.Vertices.size() + cloudMesh.Indices.size();
-
-	UINT totalIndexCount = mEarthIndexCount + mSkyIndexCount + mCloudsIndexCount;
-
-	//
-	// Extract the vertex elements we are interested in and pack the
-	// vertices of all the meshes into one vertex buffer.
-	//
-
-	std::vector<Vertex::PosNormalTexTan> vertices(totalVertexCount);
-
-	UINT k = 0;
-	for(size_t i = 0; i < earthMesh.Vertices.size(); ++i, ++k)
-	{
-		vertices[k].Pos			= earthMesh.Vertices[i].Position;
-		vertices[k].Normal		= earthMesh.Vertices[i].Normal;
-		vertices[k].Tex			= earthMesh.Vertices[i].TexC;
-		vertices[k].TangentU	= earthMesh.Vertices[i].TangentU;
-	}
-	
-	mSkyVertexOffset = k;
-
-	for(size_t i = 0; i < skyMesh.Vertices.size(); ++i, ++k)
-	{
-		vertices[k].Pos			= skyMesh.Vertices[i].Position;
-		vertices[k].Normal		= skyMesh.Vertices[i].Normal;
-		vertices[k].Tex			= skyMesh.Vertices[i].TexC;
-		vertices[k].TangentU	= skyMesh.Vertices[i].TangentU;
-	}
-
-	mCloudsVertexOffset = k;
-
-	for(size_t i = 0; i < cloudMesh.Vertices.size(); ++i, ++k)
-	{
-		vertices[k].Pos			= cloudMesh.Vertices[i].Position;
-		vertices[k].Normal		= cloudMesh.Vertices[i].Normal;
-		vertices[k].Tex			= cloudMesh.Vertices[i].TexC;
-		vertices[k].TangentU	= cloudMesh.Vertices[i].TangentU;
-	}
-
-    D3D11_BUFFER_DESC vbd;
-    vbd.Usage = D3D11_USAGE_IMMUTABLE;
-    vbd.ByteWidth = sizeof(Vertex::PosNormalTexTan) * totalVertexCount;
-    vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    vbd.CPUAccessFlags = 0;
-    vbd.MiscFlags = 0;
-    D3D11_SUBRESOURCE_DATA vinitData;
-    vinitData.pSysMem = &vertices[0];
-    HR(md3dDevice->CreateBuffer(&vbd, &vinitData, &mVB));
-
-	//
-	// Pack the indices of all the meshes into one index buffer.
-	//
-
-	std::vector<UINT> indices;
-	indices.insert(indices.end(), earthMesh.Indices.begin(), earthMesh.Indices.end());
-	mSkyIndexOffset = indices.size();
-	indices.insert(indices.end(), skyMesh.Indices.begin(), skyMesh.Indices.end());
-	mCloudsIndexOffset = indices.size();
-	indices.insert(indices.end(), cloudMesh.Indices.begin(), cloudMesh.Indices.end());
-
-	D3D11_BUFFER_DESC ibd;
-    ibd.Usage = D3D11_USAGE_IMMUTABLE;
-    ibd.ByteWidth = sizeof(UINT) * totalIndexCount;
-    ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-    ibd.CPUAccessFlags = 0;
-    ibd.MiscFlags = 0;
-    D3D11_SUBRESOURCE_DATA iinitData;
-    iinitData.pSysMem = &indices[0];
-    HR(md3dDevice->CreateBuffer(&ibd, &iinitData, &mIB));
-#endif
 }
  

@@ -7,6 +7,16 @@ const float fSamples = 5.0;
 const float fScaleDepth = 0.25;
 const float fInvScaleDepth = 4.0;
 
+struct VertexIn
+{
+	float3 PosL     : POSITION0;
+	float3 NormalL  : NORMAL;
+	float2 Tex      : TEXCOORD;
+	float3 TangentL : TANGENT;
+
+	float3 Geodetic	: POSITION1;
+};
+
 cbuffer cbPerPlanetFrame
 {
 	DirectionalLight gDirLights[3];
@@ -42,6 +52,75 @@ cbuffer cbPerObject
 	float4x4 gTexTransform;
 	Material gMaterial;
 }; 
+
+static const float PI = 3.14159265358f;
+
+float3 surfaceTangent( float3 normal )
+{
+	float4 n = float4( normal.x, 0, normal.z , 1.0 );
+	float angle = 90.0f;
+	float fCosAngle = cos(angle);
+	float fSinAngle = sin(angle);
+	float4x4 R;// = XMMatrixRotationY( 90.0f );
+	
+    R[0][0] = fCosAngle;
+    R[0][1] = 0.0f;
+    R[0][2] = -fSinAngle;
+    R[0][3] = 0.0f;
+
+    R[1][0] = 0.0f;
+    R[1][1] = 1.0f;
+    R[1][2] = 0.0f;
+    R[1][3] = 0.0f;
+
+    R[2][0] = fSinAngle;
+    R[2][1] = 0.0f;
+    R[2][2] = fCosAngle;
+    R[2][3] = 0.0f;
+
+    R[3][0] = 0.0f;
+    R[3][1] = 0.0f;
+    R[3][2] = 0.0f;
+    R[3][3] = 1.0f;
+
+	float3 result = mul(n,R).xyz;
+	return normalize(result);
+}
+
+float2 geoToTex( float3 geo )
+{
+	return float2( 
+		geo.x / ( 2.0 * PI ),
+		1.0 - (geo.y / ( PI ) + 0.5)
+		);
+}
+
+float3 geoToNormal( float3 geo )
+{
+	float cosLat = cos( geo.y );
+	float3 n = float3( 
+		cosLat * cos(geo.x),
+		sin(geo.y), 
+		cosLat * sin(geo.x) );
+	return normalize(n);
+}
+
+static const float3 radius2 = float3( 6378.140f*6378.140f, 6356.752f* 6356.752f , 6378.140f*6378.140f );
+
+float3 geoToSurface( float3 geo )
+{
+	float3 n = geoToNormal( geo );
+	float3 k = float3( 
+		radius2.x * n.x,
+		radius2.y * n.y,
+		radius2.z * n.z );
+	float gamma = sqrt( k.x * n.x + 
+						k.y * n.y + 
+						k.z * n.z );
+	return float3( k.x / gamma + geo.z * n.x,
+					 k.y / gamma + geo.z * n.y,
+					 k.z / gamma + geo.z * n.z );
+}
 
 // The scale equation calculated by Vernier's Graphical Analysis
 float scale(float fCos)
