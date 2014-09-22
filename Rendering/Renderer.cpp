@@ -121,7 +121,7 @@ void Renderer::UpdateScene(float dt)
 		control.set_earthAngle( control.get_earthAngle() + dt );
 		XMVECTOR trans = XMLoadFloat3(&control.get_earthPosW());
 		XMMATRIX T = XMMatrixTranslationFromVector(trans);
-		XMMATRIX R = XMMatrixRotationY(control.get_earthAngle());
+		XMMATRIX R = XMMatrixRotationZ(control.get_earthAngle());
 	
 		XMStoreFloat4x4(&mEarthWorld, R*T);
 	}
@@ -130,7 +130,7 @@ void Renderer::UpdateScene(float dt)
 		control.set_earthAngle( control.get_earthAngle() - dt );
 		XMVECTOR trans = XMLoadFloat3(&control.get_earthPosW());
 		XMMATRIX T = XMMatrixTranslationFromVector(trans);
-		XMMATRIX R = XMMatrixRotationY(control.get_earthAngle());
+		XMMATRIX R = XMMatrixRotationZ(control.get_earthAngle());
 	
 		XMStoreFloat4x4(&mEarthWorld, R*T);
 	}
@@ -565,24 +565,27 @@ void Renderer::BuildGeometryBuffers()
 	std::vector<Vertex::PosNormalTexTan> vertices( earthVerts.size() );
 	
 	UINT k = 0;
-	for(size_t i = 0; i < earthVerts.size(); ++i, ++k)
+	for(size_t i = 0; i < earthVerts.size(); i++, k++)
 	{
-		vertices[k].Pos			= XMFLOAT3( earthVerts[i].Position.x, earthVerts[i].Position.y, earthVerts[i].Position.z );
-		vertices[k].Normal		= XMFLOAT3( earthVerts[i].Normal.x, earthVerts[i].Normal.y, earthVerts[i].Normal.z );
-		vertices[k].Tex			= XMFLOAT2( (float)earthVerts[i].TexC.x, (float)earthVerts[i].TexC.y );
-		vertices[k].TangentU	= XMFLOAT3( earthVerts[i].TangentU.x, earthVerts[i].TangentU.y, earthVerts[i].TangentU.z );
-		vertices[k].Geodetic	= XMFLOAT3( earthVerts[i].Geodetic.toXMFloat3() );
+		vertices[k].Pos			= earthVerts[i].Position.toXMFloat3();
+		vertices[k].Geodetic	= earthVerts[i].Geodetic.toXMFloat3();
+		vertices[k].Normal		= earthVerts[i].Normal.toXMFloat3();
+		vertices[k].Tex			= earthVerts[i].TexC.toXMFloat2();
+		vertices[k].TangentU	= earthVerts[i].TangentU.toXMFloat3();
 	}
 	
 	
     D3D11_BUFFER_DESC vbd;
     vbd.Usage = D3D11_USAGE_IMMUTABLE;
     vbd.ByteWidth = sizeof(Vertex::PosNormalTexTan) * vertices.size();
+	vbd.StructureByteStride = sizeof(Vertex::PosNormalTexTan);
     vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     vbd.CPUAccessFlags = 0;
     vbd.MiscFlags = 0;
     D3D11_SUBRESOURCE_DATA vinitData;
-    vinitData.pSysMem = &vertices[0];
+	vinitData.pSysMem = vertices.data();
+	vinitData.SysMemPitch = 0;
+	vinitData.SysMemSlicePitch = 0;
     HR(md3dDevice->CreateBuffer(&vbd, &vinitData, &mVB));
 
 #else

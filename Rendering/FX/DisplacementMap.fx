@@ -35,6 +35,7 @@ struct VertexIn
 	float3 NormalL  : NORMAL;
 	float2 Tex      : TEXCOORD;
 	float3 TangentL : TANGENT;
+
 	float3 Geodetic	: POSITION1;
 };
 
@@ -45,6 +46,7 @@ struct VertexOut
 	float3 TangentW   : TANGENT;
 	float2 Tex        : TEXCOORD;
 	float  TessFactor : TESS;
+
 	float3 Geodetic	  : POSITION1;
 	
 	float4 c0		  : COLOR0;
@@ -62,7 +64,8 @@ VertexOut VS_PlanetFromSpace(VertexIn vin)
 	vout.Geodetic = vin.Geodetic;
 
 	// Output vertex attributes for interpolation across triangle.
-	vout.Tex = mul(float4(vin.Tex, 0.0f, 1.0f), gTexTransform).xy;
+	//vout.Tex = mul(float4(vin.Tex, 0.0f, 1.0f), gTexTransform).xy;
+	vout.Tex = vin.Tex;
 
 	float d = distance(vout.PosW, gEyePosW);
 
@@ -224,6 +227,7 @@ struct HullOut
     float3 NormalW  : NORMAL;
 	float3 TangentW : TANGENT;
 	float2 Tex      : TEXCOORD;
+
 	float3 Geodetic	: POSITION1;
 	
 	float4 c0		  : COLOR0;
@@ -260,6 +264,7 @@ struct DomainOut
     float3 NormalW  : NORMAL;
 	float3 TangentW : TANGENT;
 	float2 Tex      : TEXCOORD;
+
 	float3 Geodetic	: POSITION1;
 	
 	float4 c0		  : COLOR0;
@@ -318,10 +323,11 @@ float3 geoToNormal( float3 geo )
 	return normalize(n);
 }
 
+static const float3 radius2 = float3( 6378.140f*6378.140f, 6356.752f* 6356.752f , 6378.140f*6378.140f );
+
 float3 geoToSurface( float3 geo )
 {
 	float3 n = geoToNormal( geo );
-	float3 radius2 = float3( 6378.140f*6378.140f, 6356.752f* 6356.752f , 6378.140f*6378.140f );
 	float3 k = float3( 
 		radius2.x * n.x,
 		radius2.y * n.y,
@@ -344,20 +350,27 @@ DomainOut DS(PatchTess patchTess,
 	DomainOut dout;
 	
 	// Interpolate patch attributes to generated vertices.
-	dout.Geodetic = tri[2].Geodetic;
-	//dout.Geodetic = bary.x*tri[0].Geodetic + bary.y*tri[1].Geodetic + bary.z*tri[2].Geodetic;
-	//dout.PosW     = bary.x*tri[0].PosW     + bary.y*tri[1].PosW     + bary.z*tri[2].PosW;
-	//dout.NormalW  = bary.x*tri[0].NormalW  + bary.y*tri[1].NormalW  + bary.z*tri[2].NormalW;
-	//dout.TangentW = bary.x*tri[0].TangentW + bary.y*tri[1].TangentW + bary.z*tri[2].TangentW;
-	//dout.Tex      = bary.x*tri[0].Tex      + bary.y*tri[1].Tex      + bary.z*tri[2].Tex;
-	
-	dout.c0      = bary.x*tri[0].c0      + bary.y*tri[1].c0      + bary.z*tri[2].c0;
-	dout.c1      = bary.x*tri[0].c1      + bary.y*tri[1].c1      + bary.z*tri[2].c1;
+	dout.Geodetic = bary.x*tri[0].Geodetic + bary.y*tri[1].Geodetic + bary.z*tri[2].Geodetic;
 
+#if 0
+	dout.PosW     = bary.x*tri[0].PosW     + bary.y*tri[1].PosW     + bary.z*tri[2].PosW;
+	dout.NormalW  = bary.x*tri[0].NormalW  + bary.y*tri[1].NormalW  + bary.z*tri[2].NormalW;
+	dout.TangentW = bary.x*tri[0].TangentW + bary.y*tri[1].TangentW + bary.z*tri[2].TangentW;
+	dout.Tex      = bary.x*tri[0].Tex      + bary.y*tri[1].Tex      + bary.z*tri[2].Tex;
+#elif 0
+	dout.PosW = mul(float4(geoToSurface(dout.Geodetic), 1.0f), gWorld).xyz;
+	dout.NormalW  = bary.x*tri[0].NormalW  + bary.y*tri[1].NormalW  + bary.z*tri[2].NormalW;
+	dout.TangentW = mul(surfaceTangent(geoToNormal(dout.Geodetic)), (float3x3)gWorld);
+	dout.Tex = geoToTex(dout.Geodetic);
+#else
 	dout.PosW = mul(float4(geoToSurface(dout.Geodetic), 1.0f), gWorld).xyz;
 	dout.NormalW  = mul(geoToNormal(dout.Geodetic), (float3x3)gWorldInvTranspose);
 	dout.TangentW = mul(surfaceTangent(geoToNormal(dout.Geodetic)), (float3x3)gWorld);
-	dout.Tex = mul(float4(geoToTex(dout.Geodetic), 0.0f, 1.0f), gTexTransform).xy;
+	dout.Tex = geoToTex(dout.Geodetic);
+#endif
+	
+	dout.c0      = bary.x*tri[0].c0      + bary.y*tri[1].c0      + bary.z*tri[2].c0;
+	dout.c1      = bary.x*tri[0].c1      + bary.y*tri[1].c1      + bary.z*tri[2].c1;
 		
 	// Interpolating normal can unnormalize it, so normalize it.
 	dout.NormalW = normalize(dout.NormalW);
@@ -451,9 +464,9 @@ float4 PS(DomainOut pin,
 			spec    += S;
 		}
 
-		//litColor = texColor*(ambient + diffuse) + spec;
-		//litColor = litColor * pin.c1;
-		//litColor += pin.c0;
+		litColor = texColor*(ambient + diffuse) + spec;
+		litColor = litColor * pin.c1;
+		litColor += pin.c0;
 
 	}
 
