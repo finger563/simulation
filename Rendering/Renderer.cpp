@@ -181,9 +181,15 @@ void Renderer::UpdateScene(float dt)
 		mRenderOptions = RenderOptionsDisplacementMap; 
 }
 
+#define RENDER_FULL_SCENE 0
+
 void Renderer::DrawScene()
 {
-	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Black));
+	assert(md3dImmediateContext);
+	assert(mRenderTargetView);
+	assert(mDepthStencilView);
+	XMVECTORF32 clearColor = Colors::Black;
+	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&clearColor));
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
 	  
 	control.get_Camera().UpdateViewMatrix();
@@ -242,12 +248,12 @@ void Renderer::DrawScene()
 	ID3D11Buffer* mIB_test;
 	
 	std::vector<UINT> indices;
-	std::vector<UINT> earthIndices = earth.getIndices( 4 );
+	std::vector<UINT> earthIndices = earth.getIndices( 5 );
 	// Cache the starting index for each object in the concatenated index buffer.
 	mEarthIndexOffset  = 0;
 	mEarthIndexCount   = earthIndices.size();
 	indices.insert(indices.end(), earthIndices.begin(), earthIndices.end());
-	
+#if RENDER_FULL_SCENE
 	std::vector<UINT> skyIndices = sky.getIndices( 6 );
 	mSkyIndexCount	= skyIndices.size();
 	mSkyIndexOffset = indices.size();
@@ -257,6 +263,7 @@ void Renderer::DrawScene()
 	mCloudsIndexCount  = cloudsIndices.size();
 	mCloudsIndexOffset = indices.size();
 	indices.insert(indices.end(), cloudsIndices.begin(), cloudsIndices.end());
+#endif
 
 	D3D11_BUFFER_DESC ibd;
     ibd.Usage = D3D11_USAGE_IMMUTABLE;
@@ -272,6 +279,7 @@ void Renderer::DrawScene()
 	md3dImmediateContext->IASetVertexBuffers(0, 1, &mVB, &stride, &offset);
 	md3dImmediateContext->IASetIndexBuffer(mIB_test, DXGI_FORMAT_R32_UINT, 0);
 	
+	// DRAW THE EARTH
 	if( GetAsyncKeyState('1') & 0x8000 )
 		md3dImmediateContext->RSSetState(RenderStates::WireframeRS);
 		
@@ -312,7 +320,9 @@ void Renderer::DrawScene()
 	Effects::DisplacementMapFX->SetNormalMap(mEarthNormalTexSRV);
 	
 	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+#if RENDER_FULL_SCENE
 	md3dImmediateContext->OMSetDepthStencilState(RenderStates::PlanetDSS,255);
+#endif
 	if ( height > outerRadius )
 		activeTech = Effects::DisplacementMapFX->PlanetFromSpaceTech;
 	else
@@ -324,7 +334,7 @@ void Renderer::DrawScene()
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(mEarthIndexCount, mEarthIndexOffset, mEarthVertexOffset);
 	}
-	
+#if RENDER_FULL_SCENE
 	// DRAW THE CLOUDS
 	Effects::CloudsFX->SetEyePosW(control.get_Camera().GetPosition());
 	Effects::CloudsFX->SetPlanetPosW(control.get_earthPosW());
@@ -434,7 +444,7 @@ void Renderer::DrawScene()
 		activeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(mSkyIndexCount, mSkyIndexOffset, mSkyVertexOffset);
     }
-
+#endif
 	ReleaseCOM(mIB_test);
 	
 	// restore default states
@@ -446,19 +456,26 @@ void Renderer::DrawScene()
 
 void Renderer::BuildGeometryBuffers()
 {
+	int totalVerts = 0;
+	
 	earth = Ellipsoid(control.get_earthRadius(), control.get_earthRadius(), 6356.752f);
 	earth.generateMeshes( 5 );
+	std::vector<Object::Vertex> earthVerts = earth.getVertices();
+	totalVerts += earthVerts.size();
 	
+#if RENDER_FULL_SCENE
 	sky = Ellipsoid(control.get_earthRadius() + control.get_skyAltitude(), control.get_earthRadius() + control.get_skyAltitude(), 6356.752f + control.get_skyAltitude());
 	sky.generateMeshes( 7 );
+	std::vector<Object::Vertex> skyVerts = sky.getVertices();
+	totalVerts += skyVerts.size();
 	
 	clouds = Ellipsoid(control.get_earthRadius(), control.get_earthRadius(), 6356.752f);
 	clouds.generateMeshes( 5 );
-	
-	std::vector<Object::Vertex> earthVerts = earth.getVertices();
-	std::vector<Object::Vertex> skyVerts = sky.getVertices();
 	std::vector<Object::Vertex> cloudsVerts = clouds.getVertices();
-	std::vector<Vertex::PosNormalTexTan> vertices( earthVerts.size() + skyVerts.size() + cloudsVerts.size() );
+	totalVerts += cloudsVerts.size();
+#endif
+	
+	std::vector<Vertex::PosNormalTexTan> vertices( totalVerts );
 	
 	// Cache the vertex offsets to each object in the concatenated vertex buffer.
 	mEarthVertexOffset      = 0;
@@ -472,6 +489,7 @@ void Renderer::BuildGeometryBuffers()
 		vertices[k].TangentU	= earthVerts[i].TangentU.toXMFloat3();
 	}
 	
+#if RENDER_FULL_SCENE
 	mSkyVertexOffset = k;
 
 	for(size_t i = 0; i < skyVerts.size(); ++i, ++k)
@@ -493,7 +511,7 @@ void Renderer::BuildGeometryBuffers()
 		vertices[k].Tex			= cloudsVerts[i].TexC.toXMFloat2();
 		vertices[k].TangentU	= cloudsVerts[i].TangentU.toXMFloat3();
 	}
-	
+#endif
 	
     D3D11_BUFFER_DESC vbd;
     vbd.Usage = D3D11_USAGE_IMMUTABLE;

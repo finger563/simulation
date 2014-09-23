@@ -145,19 +145,20 @@ DomainOut DS_fromSpace(PatchTess patchTess,
 {
 	DomainOut dout;
 	
-	// Interpolate patch attributes to generated vertices.
-	float3 geo0,geo1,geo2;
-	geo0 = tri[0].Geodetic;
-	geo1 = tri[1].Geodetic;
-	geo2 = tri[2].Geodetic;
-		
+	// Interpolate patch attributes to generated vertices.		
 	dout.Geodetic = bary.x*tri[0].Geodetic + bary.y*tri[1].Geodetic + bary.z*tri[2].Geodetic;
 
-	[flatten] if ( abs(geo0.y) == PI / 2.0 || abs(geo1.y) == PI / 2.0 || abs(geo2.y) == PI / 2.0 ) {
-		dout.NormalW = bary.x*tri[0].NormalW + bary.y*tri[1].NormalW + bary.z*tri[2].NormalW;
-		normalize(dout.NormalW);
-		dout.Geodetic = normalToGeo( dout.NormalW );
+#if 1
+	if ( abs(tri[0].Geodetic.y) == PI / 2.0 ) {
+		dout.Geodetic.x = bary.y*tri[1].Geodetic.x + bary.z*tri[2].Geodetic.x;
 	}
+	if ( abs(tri[1].Geodetic.y) == PI / 2.0 ) {
+		dout.Geodetic.x = bary.x*tri[0].Geodetic.x + bary.z*tri[2].Geodetic.x;
+	}
+	if ( abs(tri[2].Geodetic.y) == PI / 2.0 ) {
+		dout.Geodetic.x = bary.x*tri[0].Geodetic.x + bary.y*tri[1].Geodetic.x;
+	}
+#endif
 
 	dout.PosW = mul(float4(geoToSurface(dout.Geodetic), 1.0f), gWorld).xyz;
 	dout.NormalW  = mul(geoToNormal(dout.Geodetic), (float3x3)gWorldInvTranspose);
@@ -242,6 +243,18 @@ DomainOut DS_fromAtmo(PatchTess patchTess,
 	
 	// Interpolate patch attributes to generated vertices.
 	dout.Geodetic = bary.x*tri[0].Geodetic + bary.y*tri[1].Geodetic + bary.z*tri[2].Geodetic;
+		
+#if 1
+	if ( abs(tri[0].Geodetic.y) == PI / 2.0 ) {
+		dout.Geodetic.x = bary.y*tri[1].Geodetic.x + bary.z*tri[2].Geodetic.x;
+	}
+	if ( abs(tri[1].Geodetic.y) == PI / 2.0 ) {
+		dout.Geodetic.x = bary.x*tri[0].Geodetic.x + bary.z*tri[2].Geodetic.x;
+	}
+	if ( abs(tri[2].Geodetic.y) == PI / 2.0 ) {
+		dout.Geodetic.x = bary.x*tri[0].Geodetic.x + bary.y*tri[1].Geodetic.x;
+	}
+#endif
 
 	dout.PosW = mul(float4(geoToSurface(dout.Geodetic), 1.0f), gWorld).xyz;
 	dout.NormalW  = mul(geoToNormal(dout.Geodetic), (float3x3)gWorldInvTranspose);

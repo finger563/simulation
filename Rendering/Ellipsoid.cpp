@@ -149,17 +149,25 @@ void Ellipsoid::generateMeshes( int qtDepth ) {
 
 	verts[10] = Vertex();
 	verts[10].Geodetic = Vector3D( 0, PI / 2.0 , 0 );
-	verts[10].Position = Vector3D( 0, radius.y, 0 );
-	verts[10].Normal = Vector3D( 0, 1, 0 );
-	verts[10].TexC = Vector2D( 0, 0 );
-	verts[10].TangentU = Vector3D( 1, 0, 0 );;
+	//verts[10].Position = Vector3D( 0, radius.y, 0 );
+	//verts[10].Normal = Vector3D( 0, 1, 0 );
+	//verts[10].TexC = Vector2D( 0, 0 );
+	//verts[10].TangentU = Vector3D( 1, 0, 0 );
+	verts[10].Position = geodeticToLocal( verts[10].Geodetic );
+	verts[10].Normal = geodeticToNormal( verts[10].Geodetic );
+	verts[10].TexC = geodeticToTexCoord( verts[10].Geodetic );
+	verts[10].TangentU = surfaceTangent( verts[10].Normal );
 
 	verts[11] = Vertex();
 	verts[11].Geodetic = Vector3D( 0, - PI / 2.0 , 0 );
-	verts[11].Position = Vector3D( 0, - radius.y, 0 );
-	verts[11].Normal = Vector3D( 0, -1, 0 );
-	verts[11].TexC = Vector2D( 0, 1 );
-	verts[11].TangentU = Vector3D( -1, 0, 0 );
+	//verts[11].Position = Vector3D( 0, - radius.y, 0 );
+	//verts[11].Normal = Vector3D( 0, -1, 0 );
+	//verts[11].TexC = Vector2D( 1, 1 );
+	//verts[11].TangentU = Vector3D( -1, 0, 0 );
+	verts[11].Position = geodeticToLocal( verts[11].Geodetic );
+	verts[11].Normal = geodeticToNormal( verts[11].Geodetic );
+	verts[11].TexC = geodeticToTexCoord( verts[11].Geodetic );
+	verts[11].TangentU = surfaceTangent( verts[11].Normal );
  
 	//
 	// Create the indices.
@@ -286,11 +294,13 @@ void Ellipsoid::subdivideEquilateralTriangle( QuadTreeNode* node ) {
 	newVerts[1] = midpoint( Vertices[ind[2]], Vertices[ind[1]] );	// midRight
 	newVerts[2] = midpoint( Vertices[ind[0]], Vertices[ind[2]] );	// midBottom
 
+	if ( abs(Vertices[ind[1]].Geodetic.latitude) == PI / 2.0 ) {
+		int test = 1;
+	}
+
 	if ( (Vertices[ind[0]].Geodetic.latitude < Vertices[ind[1]].Geodetic.latitude && Vertices[ind[0]].Geodetic.latitude > 0) || // not upside down triangle in north pole
 		 (Vertices[ind[0]].Geodetic.latitude > Vertices[ind[1]].Geodetic.latitude && Vertices[ind[0]].Geodetic.latitude < 0) ) { // not upside down triangle in south pole
-		if ( fmod( Vertices[ind[0]].Geodetic.longitude, PI / 2.0 ) != 0 ) {
-		}
-		else {
+		if ( fmod( Vertices[ind[0]].Geodetic.longitude, PI / 2.0 ) == 0 ) {
 			newVerts[0].Geodetic.latitude = ( Vertices[ind[0]].Geodetic.latitude - Vertices[ind[1]].Geodetic.latitude ) / 2.0 + Vertices[ind[1]].Geodetic.latitude;
 			newVerts[0].Geodetic.longitude = Vertices[ind[0]].Geodetic.longitude;
 			newVerts[0].Position = geodeticToLocal( newVerts[0].Geodetic );
@@ -299,9 +309,7 @@ void Ellipsoid::subdivideEquilateralTriangle( QuadTreeNode* node ) {
 			newVerts[0].TangentU = surfaceTangent( newVerts[0].Normal );
 		}
 	
-		if ( fmod( Vertices[ind[2]].Geodetic.longitude, PI / 2.0 ) != 0 ) {
-		}
-		else {
+		if ( fmod( Vertices[ind[2]].Geodetic.longitude, PI / 2.0 ) == 0 ) {
 			newVerts[1].Geodetic.latitude = ( Vertices[ind[1]].Geodetic.latitude - Vertices[ind[2]].Geodetic.latitude ) / 2.0 + Vertices[ind[2]].Geodetic.latitude;
 			newVerts[1].Geodetic.longitude = Vertices[ind[2]].Geodetic.longitude;
 			newVerts[1].Position = geodeticToLocal( newVerts[1].Geodetic );
