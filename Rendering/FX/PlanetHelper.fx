@@ -9,6 +9,8 @@ const float fInvScaleDepth = 4.0;
 
 static const float PI = 3.14159265358f;
 
+static const float3 radius2 = float3( 6378.140f*6378.140f, 6356.752f* 6356.752f , 6378.140f*6378.140f );
+
 struct VertexIn
 {
 	float3 PosL     : POSITION0;
@@ -105,8 +107,6 @@ float3 geoToNormal( float3 geo )
 	return normalize(n);
 }
 
-static const float3 radius2 = float3( 6378.140f*6378.140f, 6356.752f* 6356.752f , 6378.140f*6378.140f );
-
 float3 geoToSurface( float3 geo )
 {
 	float3 n = geoToNormal( geo );
@@ -120,6 +120,23 @@ float3 geoToSurface( float3 geo )
 	return float3( k.x / gamma + geo.z * n.x,
 					 k.y / gamma + geo.z * n.y,
 					 k.z / gamma + geo.z * n.z );
+}
+
+float3 surfaceNormal( float3 surf ) {
+	return normalize(float3( surf.x / radius2.x,
+		surf.y / radius2.y,
+		surf.z / radius2.z));
+}
+
+float3 normalToGeo( float3 normal ) {
+	return float3( atan( normal.z / normal.x ),
+		asin( normal.y ),
+		0);
+}
+
+float3 surfaceToGeo( float3 surf) {
+	float3 n = surfaceNormal( surf );
+	return normalToGeo( n );
 }
 
 // The scale equation calculated by Vernier's Graphical Analysis

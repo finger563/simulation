@@ -146,7 +146,18 @@ DomainOut DS_fromSpace(PatchTess patchTess,
 	DomainOut dout;
 	
 	// Interpolate patch attributes to generated vertices.
+	float3 geo0,geo1,geo2;
+	geo0 = tri[0].Geodetic;
+	geo1 = tri[1].Geodetic;
+	geo2 = tri[2].Geodetic;
+		
 	dout.Geodetic = bary.x*tri[0].Geodetic + bary.y*tri[1].Geodetic + bary.z*tri[2].Geodetic;
+
+	[flatten] if ( abs(geo0.y) == PI / 2.0 || abs(geo1.y) == PI / 2.0 || abs(geo2.y) == PI / 2.0 ) {
+		dout.NormalW = bary.x*tri[0].NormalW + bary.y*tri[1].NormalW + bary.z*tri[2].NormalW;
+		normalize(dout.NormalW);
+		dout.Geodetic = normalToGeo( dout.NormalW );
+	}
 
 	dout.PosW = mul(float4(geoToSurface(dout.Geodetic), 1.0f), gWorld).xyz;
 	dout.NormalW  = mul(geoToNormal(dout.Geodetic), (float3x3)gWorldInvTranspose);
