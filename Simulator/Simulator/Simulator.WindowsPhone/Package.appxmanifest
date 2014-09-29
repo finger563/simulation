@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
 
-  <Identity Name="b128014b-597e-4166-b625-be865eb0eedb"
+  <Identity Name="58a309e7-aefe-4862-a61b-703d82a30509"
             Publisher="CN=finge_000"
             Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="b128014b-597e-4166-b625-be865eb0eedb" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="58a309e7-aefe-4862-a61b-703d82a30509" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>Renderer.WindowsPhone</DisplayName>
+    <DisplayName>Simulator.WindowsPhone</DisplayName>
     <PublisherDisplayName>finge_000</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -25,12 +25,12 @@
   <Applications>
     <Application Id="App"
         Executable="$targetnametoken$.exe"
-        EntryPoint="Renderer_WindowsPhone.App">
+        EntryPoint="Simulator_WindowsPhone.App">
         <m3:VisualElements
-            DisplayName="Renderer.WindowsPhone"
+            DisplayName="Simulator.WindowsPhone"
             Square150x150Logo="Assets\Logo.png"
             Square44x44Logo="Assets\SmallLogo.png"
-            Description="Renderer.WindowsPhone"
+            Description="Simulator.WindowsPhone"
             ForegroundText="light"
             BackgroundColor="transparent">
             <m3:DefaultTile Wide310x150Logo="Assets\WideLogo.png" Square71x71Logo="Assets\Square71x71Logo.png"/>

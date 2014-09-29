@@ -1,15 +1,15 @@
 ﻿#include "pch.h"
-#include "RendererMain.h"
-#include "Common\DirectXHelper.h"
+#include "SimulatorMain.h"
+#include "Renderer\Common\DirectXHelper.h"
 
-using namespace Renderer;
+using namespace Simulator;
 
 using namespace Windows::Foundation;
 using namespace Windows::System::Threading;
 using namespace Concurrency;
 
 // Loads and initializes application assets when the application is loaded.
-RendererMain::RendererMain(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
+SimulatorMain::SimulatorMain(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
 	m_deviceResources(deviceResources)
 {
 	// Register to be notified if the Device is lost or recreated
@@ -28,21 +28,21 @@ RendererMain::RendererMain(const std::shared_ptr<DX::DeviceResources>& deviceRes
 	*/
 }
 
-RendererMain::~RendererMain()
+SimulatorMain::~SimulatorMain()
 {
 	// Deregister device notification
 	m_deviceResources->RegisterDeviceNotify(nullptr);
 }
 
 // Updates application state when the window size changes (e.g. device orientation change)
-void RendererMain::CreateWindowSizeDependentResources() 
+void SimulatorMain::CreateWindowSizeDependentResources() 
 {
 	// TODO: Replace this with the size-dependent initialization of your app's content.
 	m_sceneRenderer->CreateWindowSizeDependentResources();
 }
 
 // Updates the application state once per frame.
-void RendererMain::Update() 
+void SimulatorMain::Update() 
 {
 	// Update scene objects.
 	m_timer.Tick([&]()
@@ -55,7 +55,7 @@ void RendererMain::Update()
 
 // Renders the current frame according to the current application state.
 // Returns true if the frame was rendered and is ready to be displayed.
-bool RendererMain::Render() 
+bool SimulatorMain::Render() 
 {
 	// Don't try to render anything before the first Update.
 	if (m_timer.GetFrameCount() == 0)
@@ -86,14 +86,14 @@ bool RendererMain::Render()
 }
 
 // Notifies renderers that device resources need to be released.
-void RendererMain::OnDeviceLost()
+void SimulatorMain::OnDeviceLost()
 {
 	m_sceneRenderer->ReleaseDeviceDependentResources();
 	m_fpsTextRenderer->ReleaseDeviceDependentResources();
 }
 
 // Notifies renderers that device resources may now be recreated.
-void RendererMain::OnDeviceRestored()
+void SimulatorMain::OnDeviceRestored()
 {
 	m_sceneRenderer->CreateDeviceDependentResources();
 	m_fpsTextRenderer->CreateDeviceDependentResources();

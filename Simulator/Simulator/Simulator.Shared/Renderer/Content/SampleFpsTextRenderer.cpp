@@ -1,9 +1,8 @@
 ﻿#include "pch.h"
 #include "SampleFpsTextRenderer.h"
+#include "..\Common\DirectXHelper.h"
 
-#include "Common/DirectXHelper.h"
-
-using namespace Renderer;
+using namespace Simulator;
 
 // Initializes D2D resources used for text rendering.
 SampleFpsTextRenderer::SampleFpsTextRenderer(const std::shared_ptr<DX::DeviceResources>& deviceResources) : 

@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{c092596a-8533-4a2a-9551-cb85443a51a3}</ItemsProjectGuid>
+    <ItemsRootNamespace>Simulator</ItemsRootNamespace>
+    <ItemsProjectName>Simulator.Shared</ItemsProjectName>
+    <SharedGUID>d25d7a13-f0f1-4401-838b-e4751f894c61</SharedGUID>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Base\Math\Vector.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Common\DeviceResources.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Content\Sample3DSceneRenderer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Content\SampleFpsTextRenderer.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)app.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)app.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Math\Matrix.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Math\Vector.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Time\StepTimer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Common\DeviceResources.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Common\DirectXHelper.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Content\Sample3DSceneRenderer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Content\SampleFpsTextRenderer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Content\ShaderStructures.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)SimulatorMain.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)SimulatorMain.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)pch.h" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Content\SamplePixelShader.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Content\SampleVertexShader.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
+  </ItemGroup>
+</Project>

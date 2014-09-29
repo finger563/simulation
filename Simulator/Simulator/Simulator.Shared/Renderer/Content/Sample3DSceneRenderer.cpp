@@ -3,7 +3,7 @@
 
 #include "..\Common\DirectXHelper.h"
 
-using namespace Renderer;
+using namespace Simulator;
 
 using namespace DirectX;
 using namespace Windows::Foundation;

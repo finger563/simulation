@@ -2,9 +2,9 @@
 
 #include "..\Common\DeviceResources.h"
 #include "ShaderStructures.h"
-#include "..\Common\StepTimer.h"
+#include "..\..\Base\Time\StepTimer.h"
 
-namespace Renderer
+namespace Simulator
 {
 	// This sample renderer instantiates a basic rendering pipeline.
 	class Sample3DSceneRenderer

@@ -3,7 +3,7 @@
 
 #include <ppltasks.h>
 
-using namespace Renderer;
+using namespace Simulator;
 
 using namespace concurrency;
 using namespace Windows::ApplicationModel;
@@ -93,7 +93,7 @@ void App::Load(Platform::String^ entryPoint)
 {
 	if (m_main == nullptr)
 	{
-		m_main = std::unique_ptr<RendererMain>(new RendererMain(m_deviceResources));
+		m_main = std::unique_ptr<SimulatorMain>(new SimulatorMain(m_deviceResources));
 	}
 }
 

@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)app.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)SimulatorMain.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)pch.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Time\StepTimer.h">
+      <Filter>Base\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Content\Sample3DSceneRenderer.h">
+      <Filter>Renderer\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Content\SampleFpsTextRenderer.h">
+      <Filter>Renderer\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Content\ShaderStructures.h">
+      <Filter>Renderer\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Common\DeviceResources.h">
+      <Filter>Renderer\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Common\DirectXHelper.h">
+      <Filter>Renderer\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Math\Vector.h">
+      <Filter>Base\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Math\Matrix.h">
+      <Filter>Base\Math</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)app.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)SimulatorMain.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Content\Sample3DSceneRenderer.cpp">
+      <Filter>Renderer\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Content\SampleFpsTextRenderer.cpp">
+      <Filter>Renderer\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Common\DeviceResources.cpp">
+      <Filter>Renderer\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Base\Math\Vector.cpp">
+      <Filter>Base\Math</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Base">
+      <UniqueIdentifier>{15ae087d-41a0-4796-aeaf-a55a241c4edb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{c10b1bc5-7c7b-46e6-bb97-b0f7262f1675}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics">
+      <UniqueIdentifier>{09b770a2-ad88-4dee-89d0-427fa3313755}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{3b046fb6-71cf-4b01-9afc-a519e1882211}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{a0d6fbcb-9eff-4f79-841d-088ae996dd77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\Math">
+      <UniqueIdentifier>{e2c449cc-f4f8-4e35-98f1-c8bdb9aeeff9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\Memory">
+      <UniqueIdentifier>{3c54382e-2070-4f08-af71-fb4f1feb08f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\Objects">
+      <UniqueIdentifier>{74ebb8c4-704e-4188-ba33-ab226c2a9de2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\Time">
+      <UniqueIdentifier>{751c4f80-156c-4538-a071-cfd5b980ed24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Common">
+      <UniqueIdentifier>{81034ff5-286b-4d1e-8b6e-0dbab95e83d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Content">
+      <UniqueIdentifier>{8dae5c48-f44b-4114-93d8-28d80e66550a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Content\SamplePixelShader.hlsl">
+      <Filter>Renderer\Content</Filter>
+    </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Content\SampleVertexShader.hlsl">
+      <Filter>Renderer\Content</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>

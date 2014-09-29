@@ -27,8 +27,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{fe0ddade-788c-4ed8-813d-fa90ccb80adb}</ProjectGuid>
-    <RootNamespace>Renderer</RootNamespace>
+    <ProjectGuid>{d0b49d43-3e20-4db4-a4d2-62638663ad1b}</ProjectGuid>
+    <RootNamespace>Simulator</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>
     <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
     <AppContainerApplication>true</AppContainerApplication>
@@ -96,11 +96,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     
-    <PackageCertificateKeyFile>Renderer.Windows_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>Simulator.Windows_TemporaryKey.pfx</PackageCertificateKeyFile>
     
   </PropertyGroup>
 
-  <Import Project="..\Renderer.Shared\Renderer.Shared.vcxitems" Label="Shared" />
+  <Import Project="..\Simulator.Shared\Simulator.Shared.vcxitems" Label="Shared" />
   
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
@@ -199,7 +199,7 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     
-    <None Include="Renderer.Windows_TemporaryKey.pfx" />
+    <None Include="Simulator.Windows_TemporaryKey.pfx" />
     
   </ItemGroup>
   

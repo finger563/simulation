@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-namespace Renderer
+namespace Simulator
 {
 	// Constant buffer used to send MVP matrices to the vertex shader.
 	struct ModelViewProjectionConstantBuffer

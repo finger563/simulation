@@ -1,10 +1,10 @@
 ﻿#pragma once
 
 #include "pch.h"
-#include "Common\DeviceResources.h"
-#include "RendererMain.h"
+#include "Renderer\Common\DeviceResources.h"
+#include "SimulatorMain.h"
 
-namespace Renderer
+namespace Simulator
 {
 	// Main entry point for our app. Connects the app with the Windows shell and handles application lifecycle events.
 	ref class App sealed : public Windows::ApplicationModel::Core::IFrameworkView
@@ -41,7 +41,7 @@ protected:
 
 	private:
 		std::shared_ptr<DX::DeviceResources> m_deviceResources;
-		std::unique_ptr<RendererMain> m_main;
+		std::unique_ptr<SimulatorMain> m_main;
 		bool m_windowClosed;
 		bool m_windowVisible;
 	};

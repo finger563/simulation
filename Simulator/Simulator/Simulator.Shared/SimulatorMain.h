@@ -1,18 +1,18 @@
 ﻿#pragma once
 
-#include "Common\StepTimer.h"
-#include "Common\DeviceResources.h"
-#include "Content\Sample3DSceneRenderer.h"
-#include "Content\SampleFpsTextRenderer.h"
+#include "Base\Time\StepTimer.h"
+#include "Renderer\Common\DeviceResources.h"
+#include "Renderer\Content\Sample3DSceneRenderer.h"
+#include "Renderer\Content\SampleFpsTextRenderer.h"
 
 // Renders Direct2D and 3D content on the screen.
-namespace Renderer
+namespace Simulator
 {
-	class RendererMain : public DX::IDeviceNotify
+	class SimulatorMain : public DX::IDeviceNotify
 	{
 	public:
-		RendererMain(const std::shared_ptr<DX::DeviceResources>& deviceResources);
-		~RendererMain();
+		SimulatorMain(const std::shared_ptr<DX::DeviceResources>& deviceResources);
+		~SimulatorMain();
 		void CreateWindowSizeDependentResources();
 		void Update();
 		bool Render();

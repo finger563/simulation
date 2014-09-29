@@ -2,9 +2,9 @@
 
 #include <string>
 #include "..\Common\DeviceResources.h"
-#include "..\Common\StepTimer.h"
+#include "..\..\Base\Time\StepTimer.h"
 
-namespace Renderer
+namespace Simulator
 {
 	// Renders the current FPS value in the bottom right corner of the screen using Direct2D and DirectWrite.
 	class SampleFpsTextRenderer

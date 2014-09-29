@@ -21,8 +21,8 @@
   </ItemGroup>
 
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{c2655543-422f-485c-ae0f-71920fb89a37}</ProjectGuid>
-    <RootNamespace>Renderer</RootNamespace>
+    <ProjectGuid>{fdb46f21-876e-4c04-86be-7032e7d7f5cb}</ProjectGuid>
+    <RootNamespace>Simulator</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>
     <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
     <AppContainerApplication>true</AppContainerApplication>
@@ -62,7 +62,7 @@
     <Import Project="$(VSINSTALLDIR)\Common7\IDE\Extensions\Microsoft\VsGraphics\ShaderGraphContentTask.props" />
   </ImportGroup>
 
-  <Import Project="..\Renderer.Shared\Renderer.Shared.vcxitems" Label="Shared" />
+  <Import Project="..\Simulator.Shared\Simulator.Shared.vcxitems" Label="Shared" />
 
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />

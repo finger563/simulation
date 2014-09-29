@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
 
-  <Identity Name="8403322f-90f6-490b-98b9-e129aed900a7"
+  <Identity Name="180a597b-6ab7-4c52-b06e-94049ceb784b"
             Publisher="CN=finge_000"
             Version="1.0.0.0" />
 
   <Properties>
-    <DisplayName>Renderer.Windows</DisplayName>
+    <DisplayName>Simulator.Windows</DisplayName>
     <PublisherDisplayName>finge_000</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -23,12 +23,12 @@
   <Applications>
     <Application Id="App"
         Executable="$targetnametoken$.exe"
-        EntryPoint="Renderer_Windows.App">
+        EntryPoint="Simulator_Windows.App">
         <VisualElements
-            DisplayName="Renderer.Windows"
+            DisplayName="Simulator.Windows"
             Logo="Assets\Logo.png"
             SmallLogo="Assets\SmallLogo.png"
-            Description="Renderer.Windows"
+            Description="Simulator.Windows"
             ForegroundText="light"
             BackgroundColor="#464646">
             <DefaultTile ShowName="allLogos" />
