@@ -2,6 +2,7 @@
 #include "SampleFpsTextRenderer.h"
 #include "..\Common\DirectXHelper.h"
 
+using namespace Base;
 using namespace Simulator;
 
 // Initializes D2D resources used for text rendering.
@@ -37,7 +38,7 @@ SampleFpsTextRenderer::SampleFpsTextRenderer(const std::shared_ptr<DX::DeviceRes
 }
 
 // Updates the text to be displayed.
-void SampleFpsTextRenderer::Update(DX::StepTimer const& timer)
+void SampleFpsTextRenderer::Update(Time::StepTimer const& timer)
 {
 	// Update display text.
 	uint32 fps = timer.GetFramesPerSecond();

@@ -14,7 +14,7 @@ namespace Simulator
 		void CreateDeviceDependentResources();
 		void CreateWindowSizeDependentResources();
 		void ReleaseDeviceDependentResources();
-		void Update(DX::StepTimer const& timer);
+		void Update(Base::Time::StepTimer const& timer);
 		void Render();
 		void StartTracking();
 		void TrackingUpdate(float positionX);

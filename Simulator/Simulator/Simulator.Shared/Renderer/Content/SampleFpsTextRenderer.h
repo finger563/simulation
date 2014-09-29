@@ -13,7 +13,7 @@ namespace Simulator
 		SampleFpsTextRenderer(const std::shared_ptr<DX::DeviceResources>& deviceResources);
 		void CreateDeviceDependentResources();
 		void ReleaseDeviceDependentResources();
-		void Update(DX::StepTimer const& timer);
+		void Update(Base::Time::StepTimer const& timer);
 		void Render();
 
 		std::wstring                                    m_text;

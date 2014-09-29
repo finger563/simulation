@@ -30,6 +30,6 @@ namespace Simulator
 		std::unique_ptr<SampleFpsTextRenderer> m_fpsTextRenderer;
 
 		// Rendering loop timer.
-		DX::StepTimer m_timer;
+		Base::Time::StepTimer m_timer;
 	};
 }
