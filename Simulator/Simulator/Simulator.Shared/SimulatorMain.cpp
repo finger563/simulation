@@ -2,11 +2,22 @@
 #include "SimulatorMain.h"
 #include "Renderer\Common\DirectXHelper.h"
 
+#include "Base\Math\Matrix.h"
+
 using namespace Simulator;
 
 using namespace Windows::Foundation;
 using namespace Windows::System::Threading;
 using namespace Concurrency;
+
+Base::Math::Mat3x3d
+mymat = Base::Math::Mat3x3d({ 1.0, 0.0, 0.0,
+0.0, 1.0, 0.0,
+0.0, 0.0, 1.0 });
+
+Base::Math::Vec3d myvec3 = Base::Math::Vec3d({ 1.0, 2.0 });
+Base::Math::Vec4d myvec4 = Base::Math::Vec4d({ 1.0, 2.0 });
+Base::Math::Vector<5, double> newVec = Base::Math::Vector<5, double>(myvec4, 10.0);
 
 // Loads and initializes application assets when the application is loaded.
 SimulatorMain::SimulatorMain(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
@@ -80,6 +91,16 @@ bool SimulatorMain::Render()
 	// Render the scene objects.
 	// TODO: Replace this with your app's content rendering functions.
 	m_sceneRenderer->Render();
+
+	m_fpsTextRenderer->m_text = L"";
+	for (int i = 0; i < 9; i++)
+	{
+		m_fpsTextRenderer->m_text += L" " + std::to_wstring(mymat.vals[i]);
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		m_fpsTextRenderer->m_text += L" " + std::to_wstring(newVec.vals[i]);
+	}
 	m_fpsTextRenderer->Render();
 
 	return true;

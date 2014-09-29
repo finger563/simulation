@@ -10,23 +10,10 @@ namespace Base
 			T vals[numElements];
 		
 			Vector<numElements, T>();
-			Vector<numElements, T>(Vector<numElements - 1, T>, T val) {}
 
-			template<typename... Ts>
-			Vector<numElements, T>(Ts&... Args)
-			{
-				if (sizeof...(Args) <= numElements)
-				{
-					va_list _args;
-					va_start(_args, Args);
-					for (int i = 0; i < numElements; i++)
-					{
-						vals[i] = va_arg(_args,T);
-					}
-				}
-			}
+			Vector<numElements, T>(Vector<numElements - 1, T>& other, T val);
 
-			~Vector();
+			Vector<numElements, T>(std::initializer_list<T> l);
 
 			T dot(const Vector<numElements, T>& other);
 		};
@@ -40,3 +27,5 @@ namespace Base
 		typedef Vector< 4, double > Vec4d;
 	}
 }
+
+#include "Vector.cpp" // needed to get the definitions of the functions

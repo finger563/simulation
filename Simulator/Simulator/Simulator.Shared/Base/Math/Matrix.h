@@ -1,5 +1,8 @@
 #pragma once
 
+#include <type_traits>
+#include "Vector.h"
+
 namespace Base
 {
 	namespace Math
@@ -11,19 +14,19 @@ namespace Base
 			T vals[numRows*numRows];
 			int numVals = numRows * numRows;
 
-			template<typename... Ts>
-			Matrix<numRows, T>(Ts&... Args)
-			{
-				if (sizeof...(Args) == numVals)
-				{
-					va_list _args;
-					va_start(_args, Args);
-					for (int i = 0; i < numVals; i++)
-					{
-						vals[i] = va_arg(_args, T);
-					}
-				}
-			}
+			Matrix<numRows, T>();
+
+			Matrix<numRows, T>(std::initializer_list<T> l);
 		};
+
+		typedef Matrix< 2, float > Mat2x2f;
+		typedef Matrix< 3, float > Mat3x3f;
+		typedef Matrix< 4, float > Mat4x4f;
+
+		typedef Matrix< 2, double > Mat2x2d;
+		typedef Matrix< 3, double > Mat3x3d;
+		typedef Matrix< 4, double > Mat4x4d;
 	}
 }
+
+#include "Matrix.cpp" // needed to get the definitions of the functions

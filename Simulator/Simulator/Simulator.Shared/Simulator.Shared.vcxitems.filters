@@ -42,9 +42,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Common\DeviceResources.cpp">
       <Filter>Renderer\Common</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Base\Math\Vector.cpp">
-      <Filter>Base\Math</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Base">
