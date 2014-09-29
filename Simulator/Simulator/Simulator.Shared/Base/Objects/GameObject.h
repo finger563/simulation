@@ -17,8 +17,8 @@ namespace Base
 		template<typename T>
 		struct BoundingSphere
 		{
-			Vector<3,T>	position;
-			T			radius;
+			Vector<3, T>	position;
+			T				radius;
 		};
 
 		template<typename T>
@@ -27,7 +27,7 @@ namespace Base
 			Vector<3,T> corner1, corner2;
 		};
 
-		template<typenameT>
+		template<typename T>
 		struct OOBB	// object-oriented bounding box
 		{
 			Plane<T> planes[6];

@@ -3,6 +3,7 @@
 #include "Renderer\Common\DirectXHelper.h"
 
 #include "Base\Math\Matrix.h"
+#include "Base\Objects\GameObject.h"
 
 using namespace Simulator;
 
