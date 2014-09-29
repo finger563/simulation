@@ -10,14 +10,15 @@ using namespace Windows::Foundation;
 using namespace Windows::System::Threading;
 using namespace Concurrency;
 
-Base::Math::Mat3x3d
-mymat = Base::Math::Mat3x3d({ 1.0, 0.0, 0.0,
+using namespace Base::Math;
+
+Mat3x3d mymat = Mat3x3d({ 1.0, 0.0, 0.0,
 0.0, 1.0, 0.0,
 0.0, 0.0, 1.0 });
 
-Base::Math::Vec3d myvec3 = Base::Math::Vec3d({ 1.0, 2.0 });
-Base::Math::Vec4d myvec4 = Base::Math::Vec4d({ 1.0, 2.0 });
-Base::Math::Vector<5, double> newVec = Base::Math::Vector<5, double>(myvec4, 10.0);
+Vec3d myvec3 = Vec3d({ 1.0, 2.0 });
+Vec4d myvec4 = Vec4d({ 1.0, 2.0 });
+Vector<5, double> newVec = Vector<5, double>(myvec4, 10.0);
 
 // Loads and initializes application assets when the application is loaded.
 SimulatorMain::SimulatorMain(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
