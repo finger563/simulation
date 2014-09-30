@@ -47,10 +47,14 @@ Ellipsoid<T>::geodeticToNormal(Vector<3, T> geo)
 
 template<typename T>
 Vector<3, T>
-Ellipsoid<T>::normalToTangent(Vector<3, T> geo)
+Ellipsoid<T>::normalToTangent(Vector<3, T> normal)
 {
-	// NEED TO GET ROTATION WORKED OUT
-	Vector<3, T> tangent;
+	Vector<3, T> tangent({
+		normal[0],
+		0,
+		normal[2]
+	});
+	// NEED TO GET ROTATION WORKED OUT: ROTATE THIS BY PI/2 Y-AXIS
 	return tangent.Normalized();
 }
 
