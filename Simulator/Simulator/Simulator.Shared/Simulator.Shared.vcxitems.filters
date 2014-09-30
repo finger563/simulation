@@ -40,14 +40,14 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Objects\BoundingObjects.h">
       <Filter>Base\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Engine\Engine.h">
-      <Filter>Engine</Filter>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Physics\Physics.h">
+      <Filter>Physics</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Input\Input.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)Input\Input.h">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Physics\Physics.h">
-      <Filter>Physics</Filter>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Engine\Engine.h">
+      <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
