@@ -4,6 +4,9 @@
 
 #include "Base\Math\Matrix.h"
 #include "Base\Objects\GameObject.h"
+#include "Base\Data Structures\QuadTree.h"
+#include "Base\Objects\BoundingObjects.h"
+#include "Base\Objects\Ellipsoid.h"
 
 using namespace Simulator;
 
@@ -101,7 +104,17 @@ bool SimulatorMain::Render()
 	}
 	for (int i = 0; i < 5; i++)
 	{
-		m_fpsTextRenderer->m_text += L" " + std::to_wstring(newVec.vals[i]);
+		m_fpsTextRenderer->m_text += L" " + std::to_wstring(newVec[i]);
+	}
+	Vec3d geo({
+		M_PI_2,
+		M_PI_4,
+		0
+	});
+	Vec2d tex = Base::Objects::Ellipsoid<double>::geodeticToTexture(geo);
+	for (int i = 0; i < 2; i++)
+	{
+		m_fpsTextRenderer->m_text += L" " + std::to_wstring(tex[i]);
 	}
 	m_fpsTextRenderer->Render();
 

@@ -1,5 +1,8 @@
 ﻿#pragma once
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include <wrl.h>
 #include <wrl/client.h>
 #include <d3d11_2.h>
