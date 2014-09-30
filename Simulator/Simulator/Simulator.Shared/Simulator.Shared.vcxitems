@@ -22,6 +22,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)app.h" />
     <ClCompile Include="$(MSBuildThisFileDirectory)app.cpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Data Structures\QuadTree.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Subsystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Engine\Engine.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Input\Input.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Math\Matrix.h" />
@@ -36,6 +37,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Content\Sample3DSceneRenderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Content\SampleFpsTextRenderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Content\ShaderStructures.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Renderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)SimulatorMain.h" />
     <ClCompile Include="$(MSBuildThisFileDirectory)SimulatorMain.cpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)pch.h" />

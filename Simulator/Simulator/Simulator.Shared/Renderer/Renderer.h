@@ -2,14 +2,14 @@
 
 #include "Base\Subsystem.h"
 
-namespace Physics
+namespace Renderer
 {
-	class Physics : public Base::Subsystem
+	class Renderer : public Base::Subsystem
 	{
 	private:
 	public:
-		Physics();
-		~Physics();
+		Renderer();
+		~Renderer();
 
 		bool StartUp();
 		void Update();
