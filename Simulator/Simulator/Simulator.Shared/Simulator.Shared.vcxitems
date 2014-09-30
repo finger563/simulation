@@ -14,13 +14,18 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Base\Data Structures\QuadTree.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Base\Objects\Ellipsoid.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Common\DeviceResources.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Content\Sample3DSceneRenderer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Content\SampleFpsTextRenderer.cpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)app.h" />
     <ClCompile Include="$(MSBuildThisFileDirectory)app.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Data Structures\QuadTree.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Math\Matrix.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Math\Vector.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Objects\BoundingObjects.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Objects\Ellipsoid.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Objects\GameObject.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Time\StepTimer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Common\DeviceResources.h" />

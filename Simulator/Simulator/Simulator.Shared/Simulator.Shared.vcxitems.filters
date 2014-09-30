@@ -31,6 +31,15 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Objects\GameObject.h">
       <Filter>Base\Objects</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Objects\Ellipsoid.h">
+      <Filter>Base\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Data Structures\QuadTree.h">
+      <Filter>Base\Data Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Objects\BoundingObjects.h">
+      <Filter>Base\Objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)app.cpp" />
@@ -44,6 +53,12 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Common\DeviceResources.cpp">
       <Filter>Renderer\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Base\Data Structures\QuadTree.cpp">
+      <Filter>Base\Data Structures</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Base\Objects\Ellipsoid.cpp">
+      <Filter>Base\Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +94,9 @@
     </Filter>
     <Filter Include="Renderer\Content">
       <UniqueIdentifier>{8dae5c48-f44b-4114-93d8-28d80e66550a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\Data Structures">
+      <UniqueIdentifier>{b27885b8-059d-49da-9721-cf122139b6be}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

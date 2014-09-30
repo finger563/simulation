@@ -35,10 +35,16 @@ Vector<numElements, T>::Vector(std::initializer_list<T> l)
 	}
 }
 
+template <int numElements, typename T>
+T& Vector<numElements, T>::operator[](const int i)
+{
+	return vals[i];
+}
+
 // MATH OPERATIONS
 
 template <int numElements, typename T>
-T Vector<numElements,T>::dot(const Vector<numElements,T>& other)
+T Vector<numElements,T>::Dot(const Vector<numElements,T>& other)
 {
 	T retVal = 0;
 	for (int i = 0; i < numElements; i++)
@@ -46,4 +52,27 @@ T Vector<numElements,T>::dot(const Vector<numElements,T>& other)
 		retVal += vals[i] * other.vals[i];
 	}
 	return retVal;
+}
+
+template <int numElements, typename T>
+T Vector<numElements, T>::Length()
+{
+	T square = 0;
+	for (int i = 0; i < numElements; i++)
+	{
+		square += vals[i] * vals[i];
+	}
+	return sqrt(square);
+}
+
+template <int numElements, typename T>
+Vector<numElements, T> Vector<numElements, T>::Normalized()
+{
+	Vector<numElements, T> retVec = *this;
+	T len = retVec.Length();
+	for (int i = 0; i < numElements; i++)
+	{
+		retVec.vals[i] = retVec.vals[i] / len;
+	}
+	return retVec;
 }

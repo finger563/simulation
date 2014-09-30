@@ -15,7 +15,13 @@ namespace Base
 
 			Vector<numElements, T>(std::initializer_list<T> l);
 
-			T dot(const Vector<numElements, T>& other);
+			T& operator[](const int i);
+
+			T Dot(const Vector<numElements, T>& other);
+
+			T Length();
+
+			Vector<numElements, T> Normalized();
 		};
 
 		typedef Vector< 2, float > Vec2f;
