@@ -1,14 +1,10 @@
 #pragma once
+#include "pch.h"
 
 namespace Base
 {
-	class Subsystem
+	interface ISubsystem
 	{
-	protected:
-	public:
-		Subsystem();
-		~Subsystem();
-
 		virtual bool StartUp() = 0;
 		virtual void Update() = 0;
 		virtual bool ShutDown() = 0;

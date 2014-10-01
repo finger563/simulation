@@ -10,15 +10,7 @@
 
 namespace Engine
 {
-	class Engine
+	interface Engine : public Base::ISubsystem
 	{
-	private:
-	public:
-		Engine();
-		~Engine();
-
-		bool StartUp();
-		void Update();
-		bool ShutDown();
 	};
 }

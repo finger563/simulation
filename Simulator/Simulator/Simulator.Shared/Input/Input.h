@@ -1,16 +1,15 @@
 #pragma once
 
+#include "Base\Subsystem.h"
+
 namespace Input
 {
-	class Input : public Base::Subsystem
+	interface Input : public Base::ISubsystem
 	{
-	private:
-	public:
-		Input();
-		~Input();
+		template<typename T>
+		virtual void SetInputTypes(T InputTypes) = 0;
 
-		bool StartUp();
-		void Update();
-		bool ShutDown();
+		template<typename T>
+		virtual void GetInputUpdates(std::vector<T>& Inputs) = 0;
 	};
 }

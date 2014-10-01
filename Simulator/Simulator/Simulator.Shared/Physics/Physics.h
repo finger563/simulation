@@ -4,15 +4,12 @@
 
 namespace Physics
 {
-	class Physics : public Base::Subsystem
+	interface Physics : public Base::ISubsystem
 	{
-	private:
-	public:
-		Physics();
-		~Physics();
+		template<typename T>
+		virtual void SetSimulationType(T SimulationType) = 0;
 
-		bool StartUp();
-		void Update();
-		bool ShutDown();
+		template<typename T>
+		virtual void StepObjects(std::vector<T>& Objects) = 0;
 	};
 }
