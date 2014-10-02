@@ -1,26 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)app.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)SimulatorMain.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)pch.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Time\StepTimer.h">
       <Filter>Base\Time</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Content\Sample3DSceneRenderer.h">
-      <Filter>Renderer\Content</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Content\SampleFpsTextRenderer.h">
-      <Filter>Renderer\Content</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Content\ShaderStructures.h">
-      <Filter>Renderer\Content</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Common\DeviceResources.h">
-      <Filter>Renderer\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Common\DirectXHelper.h">
-      <Filter>Renderer\Common</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Math\Vector.h">
       <Filter>Base\Math</Filter>
@@ -57,24 +40,14 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)app.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)SimulatorMain.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Content\Sample3DSceneRenderer.cpp">
-      <Filter>Renderer\Content</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Content\SampleFpsTextRenderer.cpp">
-      <Filter>Renderer\Content</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Common\DeviceResources.cpp">
-      <Filter>Renderer\Common</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)Base\Data Structures\QuadTree.cpp">
       <Filter>Base\Data Structures</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)Base\Objects\Ellipsoid.cpp">
       <Filter>Base\Objects</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Simulator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Base">
@@ -104,22 +77,8 @@
     <Filter Include="Base\Time">
       <UniqueIdentifier>{751c4f80-156c-4538-a071-cfd5b980ed24}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Renderer\Common">
-      <UniqueIdentifier>{81034ff5-286b-4d1e-8b6e-0dbab95e83d4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Renderer\Content">
-      <UniqueIdentifier>{8dae5c48-f44b-4114-93d8-28d80e66550a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Base\Data Structures">
       <UniqueIdentifier>{b27885b8-059d-49da-9721-cf122139b6be}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Content\SamplePixelShader.hlsl">
-      <Filter>Renderer\Content</Filter>
-    </FxCompile>
-    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Content\SampleVertexShader.hlsl">
-      <Filter>Renderer\Content</Filter>
-    </FxCompile>
   </ItemGroup>
 </Project>
