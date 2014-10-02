@@ -51,6 +51,8 @@ public:
 	virtual void Load(String^ EntryPoint) {}
 	virtual void Run() 
 	{
+		mEngine.Initialize(); // INITIALIZE THE SIMULATOR
+
 		// Obtain a pointer to the window
 		CoreWindow^ Window = CoreWindow::GetForCurrentThread();
 
@@ -58,12 +60,8 @@ public:
 		{
 			Window->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
 
-			// Run the simulator code here (e.g. engine -> (input, physics, renderer))
+			mEngine.Update();		// HANDLES EVERYTHING FOR THE SIMULATOR
 		}
-
-		// NO LONGER USING THIS; DOESN'T WORK WELL FOR PROGRAMS WHICH MUST RUN REGARDLESS OF USER INPUT
-		//// Run ProcessEvents() to dispatch events
-		//Window->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessUntilQuit);
 	}
 	virtual void Uninitialize() {}
 

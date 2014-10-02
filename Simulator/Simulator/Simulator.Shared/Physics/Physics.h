@@ -4,24 +4,22 @@
 
 namespace Physics
 {
-	template<typename T>
 	interface IPhysics : public Base::ISubsystem
 	{
-		virtual void SetSimulationType(T SimulationType) = 0;
+		virtual void SetSimulationType() = 0;
 
-		virtual void StepObjects(std::vector<T>& Objects, T DeltaT) = 0;
+		virtual void StepObjects() = 0;
 	};
 
-	template<typename T>
-	class Physics : public IPhysics<T>
+	class Physics : public IPhysics
 	{
 	public:
 		bool Initialize();
 		void Update();
 		bool UnInitialize();
 
-		void SetSimulationType(T SimulationType);
+		void SetSimulationType();
 
-		void StepObjects(std::vector<T>& Objects, T DeltaT);
+		void StepObjects();
 	};
 }

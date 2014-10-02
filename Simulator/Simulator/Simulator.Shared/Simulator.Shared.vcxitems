@@ -17,6 +17,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Base\Data Structures\QuadTree.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Base\Objects\Ellipsoid.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)App.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Engine\Engine.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Input\Input.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Physics\Physics.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Renderer.cpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Data Structures\QuadTree.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Subsystem.h" />

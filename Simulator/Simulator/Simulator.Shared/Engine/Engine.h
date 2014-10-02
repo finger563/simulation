@@ -11,11 +11,15 @@
 
 namespace Engine
 {
-	class Engine
+	class Engine : public Base::ISubsystem
 	{
+	private:
+		Physics::Physics	mPhysics;
+		Input::Input		mInput;
+		Renderer::Renderer	mRenderer;
 	public:
-		Physics::Physics<double>	mPhysics;
-		Input::Input<double>		mInput;
-		Renderer::Renderer<double>	mRenderer;
+		bool Initialize();
+		void Update();
+		bool UnInitialize();
 	};
 }

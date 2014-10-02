@@ -10,41 +10,22 @@ using namespace DirectX;
 
 namespace Renderer
 {
-	template<typename T>
 	interface IRenderer : public Base::ISubsystem
 	{
-		virtual void SetCamera(
-			Vector<3,T> Position, 
-			Vector<4,T> Orientation, 
-			T NearPlane, 
-			T FarPlane, 
-			T FOV, 
-			T AspectRatio
-			) = 0;
-
-		virtual void SetObjects(std::vector<T>& Objects) = 0;
-
 		virtual void Render() = 0;
 	};
 
-	template<typename T>
-	class Renderer : public IRenderer<T>
+	class Renderer : public IRenderer
 	{
+	private:
+		ComPtr<ID3D11Device2> dev;				// Dx11.2 device interface
+		ComPtr<ID3D11DeviceContext2> devcon;	// Dx11.2 device context interface
+		ComPtr<IDXGISwapChain1> swapchain;		// Dx11.2 swap chain interface
+		ComPtr<ID3D11RenderTargetView> rendertarget;	// Dx11.2 render target interface
 	public:
 		bool Initialize();
 		void Update();
 		bool UnInitialize();
-
-		void SetCamera(
-			Vector<3, T> Position,
-			Vector<4, T> Orientation,
-			T NearPlane,
-			T FarPlane,
-			T FOV,
-			T AspectRatio
-			);
-
-		void SetObjects(std::vector<T>& Objects);
 
 		void Render();
 	};
