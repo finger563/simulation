@@ -38,7 +38,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Subsystem.h">
       <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Simulator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />
@@ -49,7 +48,9 @@
       <Filter>Base\Objects</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)App.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Simulator.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Renderer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Base">

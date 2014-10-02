@@ -1,5 +1,6 @@
 // Include the precompiled headers
 #include "pch.h"
+#include "Engine\Engine.h"
 
 // Use some common namespaces to simplify the code
 using namespace Windows::ApplicationModel;
@@ -16,6 +17,8 @@ using namespace Platform;
 // the class definition for the core "framework" of our app
 ref class App sealed : public IFrameworkView
 {
+	bool WindowClosed;
+	Engine::Engine mEngine;
 public:
 	// some functions called by Windows
 	virtual void Initialize(CoreApplicationView^ AppView)
@@ -23,9 +26,19 @@ public:
 		// set the OnActivated function to handle to Activated "event"
 		AppView->Activated += ref new TypedEventHandler
 			<CoreApplicationView^, IActivatedEventArgs^>(this, &App::OnActivated);
+
+		CoreApplication::Suspending += ref new EventHandler
+			<SuspendingEventArgs^>(this, &App::Suspending);
+		CoreApplication::Resuming += ref new EventHandler
+			<Object^>(this, &App::Resuming);
+
+		WindowClosed = false;
 	}
 	virtual void SetWindow(CoreWindow^ Window) 
 	{
+		Window->Closed += ref new TypedEventHandler
+			<CoreWindow^, CoreWindowEventArgs^>(this, &App::Closed);
+
 		Window->PointerPressed += ref new TypedEventHandler
 			<CoreWindow^, PointerEventArgs^>(this, &App::PointerPressed);
 		Window->KeyDown += ref new TypedEventHandler
@@ -41,8 +54,16 @@ public:
 		// Obtain a pointer to the window
 		CoreWindow^ Window = CoreWindow::GetForCurrentThread();
 
-		// Run ProcessEvents() to dispatch events
-		Window->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessUntilQuit);
+		while (!WindowClosed)
+		{
+			Window->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
+
+			// Run the simulator code here (e.g. engine -> (input, physics, renderer))
+		}
+
+		// NO LONGER USING THIS; DOESN'T WORK WELL FOR PROGRAMS WHICH MUST RUN REGARDLESS OF USER INPUT
+		//// Run ProcessEvents() to dispatch events
+		//Window->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessUntilQuit);
 	}
 	virtual void Uninitialize() {}
 
@@ -51,6 +72,15 @@ public:
 	{
 		CoreWindow^ Window = CoreWindow::GetForCurrentThread();
 		Window->Activate();
+	}
+
+	void Suspending(Object^ Sender, SuspendingEventArgs^ Args) {} // Save the state of the simulator here
+
+	void Resuming(Object^ Sender, Object^ Args) {} // Load the state of the simulator here
+
+	void Closed(CoreWindow^ Sender, CoreWindowEventArgs^ Args)
+	{
+		WindowClosed = true;
 	}
 
 	void KeyDown(CoreWindow^ Window, KeyEventArgs^ Args)

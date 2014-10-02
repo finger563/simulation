@@ -7,10 +7,15 @@
 
 #include "Physics\Physics.h"
 #include "Input\Input.h"
+#include "Renderer\Renderer.h"
 
 namespace Engine
 {
-	interface Engine : public Base::ISubsystem
+	class Engine
 	{
+	public:
+		Physics::Physics<double>	mPhysics;
+		Input::Input<double>		mInput;
+		Renderer::Renderer<double>	mRenderer;
 	};
 }

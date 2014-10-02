@@ -17,7 +17,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Base\Data Structures\QuadTree.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Base\Objects\Ellipsoid.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)App.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)Simulator.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Renderer.cpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Data Structures\QuadTree.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Subsystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Engine\Engine.h" />
@@ -34,7 +34,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Simulator.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectCapability Include="SourceItemsFromImports" />
