@@ -38,6 +38,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Subsystem.h">
       <Filter>Base</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Simulator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />
@@ -47,6 +48,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Base\Objects\Ellipsoid.cpp">
       <Filter>Base\Objects</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)App.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Simulator.cpp" />
   </ItemGroup>
   <ItemGroup>
