@@ -4,22 +4,22 @@
 
 namespace Physics
 {
-	interface IPhysics : public Base::ISubsystem
+	interface class IPhysics : public Base::ISubsystem
 	{
 		virtual void SetSimulationType() = 0;
 
 		virtual void StepObjects() = 0;
 	};
 
-	class Physics : public IPhysics
+	ref class Physics : public IPhysics
 	{
 	public:
-		bool Initialize();
-		void Update();
-		bool UnInitialize();
+		virtual bool Initialize();
+		virtual void Update();
+		virtual bool UnInitialize();
 
-		void SetSimulationType();
+		virtual void SetSimulationType();
 
-		void StepObjects();
+		virtual void StepObjects();
 	};
 }

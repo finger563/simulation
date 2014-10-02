@@ -15,22 +15,22 @@ namespace Input
 		TREE
 	};
 	
-	interface IInput : public Base::ISubsystem
+	interface class IInput : public Base::ISubsystem
 	{
 		virtual void SetInputTypes() = 0;
 
 		virtual void GetInputUpdates() = 0;
 	};
 
-	class Input : public IInput
+	ref class Input : public IInput
 	{
 	public:
-		bool Initialize();
-		void Update();
-		bool UnInitialize();
+		virtual bool Initialize();
+		virtual void Update();
+		virtual bool UnInitialize();
 
-		void SetInputTypes();
+		virtual void SetInputTypes();
 
-		void GetInputUpdates();
+		virtual void GetInputUpdates();
 	};
 }

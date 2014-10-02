@@ -3,7 +3,7 @@
 
 namespace Base
 {
-	interface ISubsystem
+	interface class ISubsystem
 	{
 		virtual bool Initialize() = 0;
 		virtual void Update() = 0;

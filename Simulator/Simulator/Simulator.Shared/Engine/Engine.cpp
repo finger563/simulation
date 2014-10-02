@@ -6,7 +6,9 @@ namespace Engine
 
 	bool Engine::Initialize()
 	{
-		mRenderer.Initialize();
+		mRenderer = ref new Renderer::Renderer();
+
+		mRenderer->Initialize();
 		return true;
 	}
 
@@ -17,8 +19,8 @@ namespace Engine
 
 	void Engine::Update()
 	{
-		mRenderer.Update();
-		mRenderer.Render();
+		mRenderer->Update();
+		mRenderer->Render();
 		return;
 	}
 }

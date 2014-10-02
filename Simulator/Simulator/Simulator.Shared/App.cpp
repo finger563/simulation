@@ -18,7 +18,7 @@ using namespace Platform;
 ref class App sealed : public IFrameworkView
 {
 	bool WindowClosed;
-	Engine::Engine mEngine;
+	Engine::Engine^ mEngine;
 public:
 	// some functions called by Windows
 	virtual void Initialize(CoreApplicationView^ AppView)
@@ -33,6 +33,8 @@ public:
 			<Object^>(this, &App::Resuming);
 
 		WindowClosed = false;
+
+		mEngine = ref new Engine::Engine();
 	}
 	virtual void SetWindow(CoreWindow^ Window) 
 	{
@@ -51,7 +53,7 @@ public:
 	virtual void Load(String^ EntryPoint) {}
 	virtual void Run() 
 	{
-		mEngine.Initialize(); // INITIALIZE THE SIMULATOR
+		mEngine->Initialize(); // INITIALIZE THE SIMULATOR
 
 		// Obtain a pointer to the window
 		CoreWindow^ Window = CoreWindow::GetForCurrentThread();
@@ -60,7 +62,7 @@ public:
 		{
 			Window->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
 
-			mEngine.Update();		// HANDLES EVERYTHING FOR THE SIMULATOR
+			mEngine->Update();		// HANDLES EVERYTHING FOR THE SIMULATOR
 		}
 	}
 	virtual void Uninitialize() {}
