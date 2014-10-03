@@ -9,7 +9,7 @@ using namespace Base::Math;
 template <int numElements, typename T>
 Vector<numElements, T>::Vector()
 {
-	memset(vals, static_cast<T>(0), sizeof(T) * numElements);
+	memset(vals, 0, sizeof(T) * numElements);
 }
 
 template <int numElements, typename T>

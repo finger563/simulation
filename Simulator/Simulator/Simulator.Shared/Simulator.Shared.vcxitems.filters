@@ -38,6 +38,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Subsystem.h">
       <Filter>Base</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Vertex.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />
@@ -92,5 +95,25 @@
     <Filter Include="Base\Data Structures">
       <UniqueIdentifier>{b27885b8-059d-49da-9721-cf122139b6be}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Renderer\Shaders">
+      <UniqueIdentifier>{c0b2d4ef-aaf8-407e-a59a-c738b5526551}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Shaders\Vertex">
+      <UniqueIdentifier>{6c1813e2-7d1c-4e7e-842a-592e2a9d9554}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Shaders\Pixel">
+      <UniqueIdentifier>{16e09570-2f71-4c2d-a45c-88926d56a477}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Shaders\Geometry">
+      <UniqueIdentifier>{9333d71f-a8c3-44b8-bc59-0eb86a4c7ac1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Vertex\VertexShader.hlsl">
+      <Filter>Renderer\Shaders\Vertex</Filter>
+    </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Pixel\PixelShader.hlsl">
+      <Filter>Renderer\Shaders\Pixel</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

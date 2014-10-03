@@ -4,7 +4,6 @@
 #include <cmath>
 
 #include "GameObject.h"
-#include "..\Data Structures\QuadTree.h"
 
 namespace Base
 {
@@ -15,8 +14,6 @@ namespace Base
 		{
 			Vector<3, T>						radius;				// c is towards poles and is therefore y dimension
 			Vector<3, T>						radiusSquared;		// c is towards poles and is therefore y dimension
-			DataStructures::QuadTreeNode<T>*	rootQT;				// QuadTree for surface mesh : DO WE WANT TO PUT THIS HERE?
-											// OR HOW TO SEPARATE THIS ELLIPSOID CLASS FROM RENDERER SPECIFIC STUFF?
 
 			Ellipsoid();
 			Ellipsoid(T a, T b, T c);	// set the three radii
