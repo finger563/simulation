@@ -32,6 +32,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Objects\GameObject.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Physics\Physics.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Time\StepTimer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Camera\Camera.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Renderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)pch.h" />
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">

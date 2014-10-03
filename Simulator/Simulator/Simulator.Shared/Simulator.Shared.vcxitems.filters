@@ -41,6 +41,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Vertex.h">
       <Filter>Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Camera\Camera.h">
+      <Filter>Renderer\Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />
@@ -106,6 +109,9 @@
     </Filter>
     <Filter Include="Renderer\Shaders\Geometry">
       <UniqueIdentifier>{9333d71f-a8c3-44b8-bc59-0eb86a4c7ac1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Camera">
+      <UniqueIdentifier>{ab618380-504a-49ef-a972-31d88e6d3c8e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
