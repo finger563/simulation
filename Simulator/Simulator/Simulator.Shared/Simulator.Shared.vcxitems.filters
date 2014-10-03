@@ -44,6 +44,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Camera\Camera.h">
       <Filter>Renderer\Camera</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Shaders\ConstantBuffers.h">
+      <Filter>Renderer\Shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />
@@ -115,10 +118,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Vertex\VertexShader.hlsl">
+    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Vertex\VertexShader.hlsl">
       <Filter>Renderer\Shaders\Vertex</Filter>
     </FxCompile>
-    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Pixel\PixelShader.hlsl">
+    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Pixel\PixelShader.hlsl">
       <Filter>Renderer\Shaders\Pixel</Filter>
     </FxCompile>
   </ItemGroup>

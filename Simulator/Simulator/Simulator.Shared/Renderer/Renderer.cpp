@@ -2,6 +2,8 @@
 #include "Renderer.h"
 #include <fstream>
 
+#include "Shaders\ConstantBuffers.h"
+
 namespace Renderer
 {
 	bool Renderer::Initialize()
@@ -108,6 +110,15 @@ namespace Renderer
 		// set the primitive topology
 		devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+		// create an OFFSET struct and fill it out
+		TestCBuffer testCB;
+		testCB.x = 0.5f;
+		testCB.y = 0.2f;
+		testCB.z = 0.7f;
+
+		// set the new values for the constant buffer
+		devcon->UpdateSubresource(constantbuffer.Get(), 0, 0, &testCB, 0, 0);
+
 		// draw 3 vertices, starting from vertex 0
 		devcon->Draw(3, 0);
 
@@ -118,9 +129,9 @@ namespace Renderer
 	void Renderer::InitGraphics()
 	{
 		BaseVertex<float> OurVertices[] = {
-			BaseVertex<float>({ 0.0f, 0.5f, 0.0f }),
-			BaseVertex<float>({ 0.45f, -0.5f, 0.0f }),
-			BaseVertex<float>({ -0.45f, -0.5f, 0.0f })
+			{ 0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f },
+			{ 0.45f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f },
+			{ -0.45f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f }
 		};
 
 		D3D11_BUFFER_DESC bd = { 0 };
@@ -150,11 +161,23 @@ namespace Renderer
 		D3D11_INPUT_ELEMENT_DESC ied[] =
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
 
 		// create the input layout
 		dev->CreateInputLayout(ied, ARRAYSIZE(ied), VSFile->Data, VSFile->Length, &inputlayout);
 		devcon->IASetInputLayout(inputlayout.Get());
+
+		// NEEDS TO BE MOVED TO SHADER SUBSYSTEM
+		D3D11_BUFFER_DESC bd = { 0 };
+
+		bd.Usage = D3D11_USAGE_DEFAULT;
+		bd.ByteWidth = 16;		// must always be a multiple of 16 bytes
+		bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+		dev->CreateBuffer(&bd, nullptr, &constantbuffer);
+		devcon->VSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());
+		// WOULD NEED TO USE PSSetConstantBuffers IF THE PS NEEDED IT
 	}
 
 	// this function loads a file into an Array^

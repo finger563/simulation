@@ -31,8 +31,10 @@ namespace Renderer
 		ComPtr<ID3D11Buffer> vertexbuffer;				// Dx11.2 GPU buffer interface
 		ComPtr<ID3D11InputLayout> inputlayout;
 
-		ComPtr<ID3D11VertexShader> vertexshader;
-		ComPtr<ID3D11PixelShader> pixelshader;
+		ComPtr<ID3D11VertexShader> vertexshader;		// should be moved to shader subsystem
+		ComPtr<ID3D11PixelShader> pixelshader;			// should be moved to shader subsystem
+
+		ComPtr<ID3D11Buffer> constantbuffer;			// one of the constant buffers : should be moved to separate (shader?) subsystem
 	public:
 		virtual bool Initialize();
 		virtual void Update();
