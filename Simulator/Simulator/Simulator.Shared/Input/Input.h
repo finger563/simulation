@@ -2,6 +2,8 @@
 
 #include "Base\Subsystem.h"
 
+using namespace Windows::UI::Core;
+
 namespace Input
 {
 	enum InputTypes
@@ -24,6 +26,7 @@ namespace Input
 
 	ref class Input : public IInput
 	{
+	private:
 	public:
 		virtual bool Initialize();
 		virtual void Update();
@@ -32,5 +35,10 @@ namespace Input
 		virtual void SetInputTypes();
 
 		virtual void GetInputUpdates();
+
+		void KeyDown(CoreWindow^ Window, KeyEventArgs^ Args);
+		void KeyUp(CoreWindow^ Window, KeyEventArgs^ Args);
+		void PointerPressed(CoreWindow^ Window, PointerEventArgs^ Args);
+		void PointerWheelChanged(CoreWindow^ Window, PointerEventArgs^ Args);
 	};
 }

@@ -11,15 +11,20 @@
 
 namespace Engine
 {
-	ref class Engine : public Base::ISubsystem
+	ref class Engine sealed : public Base::ISubsystem
 	{
 	private:
-		Physics::Physics^	mPhysics;
-		Input::Input^		mInput;
-		Renderer::Renderer^	mRenderer;
 	public:
+		Engine();
+
 		virtual bool Initialize();
 		virtual void Update();
 		virtual bool UnInitialize();
+
+		Input::Input^ GetInput();
+
+		property Physics::Physics^		mPhysics;
+		property Input::Input^			mInput;
+		property Renderer::Renderer^	mRenderer;
 	};
 }

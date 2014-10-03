@@ -16,7 +16,7 @@ namespace Physics
 
 	void Physics::Update()
 	{
-		return;
+
 	}
 
 	void Physics::SetSimulationType()

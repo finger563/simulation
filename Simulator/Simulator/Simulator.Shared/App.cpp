@@ -42,13 +42,13 @@ public:
 			<CoreWindow^, CoreWindowEventArgs^>(this, &App::Closed);
 
 		Window->PointerPressed += ref new TypedEventHandler
-			<CoreWindow^, PointerEventArgs^>(this, &App::PointerPressed);
+			<CoreWindow^, PointerEventArgs^>(mEngine->mInput, &Input::Input::PointerPressed);
 		Window->KeyDown += ref new TypedEventHandler
-			<CoreWindow^, KeyEventArgs^>(this, &App::KeyDown);
+			<CoreWindow^, KeyEventArgs^>(mEngine->mInput, &Input::Input::KeyDown);
 		Window->KeyUp += ref new TypedEventHandler
-			<CoreWindow^, KeyEventArgs^>(this, &App::KeyUp);
+			<CoreWindow^, KeyEventArgs^>(mEngine->mInput, &Input::Input::KeyUp);
 		Window->PointerWheelChanged += ref new TypedEventHandler
-			<CoreWindow^, PointerEventArgs^>(this, &App::PointerWheelChanged);
+			<CoreWindow^, PointerEventArgs^>(mEngine->mInput, &Input::Input::PointerWheelChanged);
 	}
 	virtual void Load(String^ EntryPoint) {}
 	virtual void Run() 
@@ -81,34 +81,6 @@ public:
 	void Closed(CoreWindow^ Sender, CoreWindowEventArgs^ Args)
 	{
 		WindowClosed = true;
-	}
-
-	void KeyDown(CoreWindow^ Window, KeyEventArgs^ Args)
-	{
-		if (Args->VirtualKey == VirtualKey::A ||
-			Args->VirtualKey == VirtualKey::S ||
-			Args->VirtualKey == VirtualKey::W ||
-			Args->VirtualKey == VirtualKey::D)
-		{
-			// do something..
-			MessageDialog Dialog("You pressed a key!", "Notice!");
-			Dialog.ShowAsync();
-		}
-	}
-
-	void KeyUp(CoreWindow^ Window, KeyEventArgs^ Args)
-	{
-	}
-
-	void PointerPressed(CoreWindow^ Window, PointerEventArgs^ Args)
-	{
-		MessageDialog Dialog("Thank you for clicking me!", "Notice!");
-		Dialog.ShowAsync();
-	}
-
-	void PointerWheelChanged(CoreWindow^ Window, PointerEventArgs^ Args)
-	{
-		int Wheel = Args->CurrentPoint->Properties->MouseWheelDelta; // increments of 120; + is up, - is down
 	}
 };
 
