@@ -49,6 +49,8 @@ public:
 			<CoreWindow^, KeyEventArgs^>(mEngine->mInput, &Input::Input::KeyUp);
 		Window->PointerWheelChanged += ref new TypedEventHandler
 			<CoreWindow^, PointerEventArgs^>(mEngine->mInput, &Input::Input::PointerWheelChanged);
+
+		mEngine->SetWindowProperties(Window->Bounds.Width, Window->Bounds.Height);
 	}
 	virtual void Load(String^ EntryPoint) {}
 	virtual void Run() 

@@ -120,20 +120,9 @@ namespace Renderer
 		XMMATRIX matRotateY = XMMatrixRotationY(time);
 		XMMATRIX matRotateZ = XMMatrixRotationZ(XMConvertToRadians(0.0f));
 		XMMATRIX matWorld = matRotateX * matRotateY * matRotateZ * matScale * matTranslate;
+		// END OF STUFF THAT SHOULD BE PART OF OBJECT'S CODE
 
-		// THIS SHOULD BE PUT INTO AN INITIALIZER SOMEWHERE AND HAVE A SETTER/GETTER METHOD TO THE ENGINE METHINKS
-		camera.Position = Vector<3, double>({ 5.0, 0.0, -5.0 });
-		camera.Aspect = 1680.0 / 1050.0;
-		camera.FoVY = 45.0;
-		camera.NearPlane = 1.0;
-		camera.FarPlane = 1000.0;
-
-		// THIS SHOULD BE PART OF THE CAMERA CODE I THINK
-		XMVECTOR vecCamPosition = XMVectorSet((float)camera.Position[0], (float)camera.Position[1], (float)camera.Position[2], 0);
-		// need to get these two from camera's orientation quaternion
-		XMVECTOR vecCamLookAt = XMVectorSet(0,0,0,0);
-		XMVECTOR vecCamUp = XMVectorSet(0,1,0,0);
-		XMMATRIX matView = XMMatrixLookAtLH(vecCamPosition, vecCamLookAt, vecCamUp);
+		XMMATRIX matView = XMMatrixLookAtLH(camera.PositionXM(),camera.LookAtXM(), camera.UpXM());
 
 		XMMATRIX matProjection = XMMatrixPerspectiveFovLH(
 			XMConvertToRadians((float)camera.FoVY),
@@ -151,6 +140,23 @@ namespace Renderer
 
 		swapchain->Present(1, 0);	// swap the back buffer and the front buffer
 		return;
+	}
+
+	void Renderer::SetCamera(
+		Vector<3, double> position,
+		Vector<4, double> orientation,
+		double FoVY,
+		double AspectRatio,
+		double NearPlane,
+		double FarPlane
+		)
+	{
+		camera.Position = position;
+		camera.Orientation = orientation;
+		camera.FoVY = FoVY;
+		camera.Aspect = AspectRatio;
+		camera.NearPlane = NearPlane;
+		camera.FarPlane = FarPlane;
 	}
 
 	void Renderer::InitGraphics()

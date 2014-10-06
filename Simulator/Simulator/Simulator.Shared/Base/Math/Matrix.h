@@ -10,7 +10,6 @@ namespace Base
 		template < int numRows, typename T >
 		struct Matrix
 		{
-		public:
 			T vals[numRows*numRows];
 			int numVals = numRows * numRows;
 

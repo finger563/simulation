@@ -13,8 +13,16 @@ namespace Engine
 {
 	ref class Engine sealed : public Base::ISubsystem
 	{
+		struct WindowProperties
+		{
+			double Width;
+			double Height;
+		};
+	internal: // only used by code in this project
+		void SetWindowProperties(double width, double height);
 	private:
 		std::vector<Base::Objects::GameObject<double>*> gameObjects;
+		WindowProperties windowProperties;
 	public:
 		Engine();
 
