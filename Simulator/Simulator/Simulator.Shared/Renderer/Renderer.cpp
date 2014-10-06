@@ -8,6 +8,8 @@ namespace Renderer
 {
 	bool Renderer::Initialize()
 	{
+		time = 0.0f;
+
 		// Define temporary pointers to a device and a device context
 		ComPtr<ID3D11Device> dev11;
 		ComPtr<ID3D11DeviceContext> devcon11;
@@ -112,7 +114,7 @@ namespace Renderer
 
 	void Renderer::Update()
 	{
-		return;
+		time += 0.1f;
 	}
 
 	void Renderer::Render()
@@ -132,23 +134,23 @@ namespace Renderer
 		UINT stride = sizeof(BaseVertex<float>);
 		UINT offset = 0;
 		devcon->IASetVertexBuffers(0, 1, vertexbuffer.GetAddressOf(), &stride, &offset);
+		// set the index buffer
+		devcon->IASetIndexBuffer(indexbuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
 
 		// set the primitive topology
 		devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		// THIS SHOULD BE PART OF THE OBJECT'S CODE I THINK? OR A HELPER FUNCTION USING OBJECT PROPERTIES
-		static float time = 0;
-		time += 0.1f;
-
-		XMMATRIX matTranslate = XMMatrixTranslation(0.0f, 0.0f, sinf(time/2.0f)*3.0f);
+		XMMATRIX matTranslate = XMMatrixTranslation(0.0f, 0.0f, sinf(time / 2.0f)*3.0f);
 		XMMATRIX matScale = XMMatrixScaling(1.0f, 1.0f, 1.0f);
-		XMMATRIX matRotateX = XMMatrixRotationX(XMConvertToRadians(0.0f));
+		XMMATRIX matRotateX = XMMatrixRotationX(time / 5.0f);
 		XMMATRIX matRotateY = XMMatrixRotationY(time);
 		XMMATRIX matRotateZ = XMMatrixRotationZ(XMConvertToRadians(0.0f));
 		XMMATRIX matWorld = matRotateX * matRotateY * matRotateZ * matScale * matTranslate;
+		//XMMATRIX matWorld = matRotateY;
 		// END OF STUFF THAT SHOULD BE PART OF OBJECT'S CODE
 
-		XMMATRIX matView = XMMatrixLookAtLH(camera.PositionXM(),camera.LookAtXM(), camera.UpXM());
+		XMMATRIX matView = XMMatrixLookAtLH(camera.PositionXM(), camera.LookAtXM(), camera.UpXM());
 
 		XMMATRIX matProjection = XMMatrixPerspectiveFovLH(
 			XMConvertToRadians((float)camera.FoVY),
@@ -162,7 +164,7 @@ namespace Renderer
 		devcon->UpdateSubresource(constantbuffer.Get(), 0, 0, &matFinal, 0, 0);
 
 		// draw 3 vertices, starting from vertex 0
-		devcon->Draw(3, 0);
+		devcon->DrawIndexed(36, 0, 0);
 
 		swapchain->Present(1, 0);	// swap the back buffer and the front buffer
 		return;
@@ -188,18 +190,51 @@ namespace Renderer
 	void Renderer::InitGraphics()
 	{
 		BaseVertex<float> OurVertices[] = {
-			{ 0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f },
-			{ 0.45f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f },
-			{ -0.45f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f }
+				{ -1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f },    // vertex 0
+				{ 1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f },    // vertex 1
+				{ -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f },    // 2
+				{ 1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f },    // 3
+				{ -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f },    // ...
+				{ 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
+				{ -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
+				{ 1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
 		};
 		
-		D3D11_BUFFER_DESC bd = { 0 };
-		bd.ByteWidth = sizeof(BaseVertex<float>) * ARRAYSIZE(OurVertices);
-		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		// create the vertex buffer
+		D3D11_BUFFER_DESC vertexBD = { 0 };
+		vertexBD.ByteWidth = sizeof(BaseVertex<float>) * ARRAYSIZE(OurVertices);
+		vertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
-		D3D11_SUBRESOURCE_DATA srd = { OurVertices, 0, 0 };
+		D3D11_SUBRESOURCE_DATA vertexSRD = { OurVertices, 0, 0 };
 
-		dev->CreateBuffer(&bd, &srd, &vertexbuffer);
+		dev->CreateBuffer(&vertexBD, &vertexSRD, &vertexbuffer);
+		
+		short OurIndices[] =
+		{
+			0, 1, 2,    // side 1
+			2, 1, 3,
+			4, 0, 6,    // side 2
+			6, 0, 2,
+			7, 5, 6,    // side 3
+			6, 5, 4,
+			3, 1, 7,    // side 4
+			7, 1, 5,
+			4, 5, 0,    // side 5
+			0, 5, 1,
+			3, 7, 2,    // side 6
+			2, 7, 6,
+		};
+
+		// create the index buffer
+		// buffer description
+		D3D11_BUFFER_DESC indexBD = { 0 };
+		indexBD.ByteWidth = sizeof(short) * ARRAYSIZE(OurIndices);    // indices are stored in short values
+		indexBD.BindFlags = D3D11_BIND_INDEX_BUFFER;
+
+		// subresource data
+		D3D11_SUBRESOURCE_DATA indexSRD = { OurIndices, 0, 0 };
+
+		dev->CreateBuffer(&indexBD, &indexSRD, &indexbuffer);
 	}
 
 	void Renderer::InitPipeline()

@@ -33,6 +33,7 @@ namespace Renderer
 			);
 
 	private:
+		float time;
 		Camera<double> camera;
 
 		ComPtr<ID3D11Device2> dev;						// Dx11.2 device interface
@@ -43,7 +44,8 @@ namespace Renderer
 
 		ComPtr<ID3D11DepthStencilView> zbuffer;			// Dx11.2 z-buffer interface
 
-		ComPtr<ID3D11Buffer> vertexbuffer;				// Dx11.2 GPU buffer interface
+		ComPtr<ID3D11Buffer> vertexbuffer;				// Dx11.2 GPU vertex buffer interface
+		ComPtr<ID3D11Buffer> indexbuffer;				// Dx11.2 GPU index buffer interface
 		ComPtr<ID3D11InputLayout> inputlayout;
 
 		ComPtr<ID3D11VertexShader> vertexshader;		// should be moved to shader subsystem
