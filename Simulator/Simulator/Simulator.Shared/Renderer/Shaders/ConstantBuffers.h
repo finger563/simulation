@@ -2,8 +2,12 @@
 
 namespace Renderer
 {
-	struct TestCBuffer
+	struct CBuffer
 	{
-		float x, y, z;
+		XMMATRIX matWVP;
+		XMMATRIX matRotation;
+		XMVECTOR DiffuseVector;
+		XMVECTOR DiffuseColor;
+		XMVECTOR AmbientColor;
 	};
 }

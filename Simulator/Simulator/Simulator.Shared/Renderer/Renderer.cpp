@@ -160,8 +160,17 @@ namespace Renderer
 			);
 		XMMATRIX matFinal = matWorld * matView * matProjection;
 
+		CBuffer cbuffer;
+		cbuffer.matWVP = matFinal;
+		// REQUIRED FOR LIGHTING
+		cbuffer.matRotation = matRotateX * matRotateY * matRotateZ;
+		cbuffer.DiffuseVector = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
+		cbuffer.DiffuseColor = XMVectorSet(0.5f, 0.5f, 0.5f, 1.0f);
+		cbuffer.AmbientColor = XMVectorSet(0.2f, 0.2f, 0.2f, 1.0f);
+		// END REQUIRED FOR LIGHTING
+
 		// set the new values for the constant buffer
-		devcon->UpdateSubresource(constantbuffer.Get(), 0, 0, &matFinal, 0, 0);
+		devcon->UpdateSubresource(constantbuffer.Get(), 0, 0, &cbuffer, 0, 0);
 
 		// draw 3 vertices, starting from vertex 0
 		devcon->DrawIndexed(36, 0, 0);
@@ -190,14 +199,35 @@ namespace Renderer
 	void Renderer::InitGraphics()
 	{
 		BaseVertex<float> OurVertices[] = {
-				{ -1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f },    // vertex 0
-				{ 1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f },    // vertex 1
-				{ -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f },    // 2
-				{ 1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f },    // 3
-				{ -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f },    // ...
-				{ 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
-				{ -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
-				{ 1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
+				{ -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },    // side 1
+				{ 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+				{ -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+				{ 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+
+				{ -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f },    // side 2
+				{ -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f },
+				{ 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f },
+				{ 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f },
+
+				{ -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f },    // side 3
+				{ -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f },
+				{ 1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f },
+				{ 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f },
+
+				{ -1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f },    // side 4
+				{ 1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f },
+				{ -1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f },
+				{ 1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f },
+
+				{ 1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f },    // side 5
+				{ 1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f },
+				{ 1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
+				{ 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
+
+				{ -1.0f, -1.0f, -1.0f, -1.0f, 0.0f, 0.0f },    // side 6
+				{ -1.0f, -1.0f, 1.0f, -1.0f, 0.0f, 0.0f },
+				{ -1.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f },
+				{ -1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f },
 		};
 		
 		// create the vertex buffer
@@ -213,16 +243,16 @@ namespace Renderer
 		{
 			0, 1, 2,    // side 1
 			2, 1, 3,
-			4, 0, 6,    // side 2
-			6, 0, 2,
-			7, 5, 6,    // side 3
-			6, 5, 4,
-			3, 1, 7,    // side 4
-			7, 1, 5,
-			4, 5, 0,    // side 5
-			0, 5, 1,
-			3, 7, 2,    // side 6
-			2, 7, 6,
+			4, 5, 6,    // side 2
+			6, 5, 7,
+			8, 9, 10,    // side 3
+			10, 9, 11,
+			12, 13, 14,    // side 4
+			14, 13, 15,
+			16, 17, 18,    // side 5
+			18, 17, 19,
+			20, 21, 22,    // side 6
+			22, 21, 23,
 		};
 
 		// create the index buffer
@@ -255,7 +285,8 @@ namespace Renderer
 		D3D11_INPUT_ELEMENT_DESC ied[] =
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			//{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
 
 		// create the input layout
@@ -266,7 +297,7 @@ namespace Renderer
 		D3D11_BUFFER_DESC bd = { 0 };
 
 		bd.Usage = D3D11_USAGE_DEFAULT;
-		bd.ByteWidth = 64;		// must always be a multiple of 16 bytes
+		bd.ByteWidth = sizeof(CBuffer);		// must always be a multiple of 16 bytes
 		bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
 		dev->CreateBuffer(&bd, nullptr, &constantbuffer);
