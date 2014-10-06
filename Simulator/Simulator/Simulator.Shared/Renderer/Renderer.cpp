@@ -73,8 +73,31 @@ namespace Renderer
 		viewport.TopLeftY = 0;
 		viewport.Width = Window->Bounds.Width;
 		viewport.Height = Window->Bounds.Height;
+		viewport.MinDepth = 0;    // the closest an object can be on the depth buffer is 0.0
+		viewport.MaxDepth = 1;    // the farthest an object can be on the depth buffer is 1.0
 
 		devcon->RSSetViewports(1, &viewport);
+
+		// enabling Depth Buffering
+		D3D11_TEXTURE2D_DESC texd = { 0 };
+
+		texd.Width = Window->Bounds.Width;
+		texd.Height = Window->Bounds.Height;
+		texd.ArraySize = 1;
+		texd.MipLevels = 1;
+		texd.SampleDesc.Count = 1;
+		texd.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		texd.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+
+		ComPtr<ID3D11Texture2D> zbuffertexture;
+		dev->CreateTexture2D(&texd, nullptr, &zbuffertexture);
+
+		D3D11_DEPTH_STENCIL_VIEW_DESC dsvd;
+		ZeroMemory(&dsvd, sizeof(dsvd));
+
+		dsvd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+
+		dev->CreateDepthStencilView(zbuffertexture.Get(), &dsvd, &zbuffer);
 
 		InitGraphics();
 		InitPipeline();
@@ -95,8 +118,11 @@ namespace Renderer
 	void Renderer::Render()
 	{
 		// set our new render target object as the active render target
-		devcon->OMSetRenderTargets(1, rendertarget.GetAddressOf(), nullptr);
+		devcon->OMSetRenderTargets(1, rendertarget.GetAddressOf(), zbuffer.Get());
 		// can use this to set multiple render targets (number, list)
+
+		// clear the depth buffer
+		devcon->ClearDepthStencilView(zbuffer.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 		// clear the back buffer to a deep blue
 		float color[4] = { 0.0f, 0.2f, 0.4f, 1.0f };

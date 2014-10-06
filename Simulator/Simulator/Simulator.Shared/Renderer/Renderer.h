@@ -41,6 +41,8 @@ namespace Renderer
 		ComPtr<IDXGISwapChain1> swapchain;				// Dx11.2 swap chain interface
 		ComPtr<ID3D11RenderTargetView> rendertarget;	// Dx11.2 render target interface
 
+		ComPtr<ID3D11DepthStencilView> zbuffer;			// Dx11.2 z-buffer interface
+
 		ComPtr<ID3D11Buffer> vertexbuffer;				// Dx11.2 GPU buffer interface
 		ComPtr<ID3D11InputLayout> inputlayout;
 

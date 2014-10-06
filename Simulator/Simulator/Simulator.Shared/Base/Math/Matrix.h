@@ -25,7 +25,7 @@ namespace Base
 		template<typename T>
 		Matrix<4, T> MatrixRotationY(T angle);
 		template<typename T>
-		Matrix<4, T> MatrixRotationX(T angle);
+		Matrix<4, T> MatrixRotationZ(T angle);
 
 		typedef Matrix< 2, float > Mat2x2f;
 		typedef Matrix< 3, float > Mat3x3f;

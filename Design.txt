@@ -85,6 +85,23 @@ Goals:
 
 Next Steps:
 -----------
+* Finish Transition to DX11.2
+  * Uses only MSVS 2013, Windows 8.1 SDK (no need for 2010 & june 2010 sdk)
+* Modularize engine:
+  * Base
+    * Math
+    * Data Structures
+    * Objects
+    * Memory
+    * Time
+  * Input
+  * Physics
+  * Renderer
+    * Camera
+    * Shaders
+  * Engine
+  * App
+* Finish Quaternion camera & object orientation representation
 * Change earth representation to actual mesh
   * each set of triangles on the mesh should correspsond to sub textures
     * this allows us to only load textures into memory which may actually be displayed
