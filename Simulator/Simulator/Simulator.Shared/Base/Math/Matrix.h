@@ -8,7 +8,7 @@ namespace Base
 	namespace Math
 	{
 		template < int numRows, typename T >
-		struct Matrix
+		struct Matrix	// [row * col]
 		{
 			T vals[numRows*numRows];
 			int numVals = numRows * numRows;
@@ -18,10 +18,14 @@ namespace Base
 			Matrix<numRows, T>(std::initializer_list<T> l);
 
 			void ToIdentity();
-			void ToRotationX(T angle);
-			void ToRotationY(T angle);
-			void ToRotationZ(T angle);
 		};
+
+		template<typename T>
+		Matrix<4, T> MatrixRotationX(T angle);
+		template<typename T>
+		Matrix<4, T> MatrixRotationY(T angle);
+		template<typename T>
+		Matrix<4, T> MatrixRotationX(T angle);
 
 		typedef Matrix< 2, float > Mat2x2f;
 		typedef Matrix< 3, float > Mat3x3f;

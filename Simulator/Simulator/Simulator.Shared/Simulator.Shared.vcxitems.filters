@@ -47,6 +47,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Shaders\ConstantBuffers.h">
       <Filter>Renderer\Shaders</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Math\Quaternion.h">
+      <Filter>Base\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />

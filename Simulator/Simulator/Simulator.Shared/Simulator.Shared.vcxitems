@@ -23,6 +23,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Camera\Camera.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Renderer.cpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Data Structures\QuadTree.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Math\Quaternion.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Subsystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Engine\Engine.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Input\Input.h" />
