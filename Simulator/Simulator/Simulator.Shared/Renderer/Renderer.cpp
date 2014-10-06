@@ -110,14 +110,41 @@ namespace Renderer
 		// set the primitive topology
 		devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		// create an OFFSET struct and fill it out
-		TestCBuffer testCB;
-		testCB.x = 0.5f;
-		testCB.y = 0.2f;
-		testCB.z = 0.7f;
+		// THIS SHOULD BE PART OF THE OBJECT'S CODE I THINK? OR A HELPER FUNCTION USING OBJECT PROPERTIES
+		static float time = 0;
+		time += 0.1f;
+
+		XMMATRIX matTranslate = XMMatrixTranslation(0.0f, 0.0f, sinf(time/2.0f)*3.0f);
+		XMMATRIX matScale = XMMatrixScaling(1.0f, 1.0f, 1.0f);
+		XMMATRIX matRotateX = XMMatrixRotationX(XMConvertToRadians(0.0f));
+		XMMATRIX matRotateY = XMMatrixRotationY(time);
+		XMMATRIX matRotateZ = XMMatrixRotationZ(XMConvertToRadians(0.0f));
+		XMMATRIX matWorld = matRotateX * matRotateY * matRotateZ * matScale * matTranslate;
+
+		// THIS SHOULD BE PUT INTO AN INITIALIZER SOMEWHERE AND HAVE A SETTER/GETTER METHOD TO THE ENGINE METHINKS
+		camera.Position = Vector<3, double>({ 5.0, 0.0, -5.0 });
+		camera.Aspect = 1680.0 / 1050.0;
+		camera.FoVY = 45.0;
+		camera.NearPlane = 1.0;
+		camera.FarPlane = 1000.0;
+
+		// THIS SHOULD BE PART OF THE CAMERA CODE I THINK
+		XMVECTOR vecCamPosition = XMVectorSet((float)camera.Position[0], (float)camera.Position[1], (float)camera.Position[2], 0);
+		// need to get these two from camera's orientation quaternion
+		XMVECTOR vecCamLookAt = XMVectorSet(0,0,0,0);
+		XMVECTOR vecCamUp = XMVectorSet(0,1,0,0);
+		XMMATRIX matView = XMMatrixLookAtLH(vecCamPosition, vecCamLookAt, vecCamUp);
+
+		XMMATRIX matProjection = XMMatrixPerspectiveFovLH(
+			XMConvertToRadians((float)camera.FoVY),
+			(float)camera.Aspect,
+			(float)camera.NearPlane,
+			(float)camera.FarPlane
+			);
+		XMMATRIX matFinal = matWorld * matView * matProjection;
 
 		// set the new values for the constant buffer
-		devcon->UpdateSubresource(constantbuffer.Get(), 0, 0, &testCB, 0, 0);
+		devcon->UpdateSubresource(constantbuffer.Get(), 0, 0, &matFinal, 0, 0);
 
 		// draw 3 vertices, starting from vertex 0
 		devcon->Draw(3, 0);
@@ -133,7 +160,7 @@ namespace Renderer
 			{ 0.45f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f },
 			{ -0.45f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f }
 		};
-
+		
 		D3D11_BUFFER_DESC bd = { 0 };
 		bd.ByteWidth = sizeof(BaseVertex<float>) * ARRAYSIZE(OurVertices);
 		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -172,7 +199,7 @@ namespace Renderer
 		D3D11_BUFFER_DESC bd = { 0 };
 
 		bd.Usage = D3D11_USAGE_DEFAULT;
-		bd.ByteWidth = 16;		// must always be a multiple of 16 bytes
+		bd.ByteWidth = 64;		// must always be a multiple of 16 bytes
 		bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
 		dev->CreateBuffer(&bd, nullptr, &constantbuffer);

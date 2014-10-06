@@ -6,10 +6,14 @@
 namespace Renderer
 {
 	template<typename T>
-	ref class Camera
+	class Camera
 	{
 	public:
-		property Vector<3, T> Position;
-		property Vector<4, T> Orientation;
+		Vector<3, T> Position;
+		Vector<4, T> Orientation;
+		T FoVY;
+		T Aspect;
+		T NearPlane;
+		T FarPlane;
 	};
 }

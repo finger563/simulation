@@ -14,6 +14,7 @@ namespace Engine
 	ref class Engine sealed : public Base::ISubsystem
 	{
 	private:
+		std::vector<Base::Objects::GameObject<double>*> gameObjects;
 	public:
 		Engine();
 

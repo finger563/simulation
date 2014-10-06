@@ -4,6 +4,7 @@
 #include "Base\Math\Vector.h"
 #include "Base\Math\Matrix.h"
 #include "Vertex.h"
+#include "Camera\Camera.h"
 
 using namespace Microsoft::WRL;
 using namespace Windows::UI::Core;
@@ -22,6 +23,8 @@ namespace Renderer
 	ref class Renderer : public IRenderer
 	{
 	private:
+		Camera<double> camera;
+
 		ComPtr<ID3D11Device2> dev;						// Dx11.2 device interface
 		ComPtr<ID3D11DeviceContext2> devcon;			// Dx11.2 device context interface
 
