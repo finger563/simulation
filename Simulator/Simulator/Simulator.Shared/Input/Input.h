@@ -6,34 +6,21 @@ using namespace Windows::UI::Core;
 
 namespace Input
 {
-	enum InputTypes
-	{
-		DIRECTIONAL,
-		ROTATIONAL,
-		BOOLEAN,
-		SEQUENTIAL,
-		SELECTION
-	};
-
-	enum ValueTypes
-	{
-		FLOAT,
-		INT,
-		BOOL
-	};
+	enum ValueOperations { ADD, SUBTRACT, MULTIPLY, DIVIDE };
+	enum ValueTypes { FLOAT, INT, BOOL };
 
 	struct InputValue
 	{
-		InputTypes inputType;
-		ValueTypes valueType;
+		float Magnitude;
+		ValueTypes Type;
 		union
 		{
 			float fval;
 			int ival;
 			bool bval;
 		};
-
-		void Initialize(InputTypes iType, ValueTypes vType);
+		InputValue() { fval = 0; }
+		InputValue(ValueTypes t, float mag);
 	};
 	
 	interface class IInput : public Base::ISubsystem
@@ -43,14 +30,17 @@ namespace Input
 	ref class Input : public IInput
 	{
 	private:
-		std::vector<InputValue> inputs;
+		std::map<Platform::String^, InputValue> nameToValue;
+		std::map<Windows::System::VirtualKey, InputValue*> keyToValuePtr;
 		void ClearInputs();
 	internal:
-		void SetInputTypes(
-			std::vector<InputTypes>& iTypes,
-			std::vector<ValueTypes>& vTypes
+		bool AddInput(
+			Platform::String^ name,
+			ValueTypes t,
+			float magnitude,
+			Windows::System::VirtualKey initialKey
 			);
-		std::vector<InputValue>& GetInputs();
+		InputValue& GetInput(Platform::String^ name);
 	public:
 		virtual bool Initialize();
 		virtual void Update();

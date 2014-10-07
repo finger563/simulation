@@ -7,15 +7,15 @@ using namespace Windows::UI::Popups;
 namespace Input
 {
 
-	void InputValue::Initialize(InputTypes iType, ValueTypes vType)
+	InputValue::InputValue(ValueTypes t, float mag)
 	{
-		valueType = vType;
-		inputType = iType;
+		Type = t;
+		Magnitude = mag;
+		fval = 0;
 	}
 
 	bool Input::Initialize()
 	{
-		ClearInputs();
 		return true;
 	}
 
@@ -26,71 +26,41 @@ namespace Input
 
 	void Input::Update()
 	{
-		ClearInputs();
 	}
 
-	void Input::ClearInputs()
-	{
-		for (unsigned int i = 0; i < inputs.size(); i++)
-		{
-			inputs[i].fval = 0.0f;
-		}
-	}
-
-	void Input::SetInputTypes(
-		std::vector<InputTypes>& iTypes,
-		std::vector<ValueTypes>& vTypes
+	bool Input::AddInput(
+		Platform::String^ name,
+		ValueTypes t,
+		float magnitude,
+		VirtualKey initialKey
 		)
 	{
-		assert( iTypes.size() == vTypes.size() );
-		for (unsigned int i = 0; i < iTypes.size(); i++)
-		{
-			inputs.push_back(InputValue());
-			inputs.back().Initialize(iTypes[i], vTypes[i]);
-		}
+		if (keyToValuePtr.find(initialKey) != keyToValuePtr.end())
+			return false;		// another input already uses this key
+		nameToValue[name] = InputValue(t, magnitude);
+		keyToValuePtr[initialKey] = &nameToValue[name];
+		return true;
 	}
 
-	std::vector<InputValue>& Input::GetInputs()
+	InputValue& Input::GetInput(Platform::String^ name)
 	{
-		return inputs;
+		return nameToValue[name];
 	}
 
 	void Input::KeyDown(CoreWindow^ Window, KeyEventArgs^ Args)
 	{
-		switch (Args->VirtualKey)
-		{
-		case (VirtualKey::A) :
-			inputs[1].fval -= 0.5f;
-			break;
-		case (VirtualKey::D) :
-			inputs[1].fval += 0.5f;
-			break;
-		case (VirtualKey::W) :
-			inputs[0].fval += 0.5f;
-			break;
-		case (VirtualKey::S) :
-			inputs[0].fval -= 0.5f;
-			break;
-
-		case (VirtualKey::Up) :
-			inputs[2].fval -= 0.5f;
-			break;
-		case (VirtualKey::Down) :
-			inputs[2].fval += 0.5f;
-			break;
-		case (VirtualKey::Left) :
-			inputs[3].fval -= 0.5f;
-			break;
-		case (VirtualKey::Right) :
-			inputs[3].fval += 0.5f;
-			break;
-		default:
-			break;
-		}
+		if (keyToValuePtr.find(Args->VirtualKey) == keyToValuePtr.end())
+			return;
+		InputValue* val = keyToValuePtr[Args->VirtualKey];
+		val->fval = val->Magnitude;
 	}
 
 	void Input::KeyUp(CoreWindow^ Window, KeyEventArgs^ Args)
 	{
+		if (keyToValuePtr.find(Args->VirtualKey) == keyToValuePtr.end())
+			return;
+		InputValue* val = keyToValuePtr[Args->VirtualKey];
+		val->fval = 0;
 	}
 
 	void Input::PointerPressed(CoreWindow^ Window, PointerEventArgs^ Args)

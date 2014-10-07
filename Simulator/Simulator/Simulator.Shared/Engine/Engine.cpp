@@ -25,17 +25,57 @@ namespace Engine
 			);
 
 		mInput->Initialize();
-		std::vector<Input::InputTypes> iTypes = 
-		{ 
-			Input::InputTypes::DIRECTIONAL, Input::InputTypes::DIRECTIONAL, // WASD
-			Input::InputTypes::ROTATIONAL, Input::InputTypes::ROTATIONAL // up/down/left/right
-		};
-		std::vector<Input::ValueTypes> vTypes = 
-		{ 
-			Input::ValueTypes::FLOAT, Input::ValueTypes::FLOAT,
-			Input::ValueTypes::FLOAT, Input::ValueTypes::FLOAT
-		};
-		mInput->SetInputTypes(iTypes, vTypes);
+		mInput->AddInput(
+			"WalkForward",
+			Input::ValueTypes::FLOAT,
+			0.5f,
+			Windows::System::VirtualKey::W
+			);
+		mInput->AddInput(
+			"WalkBackward",
+			Input::ValueTypes::FLOAT,
+			0.5f,
+			Windows::System::VirtualKey::S
+			);
+		mInput->AddInput(
+			"StrafeRight",
+			Input::ValueTypes::FLOAT,
+			0.5f,
+			Windows::System::VirtualKey::D
+			);
+		mInput->AddInput(
+			"StrafeLeft",
+			Input::ValueTypes::FLOAT,
+			0.5f,
+			Windows::System::VirtualKey::A
+			);
+
+		mInput->AddInput(
+			"YawRight",
+			Input::ValueTypes::FLOAT,
+			0.05f,
+			Windows::System::VirtualKey::Right
+			);
+		mInput->AddInput(
+			"YawLeft",
+			Input::ValueTypes::FLOAT,
+			0.05f,
+			Windows::System::VirtualKey::Left
+			);
+
+		mInput->AddInput(
+			"PitchUp",
+			Input::ValueTypes::FLOAT,
+			0.05f,
+			Windows::System::VirtualKey::Up
+			);
+		mInput->AddInput(
+			"PitchDown",
+			Input::ValueTypes::FLOAT,
+			0.05f,
+			Windows::System::VirtualKey::Down
+			);
+
 		mPhysics->Initialize();
 		return true;
 	}
@@ -47,12 +87,25 @@ namespace Engine
 
 	void Engine::Update()
 	{
-		std::vector<Input::InputValue>& inputs = mInput->GetInputs();
-		mRenderer->Pitch(inputs[2].fval);
-		mRenderer->Yaw(inputs[3].fval);
-		mRenderer->Walk(inputs[0].fval);
-		mRenderer->Strafe(inputs[1].fval);
 		mInput->Update();
+
+		float walk = 0;
+		float strafe = 0;
+		float pitch = 0;
+		float yaw = 0;
+		walk += mInput->GetInput("WalkForward").fval;
+		walk -= mInput->GetInput("WalkBackward").fval;
+		strafe += mInput->GetInput("StrafeRight").fval;
+		strafe -= mInput->GetInput("StrafeLeft").fval;
+		pitch += mInput->GetInput("PitchUp").fval;
+		pitch -= mInput->GetInput("PitchDown").fval;
+		yaw += mInput->GetInput("YawRight").fval;
+		yaw -= mInput->GetInput("YawLeft").fval;
+		mRenderer->Pitch(pitch);
+		mRenderer->Yaw(yaw);
+		mRenderer->Walk(walk);
+		mRenderer->Strafe(strafe);
+
 		mPhysics->Update();
 		mRenderer->Update();
 		mRenderer->Render();
