@@ -25,8 +25,16 @@ namespace Engine
 			);
 
 		mInput->Initialize();
-		std::vector<Input::InputTypes> iTypes = { Input::InputTypes::DIRECTIONAL, Input::InputTypes::DIRECTIONAL };
-		std::vector<Input::ValueTypes> vTypes = { Input::ValueTypes::FLOAT, Input::ValueTypes::FLOAT };
+		std::vector<Input::InputTypes> iTypes = 
+		{ 
+			Input::InputTypes::DIRECTIONAL, Input::InputTypes::DIRECTIONAL, // WASD
+			Input::InputTypes::ROTATIONAL, Input::InputTypes::ROTATIONAL // up/down/left/right
+		};
+		std::vector<Input::ValueTypes> vTypes = 
+		{ 
+			Input::ValueTypes::FLOAT, Input::ValueTypes::FLOAT,
+			Input::ValueTypes::FLOAT, Input::ValueTypes::FLOAT
+		};
 		mInput->SetInputTypes(iTypes, vTypes);
 		mPhysics->Initialize();
 		return true;
@@ -40,6 +48,8 @@ namespace Engine
 	void Engine::Update()
 	{
 		std::vector<Input::InputValue>& inputs = mInput->GetInputs();
+		mRenderer->Pitch(inputs[2].fval);
+		mRenderer->Yaw(inputs[3].fval);
 		mRenderer->Walk(inputs[0].fval);
 		mRenderer->Strafe(inputs[1].fval);
 		mInput->Update();

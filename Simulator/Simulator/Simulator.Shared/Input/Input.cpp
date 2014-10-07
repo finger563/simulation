@@ -71,6 +71,19 @@ namespace Input
 		case (VirtualKey::S) :
 			inputs[0].fval -= 0.5f;
 			break;
+
+		case (VirtualKey::Up) :
+			inputs[2].fval -= 0.5f;
+			break;
+		case (VirtualKey::Down) :
+			inputs[2].fval += 0.5f;
+			break;
+		case (VirtualKey::Left) :
+			inputs[3].fval -= 0.5f;
+			break;
+		case (VirtualKey::Right) :
+			inputs[3].fval += 0.5f;
+			break;
 		default:
 			break;
 		}
