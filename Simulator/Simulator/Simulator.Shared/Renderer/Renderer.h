@@ -25,16 +25,17 @@ namespace Renderer
 	internal: // only used by code in this project
 		void SetCamera(
 			Vector<3, double> position,
-			Vector<4, double> orientation,
-			double FoVY,
-			double AspectRatio,
-			double NearPlane,
-			double FarPlane
+			Vector<3, double> view,
+			Vector<3, double> up,
+			float FoVY,
+			float AspectRatio,
+			float NearPlane,
+			float FarPlane
 			);
 
 	private:
 		float time;
-		Camera<double> camera;
+		Camera camera;
 
 		ComPtr<ID3D11Device2> dev;						// Dx11.2 device interface
 		ComPtr<ID3D11DeviceContext2> devcon;			// Dx11.2 device context interface

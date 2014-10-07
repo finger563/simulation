@@ -8,12 +8,14 @@ namespace Base
 	namespace Math
 	{
 		template<typename T>
-		Vector<4, T> QuaternionMultiply(const Vector<4, T>& Q1, const Vector<4, T>& Q2);
+		Vector<4, T> QuaternionConjugate(Vector<4, T>& Q);
+		template<typename T>
+		Vector<4, T> QuaternionMultiply(Vector<4, T>& Q1, Vector<4, T>& Q2);
 		template<typename T>	// assumes a NORMALIZED AXIS VECTOR
-		Vector<4, T> QuaternionFromAxisAngle(const Vector<3, T>& Axis, T Angle);
+		Vector<4, T> QuaternionFromAxisAngle(Vector<3, T>& Axis, T Angle);
 
 		template<typename T>	// assumes a NORMALIZED QUATERNION
-		Matrix<4,T> RotationMatrixFromQuaternion(const Vector<4, T>& Q);
+		Matrix<4,T> RotationMatrixFromQuaternion(Vector<4, T>& Q);
 	}
 }
 

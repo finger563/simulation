@@ -19,10 +19,10 @@ VertexOut main(float4 pos : POSITION, float4 normal : NORMAL)
 	VertexOut vertOut;
 	vertOut.position = mul(matWVP, pos);
 
-	vertOut.color = ambientcol;
-
 	float4 norm = normalize(mul(rotation, normal));
 	float diffusebrightness = saturate(dot(norm, lightvec));
+
+	vertOut.color = ambientcol;
 	vertOut.color += lightcol * diffusebrightness;    // find the diffuse color and add
 
 	return vertOut;

@@ -115,6 +115,9 @@ namespace Renderer
 	void Renderer::Update()
 	{
 		time += 0.1f;
+
+		XMVECTOR rotAxis = XMVectorSet(0, 1, 0, 0);
+		camera.RotateByAxisAngle(rotAxis, -M_PI_4 / 100.0f);
 	}
 
 	void Renderer::Render()
@@ -144,26 +147,24 @@ namespace Renderer
 		XMMATRIX matTranslate = XMMatrixTranslation(0.0f, 0.0f, sinf(time / 2.0f)*3.0f);
 		XMMATRIX matScale = XMMatrixScaling(1.0f, 1.0f, 1.0f);
 		XMMATRIX matRotateX = XMMatrixRotationX(time / 5.0f);
-		XMMATRIX matRotateY = XMMatrixRotationY(time);
+		XMMATRIX matRotateY = XMMatrixRotationY(time / 5.0f);
 		XMMATRIX matRotateZ = XMMatrixRotationZ(XMConvertToRadians(0.0f));
 		XMMATRIX matWorld = matRotateX * matRotateY * matRotateZ * matScale * matTranslate;
-		//XMMATRIX matWorld = matRotateY;
 		// END OF STUFF THAT SHOULD BE PART OF OBJECT'S CODE
 
-		XMMATRIX matView = XMMatrixLookAtLH(camera.PositionXM(), camera.LookAtXM(), camera.UpXM());
-
+		XMMATRIX matView = XMMatrixLookAtLH(camera.Position, camera.View, camera.Up);
 		XMMATRIX matProjection = XMMatrixPerspectiveFovLH(
-			XMConvertToRadians((float)camera.FoVY),
-			(float)camera.Aspect,
-			(float)camera.NearPlane,
-			(float)camera.FarPlane
+			XMConvertToRadians(camera.FoVY),
+			camera.Aspect,
+			camera.NearPlane,
+			camera.FarPlane
 			);
 		XMMATRIX matFinal = matWorld * matView * matProjection;
 
 		CBuffer cbuffer;
 		cbuffer.matWVP = matFinal;
 		// REQUIRED FOR LIGHTING
-		cbuffer.matRotation = matRotateX * matRotateY * matRotateZ;
+		cbuffer.matRotation =  matRotateX * matRotateY * matRotateZ;
 		cbuffer.DiffuseVector = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
 		cbuffer.DiffuseColor = XMVectorSet(0.5f, 0.5f, 0.5f, 1.0f);
 		cbuffer.AmbientColor = XMVectorSet(0.2f, 0.2f, 0.2f, 1.0f);
@@ -181,15 +182,17 @@ namespace Renderer
 
 	void Renderer::SetCamera(
 		Vector<3, double> position,
-		Vector<4, double> orientation,
-		double FoVY,
-		double AspectRatio,
-		double NearPlane,
-		double FarPlane
+		Vector<3, double> view,
+		Vector<3, double> up,
+		float FoVY,
+		float AspectRatio,
+		float NearPlane,
+		float FarPlane
 		)
 	{
-		camera.Position = position;
-		camera.Orientation = orientation;
+		camera.Position = XMVectorSet(position[0],position[1],position[2],0);
+		camera.View = XMVectorSet(view[0], view[1], view[2], 0);
+		camera.Up = XMVectorSet(up[0], up[1], up[2], 0);
 		camera.FoVY = FoVY;
 		camera.Aspect = AspectRatio;
 		camera.NearPlane = NearPlane;
