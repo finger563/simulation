@@ -1,10 +1,11 @@
 #pragma once
 
-#include "Base\Subsystem.h"
-#include "Base\Math\Vector.h"
-#include "Base\Math\Matrix.h"
+#include "Base\Base.h"
+
 #include "Vertex.h"
 #include "Camera\Camera.h"
+#include "Lighting\Light.h"
+#include "Shaders\ConstantBuffers.h"
 
 using namespace Microsoft::WRL;
 using namespace Windows::UI::Core;
@@ -24,9 +25,9 @@ namespace Renderer
 	{
 	internal: // only used by code in this project
 		void SetCamera(
-			Vector<3, double> position,
-			Vector<3, double> view,
-			Vector<3, double> up,
+			Vector<3, float> position,
+			Vector<3, float> view,
+			Vector<3, float> up,
 			float FoVY,
 			float AspectRatio,
 			float NearPlane,
@@ -34,8 +35,10 @@ namespace Renderer
 			);
 
 	private:
-		float time;
-		Camera camera;
+		float time;										// time value (this should be removed)
+		Camera camera;									// Camera used to render the scene
+
+		std::vector<Light*> lights;						// Vector containing all lights in a scene
 
 		ComPtr<ID3D11Device2> dev;						// Dx11.2 device interface
 		ComPtr<ID3D11DeviceContext2> devcon;			// Dx11.2 device context interface
@@ -52,17 +55,17 @@ namespace Renderer
 		ComPtr<ID3D11VertexShader> vertexshader;		// should be moved to shader subsystem
 		ComPtr<ID3D11PixelShader> pixelshader;			// should be moved to shader subsystem
 
-		ComPtr<ID3D11Buffer> constantbuffer;			// one of the constant buffers : should be moved to separate (shader?) subsystem
+		ComPtr<ID3D11Buffer> constantbuffer;			// one of the constant buffers : should be moved to separate subsystem (shader?)
 	public:
 		virtual bool Initialize();
 		virtual void Update();
 		virtual bool UnInitialize();
 
-		void InitGraphics();
-		// this function initializes the GPU settings and prepares it for rendering
-		void InitPipeline();
-
 		virtual void Render();
 
+		// InitGraphics() initializes the vertex buffer & index buffer : should be moved to separate subsystem
+		void InitGraphics();
+		// InitPipeline() initializes the GPU shaders, input layout, and constant buffers : should be moved to separate subsystem
+		void InitPipeline();
 	};
 }

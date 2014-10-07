@@ -21,6 +21,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Input\Input.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Physics\Physics.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Renderer.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Base.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Data Structures\QuadTree.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Math\Quaternion.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Subsystem.h" />
@@ -34,6 +35,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Physics\Physics.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Time\StepTimer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Camera\Camera.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Lighting\Light.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Renderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)pch.h" />
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">

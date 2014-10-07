@@ -1,9 +1,6 @@
 #pragma once
 
 #include "pch.h"
-#include "Base\Math\Vector.h"
-#include "Base\Math\Matrix.h"
-#include "Base\Math\Quaternion.h"
 
 using namespace DirectX;
 

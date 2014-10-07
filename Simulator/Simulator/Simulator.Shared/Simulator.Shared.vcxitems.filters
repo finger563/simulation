@@ -50,6 +50,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Math\Quaternion.h">
       <Filter>Base\Math</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Lighting\Light.h">
+      <Filter>Renderer\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Base.h">
+      <Filter>Base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />
@@ -118,6 +124,9 @@
     </Filter>
     <Filter Include="Renderer\Camera">
       <UniqueIdentifier>{ab618380-504a-49ef-a972-31d88e6d3c8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Lighting">
+      <UniqueIdentifier>{60973c99-d871-413d-99a3-bf4f2c5d75ae}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

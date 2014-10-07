@@ -2,8 +2,6 @@
 #include "Renderer.h"
 #include <fstream>
 
-#include "Shaders\ConstantBuffers.h"
-
 namespace Renderer
 {
 	bool Renderer::Initialize()
@@ -83,8 +81,8 @@ namespace Renderer
 		// enabling Depth Buffering
 		D3D11_TEXTURE2D_DESC texd = { 0 };
 
-		texd.Width = Window->Bounds.Width;
-		texd.Height = Window->Bounds.Height;
+		texd.Width = (UINT)(Window->Bounds.Width);
+		texd.Height = (UINT)(Window->Bounds.Height);
 		texd.ArraySize = 1;
 		texd.MipLevels = 1;
 		texd.SampleDesc.Count = 1;
@@ -117,7 +115,7 @@ namespace Renderer
 		time += 0.1f;
 
 		XMVECTOR rotAxis = XMVectorSet(0, 1, 0, 0);
-		camera.RotateByAxisAngle(rotAxis, -M_PI_4 / 100.0f);
+		camera.RotateByAxisAngle(rotAxis, (float)(-M_PI_4) / 100.0f);
 	}
 
 	void Renderer::Render()
@@ -181,9 +179,9 @@ namespace Renderer
 	}
 
 	void Renderer::SetCamera(
-		Vector<3, double> position,
-		Vector<3, double> view,
-		Vector<3, double> up,
+		Vector<3, float> position,
+		Vector<3, float> view,
+		Vector<3, float> up,
 		float FoVY,
 		float AspectRatio,
 		float NearPlane,
