@@ -15,7 +15,7 @@ namespace Engine
 	{
 		mRenderer->Initialize();
 		mRenderer->SetCamera(
-			Vector<3, float>({ 5.0, 0.0, -5.0 }),						// position
+			Vector<3, float>({ 0.0, 0.0, -5.0 }),						// position
 			Vector<3, float>({ 0.0, 0.0, 1.0 }),						// view
 			Vector<3, float>({ 0.0, 1.0, 0.0 }),						// up
 			45.0f,														// FOVY

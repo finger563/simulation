@@ -16,6 +16,19 @@ namespace Input
 		MODIFIER,
 		TREE
 	};
+
+	template<int numDimensions>
+	struct InputValue
+	{
+		InputTypes Type;
+		union
+		{
+			float fvals[numDimensions];
+			int ivals[numDimensions];
+			boolean bvals[numDimensions];
+			InputValue<numDimensions>* children[numDimensions];
+		};
+	};
 	
 	interface class IInput : public Base::ISubsystem
 	{

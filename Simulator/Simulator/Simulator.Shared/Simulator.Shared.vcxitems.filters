@@ -78,6 +78,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Engine\Engine.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Camera\Camera.cpp">
+      <Filter>Renderer\Camera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Base">

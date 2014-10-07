@@ -20,6 +20,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Engine\Engine.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Input\Input.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Physics\Physics.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Camera\Camera.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Renderer.cpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Base.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Data Structures\QuadTree.h" />

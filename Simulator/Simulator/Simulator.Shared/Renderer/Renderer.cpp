@@ -114,11 +114,8 @@ namespace Renderer
 	{
 		//time += 0.1f;
 
-		XMVECTOR rotAxis = XMVectorSet(0, 1, 0, 0);
-		//camera.RotateByAxisAngle(rotAxis, (float)(-M_PI_4) / 100.0f);
-		//camera.RotateAroundUp((float)(M_PI_4) / 50.0f);
-		//camera.RotateAroundRight((float)(M_PI_4) / 50.0f);
-		camera.RotateAroundPoint(XMVectorSet(0, 0, 0, 0), camera.Up, (float)(M_PI_4) / 50.0f);
+		camera.RotateAroundUp((float)(M_PI_4) / 50.0f);
+		//camera.RotateAroundRight(-(float)(M_PI_4) / 50.0f);
 	}
 
 	void Renderer::Render()
@@ -188,7 +185,7 @@ namespace Renderer
 		camera.Position = XMVectorSet(position[0],position[1],position[2],0);
 		camera.View = XMVectorSet(view[0], view[1], view[2], 0);
 		camera.Up = XMVectorSet(up[0], up[1], up[2], 0);
-		camera.Right = XMVector3Cross(camera.View, camera.Up);
+		camera.Right = XMVector3Cross(-camera.View, camera.Up);
 		camera.FoVY = FoVY;
 		camera.Aspect = AspectRatio;
 		camera.NearPlane = NearPlane;
