@@ -17,37 +17,52 @@ namespace Input
 		TREE
 	};
 
-	template<int numDimensions>
-	struct InputValue
+	enum ValueTypes
 	{
-		InputTypes Type;
+		FLOAT,
+		INT,
+		BOOL,
+		INPUT
+	};
+
+	class InputValue
+	{
+	private:
+		InputTypes inputType;
+		ValueTypes valueType;
+		int numDimensions;
+	public:
 		union
 		{
-			float fvals[numDimensions];
-			int ivals[numDimensions];
-			boolean bvals[numDimensions];
-			InputValue<numDimensions>* children[numDimensions];
+			float* fvals;
+			int* ivals;
+			bool* bvals;
+			InputValue* children;
 		};
+		InputValue() { numDimensions = 0; fvals = nullptr; }
+		~InputValue();
+		void Initialize(InputTypes iType, ValueTypes vType, int dimensions);
 	};
 	
 	interface class IInput : public Base::ISubsystem
 	{
-		virtual void SetInputTypes() = 0;
-
-		virtual void GetInputUpdates() = 0;
 	};
 
 	ref class Input : public IInput
 	{
 	private:
+		std::vector<InputValue> inputs;
+	internal:
+		void SetInputTypes(
+			std::vector<InputTypes>& iTypes,
+			std::vector<ValueTypes>& vTypes,
+			std::vector<int>& dims
+			);
+		std::vector<InputValue>& GetInputUpdates();
 	public:
 		virtual bool Initialize();
 		virtual void Update();
 		virtual bool UnInitialize();
-
-		virtual void SetInputTypes();
-
-		virtual void GetInputUpdates();
 
 		void KeyDown(CoreWindow^ Window, KeyEventArgs^ Args);
 		void KeyUp(CoreWindow^ Window, KeyEventArgs^ Args);

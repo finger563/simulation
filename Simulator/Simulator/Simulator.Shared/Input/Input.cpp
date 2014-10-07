@@ -6,6 +6,50 @@ using namespace Windows::UI::Popups;
 
 namespace Input
 {
+	InputValue::~InputValue()
+	{
+		if (numDimensions > 0)
+		{
+			switch (valueType)
+			{
+			case ValueTypes::FLOAT:
+				delete[] fvals;
+				break;
+			case ValueTypes::INT:
+				delete[] ivals;
+				break;
+			case ValueTypes::BOOL:
+				delete[] bvals;
+				break;
+			case ValueTypes::INPUT:
+				delete[] children;
+				break;
+			}
+			delete[] fvals;
+		}
+	}
+
+	void InputValue::Initialize(InputTypes iType, ValueTypes vType, int dimensions)
+	{
+		numDimensions = dimensions;
+		valueType = vType;
+		inputType = iType;
+		switch (vType)
+		{
+		case ValueTypes::FLOAT:
+			fvals = new float[numDimensions];
+			break;
+		case ValueTypes::INT:
+			ivals = new int[numDimensions];
+			break;
+		case ValueTypes::BOOL:
+			bvals = new bool[numDimensions];
+			break;
+		case ValueTypes::INPUT:
+			children = new InputValue[numDimensions];
+			break;
+		}
+	}
 
 	bool Input::Initialize()
 	{
@@ -22,14 +66,23 @@ namespace Input
 		return;
 	}
 
-	void Input::SetInputTypes()
+	void Input::SetInputTypes(
+		std::vector<InputTypes>& iTypes,
+		std::vector<ValueTypes>& vTypes,
+		std::vector<int>& dims
+		)
 	{
-
+		assert( iTypes.size() == vTypes.size() && vTypes.size() == dims.size() );
+		for (unsigned int i = 0; i < iTypes.size(); i++)
+		{
+			inputs.push_back(InputValue());
+			inputs.back().Initialize(iTypes[i], vTypes[i], dims[i]);
+		}
 	}
 
-	void Input::GetInputUpdates()
+	std::vector<InputValue>& Input::GetInputUpdates()
 	{
-
+		return inputs;
 	}
 
 	void Input::KeyDown(CoreWindow^ Window, KeyEventArgs^ Args)
