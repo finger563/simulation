@@ -12,36 +12,28 @@ namespace Input
 		ROTATIONAL,
 		BOOLEAN,
 		SEQUENTIAL,
-		FLOATING,
-		MODIFIER,
-		TREE
+		SELECTION
 	};
 
 	enum ValueTypes
 	{
 		FLOAT,
 		INT,
-		BOOL,
-		INPUT
+		BOOL
 	};
 
-	class InputValue
+	struct InputValue
 	{
-	private:
 		InputTypes inputType;
 		ValueTypes valueType;
-		int numDimensions;
-	public:
 		union
 		{
-			float* fvals;
-			int* ivals;
-			bool* bvals;
-			InputValue* children;
+			float fval;
+			int ival;
+			bool bval;
 		};
-		InputValue() { numDimensions = 0; fvals = nullptr; }
-		~InputValue();
-		void Initialize(InputTypes iType, ValueTypes vType, int dimensions);
+
+		void Initialize(InputTypes iType, ValueTypes vType);
 	};
 	
 	interface class IInput : public Base::ISubsystem
@@ -52,13 +44,13 @@ namespace Input
 	{
 	private:
 		std::vector<InputValue> inputs;
+		void ClearInputs();
 	internal:
 		void SetInputTypes(
 			std::vector<InputTypes>& iTypes,
-			std::vector<ValueTypes>& vTypes,
-			std::vector<int>& dims
+			std::vector<ValueTypes>& vTypes
 			);
-		std::vector<InputValue>& GetInputUpdates();
+		std::vector<InputValue>& GetInputs();
 	public:
 		virtual bool Initialize();
 		virtual void Update();

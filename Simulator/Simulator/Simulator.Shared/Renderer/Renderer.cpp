@@ -114,7 +114,7 @@ namespace Renderer
 	{
 		//time += 0.1f;
 
-		camera.RotateAroundUp((float)(M_PI_4) / 50.0f);
+		//camera.RotateAroundUp((float)(M_PI_4) / 50.0f);
 		//camera.RotateAroundRight(-(float)(M_PI_4) / 50.0f);
 	}
 
@@ -190,6 +190,31 @@ namespace Renderer
 		camera.Aspect = AspectRatio;
 		camera.NearPlane = NearPlane;
 		camera.FarPlane = FarPlane;
+	}
+
+	void Renderer::Walk(float Dist)
+	{
+		camera.Walk(Dist);
+	}
+
+	void Renderer::Strafe(float Dist)
+	{
+		camera.Strafe(Dist);
+	}
+
+	void Renderer::Pitch(float Angle)
+	{
+		camera.RotateAroundRight(Angle);
+	}
+
+	void Renderer::Roll(float Angle)
+	{
+		camera.RotateAroundView(Angle);
+	}
+
+	void Renderer::Yaw(float Angle)
+	{
+		camera.RotateAroundUp(Angle);
 	}
 
 	void Renderer::InitGraphics()

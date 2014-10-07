@@ -25,10 +25,9 @@ namespace Engine
 			);
 
 		mInput->Initialize();
-		std::vector<Input::InputTypes> iTypes = { Input::InputTypes::DIRECTIONAL };
-		std::vector<Input::ValueTypes> vTypes = { Input::ValueTypes::FLOAT };
-		std::vector<int> dims = { 2 };
-		mInput->SetInputTypes(iTypes, vTypes, dims);
+		std::vector<Input::InputTypes> iTypes = { Input::InputTypes::DIRECTIONAL, Input::InputTypes::DIRECTIONAL };
+		std::vector<Input::ValueTypes> vTypes = { Input::ValueTypes::FLOAT, Input::ValueTypes::FLOAT };
+		mInput->SetInputTypes(iTypes, vTypes);
 		mPhysics->Initialize();
 		return true;
 	}
@@ -40,8 +39,10 @@ namespace Engine
 
 	void Engine::Update()
 	{
+		std::vector<Input::InputValue>& inputs = mInput->GetInputs();
+		mRenderer->Walk(inputs[0].fval);
+		mRenderer->Strafe(inputs[1].fval);
 		mInput->Update();
-		std::vector<Input::InputValue> inputs = mInput->GetInputUpdates();
 		mPhysics->Update();
 		mRenderer->Update();
 		mRenderer->Render();

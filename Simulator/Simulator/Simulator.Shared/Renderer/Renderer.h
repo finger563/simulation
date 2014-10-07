@@ -24,6 +24,11 @@ namespace Renderer
 	ref class Renderer : public IRenderer
 	{
 	internal: // only used by code in this project
+		void Walk	(float Dist);
+		void Strafe	(float Dist);
+		void Pitch	(float Angle);
+		void Roll	(float Angle);
+		void Yaw	(float Angle);
 		void SetCamera(
 			Vector<3, float> position,
 			Vector<3, float> view,

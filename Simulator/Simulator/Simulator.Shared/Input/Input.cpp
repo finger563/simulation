@@ -6,53 +6,16 @@ using namespace Windows::UI::Popups;
 
 namespace Input
 {
-	InputValue::~InputValue()
-	{
-		if (numDimensions > 0)
-		{
-			switch (valueType)
-			{
-			case ValueTypes::FLOAT:
-				delete[] fvals;
-				break;
-			case ValueTypes::INT:
-				delete[] ivals;
-				break;
-			case ValueTypes::BOOL:
-				delete[] bvals;
-				break;
-			case ValueTypes::INPUT:
-				delete[] children;
-				break;
-			}
-			delete[] fvals;
-		}
-	}
 
-	void InputValue::Initialize(InputTypes iType, ValueTypes vType, int dimensions)
+	void InputValue::Initialize(InputTypes iType, ValueTypes vType)
 	{
-		numDimensions = dimensions;
 		valueType = vType;
 		inputType = iType;
-		switch (vType)
-		{
-		case ValueTypes::FLOAT:
-			fvals = new float[numDimensions];
-			break;
-		case ValueTypes::INT:
-			ivals = new int[numDimensions];
-			break;
-		case ValueTypes::BOOL:
-			bvals = new bool[numDimensions];
-			break;
-		case ValueTypes::INPUT:
-			children = new InputValue[numDimensions];
-			break;
-		}
 	}
 
 	bool Input::Initialize()
 	{
+		ClearInputs();
 		return true;
 	}
 
@@ -63,38 +26,53 @@ namespace Input
 
 	void Input::Update()
 	{
-		return;
+		ClearInputs();
+	}
+
+	void Input::ClearInputs()
+	{
+		for (unsigned int i = 0; i < inputs.size(); i++)
+		{
+			inputs[i].fval = 0.0f;
+		}
 	}
 
 	void Input::SetInputTypes(
 		std::vector<InputTypes>& iTypes,
-		std::vector<ValueTypes>& vTypes,
-		std::vector<int>& dims
+		std::vector<ValueTypes>& vTypes
 		)
 	{
-		assert( iTypes.size() == vTypes.size() && vTypes.size() == dims.size() );
+		assert( iTypes.size() == vTypes.size() );
 		for (unsigned int i = 0; i < iTypes.size(); i++)
 		{
 			inputs.push_back(InputValue());
-			inputs.back().Initialize(iTypes[i], vTypes[i], dims[i]);
+			inputs.back().Initialize(iTypes[i], vTypes[i]);
 		}
 	}
 
-	std::vector<InputValue>& Input::GetInputUpdates()
+	std::vector<InputValue>& Input::GetInputs()
 	{
 		return inputs;
 	}
 
 	void Input::KeyDown(CoreWindow^ Window, KeyEventArgs^ Args)
 	{
-		if (Args->VirtualKey == VirtualKey::A ||
-			Args->VirtualKey == VirtualKey::S ||
-			Args->VirtualKey == VirtualKey::W ||
-			Args->VirtualKey == VirtualKey::D)
+		switch (Args->VirtualKey)
 		{
-			// do something..
-			MessageDialog Dialog("You pressed a key!", "Notice!");
-			Dialog.ShowAsync();
+		case (VirtualKey::A) :
+			inputs[1].fval -= 0.5f;
+			break;
+		case (VirtualKey::D) :
+			inputs[1].fval += 0.5f;
+			break;
+		case (VirtualKey::W) :
+			inputs[0].fval += 0.5f;
+			break;
+		case (VirtualKey::S) :
+			inputs[0].fval -= 0.5f;
+			break;
+		default:
+			break;
 		}
 	}
 
