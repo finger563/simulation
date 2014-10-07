@@ -112,10 +112,13 @@ namespace Renderer
 
 	void Renderer::Update()
 	{
-		time += 0.1f;
+		//time += 0.1f;
 
 		XMVECTOR rotAxis = XMVectorSet(0, 1, 0, 0);
-		camera.RotateByAxisAngle(rotAxis, (float)(-M_PI_4) / 100.0f);
+		//camera.RotateByAxisAngle(rotAxis, (float)(-M_PI_4) / 100.0f);
+		//camera.RotateAroundUp((float)(M_PI_4) / 50.0f);
+		//camera.RotateAroundRight((float)(M_PI_4) / 50.0f);
+		camera.RotateAroundPoint(XMVectorSet(0, 0, 0, 0), camera.Up, (float)(M_PI_4) / 50.0f);
 	}
 
 	void Renderer::Render()
@@ -150,14 +153,8 @@ namespace Renderer
 		XMMATRIX matWorld = matRotateX * matRotateY * matRotateZ * matScale * matTranslate;
 		// END OF STUFF THAT SHOULD BE PART OF OBJECT'S CODE
 
-		XMMATRIX matView = XMMatrixLookAtLH(camera.Position, camera.View, camera.Up);
-		XMMATRIX matProjection = XMMatrixPerspectiveFovLH(
-			XMConvertToRadians(camera.FoVY),
-			camera.Aspect,
-			camera.NearPlane,
-			camera.FarPlane
-			);
-		XMMATRIX matFinal = matWorld * matView * matProjection;
+		camera.UpdateMatrices();
+		XMMATRIX matFinal = matWorld * camera.ViewMatrix * camera.ProjMatrix;
 
 		CBuffer cbuffer;
 		cbuffer.matWVP = matFinal;
@@ -191,6 +188,7 @@ namespace Renderer
 		camera.Position = XMVectorSet(position[0],position[1],position[2],0);
 		camera.View = XMVectorSet(view[0], view[1], view[2], 0);
 		camera.Up = XMVectorSet(up[0], up[1], up[2], 0);
+		camera.Right = XMVector3Cross(camera.View, camera.Up);
 		camera.FoVY = FoVY;
 		camera.Aspect = AspectRatio;
 		camera.NearPlane = NearPlane;

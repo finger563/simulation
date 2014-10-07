@@ -7,6 +7,7 @@ namespace Base
 {
 	namespace Math
 	{
+#if 0
 		template<typename T>
 		Vector<4, T> QuaternionConjugate(Vector<4, T>& Q);
 		template<typename T>
@@ -16,7 +17,10 @@ namespace Base
 
 		template<typename T>	// assumes a NORMALIZED QUATERNION
 		Matrix<4,T> RotationMatrixFromQuaternion(Vector<4, T>& Q);
+#endif
 	}
 }
 
+#if 0
 #include "Quaternion.cpp" // needed to get the definitions of the functions
+#endif
