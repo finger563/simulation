@@ -13,6 +13,7 @@ namespace Engine
 
 	bool Engine::Initialize()
 	{
+		SimulationTime = 0;
 		mRenderer->Initialize();
 		mRenderer->SetCamera(
 			Vector<3, float>({ 0.0, 0.0, -5.0 }),						// position
@@ -93,6 +94,8 @@ namespace Engine
 
 	void Engine::Update()
 	{
+		SimulationTime += 0.05;
+
 		mInput->Update();
 
 		float walk = 0;
@@ -111,6 +114,9 @@ namespace Engine
 		mRenderer->Yaw(yaw);
 		mRenderer->Walk(walk);
 		mRenderer->Strafe(strafe);
+
+		gameObjects[0].position.vals[0] = cos(SimulationTime) * 3.0;
+		gameObjects[0].position.vals[2] = sin(SimulationTime) * 3.0;
 
 		mPhysics->Update();
 		mRenderer->Update();

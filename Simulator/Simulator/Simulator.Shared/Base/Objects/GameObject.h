@@ -21,12 +21,15 @@ namespace Base
 			// Note that this is filled out separately
 			DataStructures::QuadTreeNode<T>*	rootQT;
 			Mesh*								mesh;
+			Vector<3, T> scale;			// x,y,z scale factors
 
 			BoundingSphere<T>	boundingSphere;
 			AABB<T>				boundingBox;
 			OOBB<T>				orientedBoundingBox;
 
-			GameObject() : rootQT(nullptr), mesh(nullptr), position(Vector<3, T>({ 0, 0, 0 })), velocity(position), orientation(Vector<4, T>(velocity, 0))
+			GameObject() : rootQT(nullptr), mesh(nullptr), 
+				position(Vector<3, T>({ 0, 0, 0 })), velocity(position), orientation(Vector<4, T>(velocity, 0)),
+				scale(Vector<3, T>({ 1, 1, 1 }))
 			{}
 			GameObject(Vector<3, T>& pos) : GameObject(), position(pos) {}
 		};

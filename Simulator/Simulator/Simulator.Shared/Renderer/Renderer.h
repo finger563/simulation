@@ -41,9 +41,8 @@ namespace Renderer
 			);
 		void SetObjectsInScene(std::vector<Base::Objects::GameObject<float>>* _objects);
 	private:
-		float time;										// time value (this should be removed)
 		Camera camera;									// Camera used to render the scene
-		std::vector<Base::Objects::GameObject<float>>* objects;
+		std::vector<Base::Objects::GameObject<float>>* objects;	// pointer to objects created and maintained by Engine
 
 		std::vector<DirectionalLight> directionalLights;// Vector containing all directional lights in a scene
 		std::vector<PointLight> pointLights;			// Vector containing all point lights in a scene

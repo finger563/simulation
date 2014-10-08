@@ -5,7 +5,7 @@
 
 namespace Renderer
 {
-	static class BaseObjects
+	class BaseObjects
 	{
 	public:
 		static void InitSphereMesh(Base::Mesh** meshPtr);

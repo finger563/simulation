@@ -6,8 +6,6 @@ namespace Renderer
 {
 	bool Renderer::Initialize()
 	{
-		time = 0.0f;
-
 		directionalLights.push_back(
 			DirectionalLight( 
 				XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f),	// position
@@ -18,6 +16,8 @@ namespace Renderer
 			);
 
 		// EVERYTHING UNDER HERE IS REQUIRED TO BE PART OF THIS FUNCTION FOR NOW
+
+		objects = nullptr;
 
 		// Define temporary pointers to a device and a device context
 		ComPtr<ID3D11Device> dev11;
@@ -125,7 +125,7 @@ namespace Renderer
 
 	void Renderer::Update()
 	{
-		time += 0.1f;
+
 	}
 
 	void Renderer::Render()
@@ -150,16 +150,15 @@ namespace Renderer
 
 		// set the primitive topology
 		devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		// THIS SHOULD BE PART OF THE OBJECT'S CODE I THINK? OR A HELPER FUNCTION USING OBJECT PROPERTIES
-		XMMATRIX matTranslate = XMMatrixTranslation(0.0f, 0.0f, sinf(time / 2.0f)*3.0f);
-		XMMATRIX matScale = XMMatrixScaling(1.0f, 1.0f, 1.0f);
-		XMMATRIX matRotateX = XMMatrixRotationX(time / 5.0f);
-		XMMATRIX matRotateY = XMMatrixRotationY(time / 5.0f);
-		XMMATRIX matRotateZ = XMMatrixRotationZ(XMConvertToRadians(0.0f));
+		
+		XMMATRIX matTranslate = XMMatrixTranslation((*objects)[0].position[0], (*objects)[0].position[1], (*objects)[0].position[2]);
+		XMMATRIX matScale = XMMatrixScaling((*objects)[0].scale[0], (*objects)[0].scale[1], (*objects)[0].scale[2]);
+		XMMATRIX matRotateX = XMMatrixRotationX((*objects)[0].orientation[0]);
+		XMMATRIX matRotateY = XMMatrixRotationY((*objects)[0].orientation[1]);
+		XMMATRIX matRotateZ = XMMatrixRotationZ((*objects)[0].orientation[2]);
 		XMMATRIX matRotation = matRotateX * matRotateY * matRotateZ;
+
 		XMMATRIX matWorld = matRotation * matScale * matTranslate;
-		// END OF STUFF THAT SHOULD BE PART OF OBJECT'S CODE
 
 		camera.UpdateMatrices();
 		XMMATRIX matFinal = matWorld * camera.ViewMatrix * camera.ProjMatrix;
@@ -231,6 +230,7 @@ namespace Renderer
 
 	void Renderer::SetObjectsInScene(std::vector<Base::Objects::GameObject<float>>* _objects)
 	{
+		objects = _objects;
 		numIndices = 0;
 		std::vector<Base::Vertex> OurVertices;
 		std::vector<UINT> OurIndices;
