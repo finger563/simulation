@@ -56,6 +56,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Base.h">
       <Filter>Base</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Lighting\Material.h">
+      <Filter>Renderer\Lighting</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />
@@ -116,28 +119,42 @@
     <Filter Include="Renderer\Shaders">
       <UniqueIdentifier>{c0b2d4ef-aaf8-407e-a59a-c738b5526551}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Renderer\Shaders\Vertex">
-      <UniqueIdentifier>{6c1813e2-7d1c-4e7e-842a-592e2a9d9554}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Renderer\Shaders\Pixel">
-      <UniqueIdentifier>{16e09570-2f71-4c2d-a45c-88926d56a477}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Renderer\Shaders\Geometry">
-      <UniqueIdentifier>{9333d71f-a8c3-44b8-bc59-0eb86a4c7ac1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Renderer\Camera">
       <UniqueIdentifier>{ab618380-504a-49ef-a972-31d88e6d3c8e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Renderer\Lighting">
       <UniqueIdentifier>{60973c99-d871-413d-99a3-bf4f2c5d75ae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Renderer\Shaders\Planetary">
+      <UniqueIdentifier>{92883026-b3fc-4980-b168-95b2941f6e50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Shaders\Basic">
+      <UniqueIdentifier>{03f55251-e95d-4a32-86df-cb11c685828f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Shaders\Common">
+      <UniqueIdentifier>{7c0bcce6-f4c8-4c3e-99a6-944736e993eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Vertex\VertexShader.hlsl">
-      <Filter>Renderer\Shaders\Vertex</Filter>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Basic\VertexShader.hlsl">
+      <Filter>Renderer\Shaders\Basic</Filter>
     </FxCompile>
-    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Pixel\PixelShader.hlsl">
-      <Filter>Renderer\Shaders\Pixel</Filter>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Basic\PixelShader.hlsl">
+      <Filter>Renderer\Shaders\Basic</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Common\ConstantBuffers.hlsli">
+      <Filter>Renderer\Shaders\Common</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Common\Light.hlsli">
+      <Filter>Renderer\Shaders\Common</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Common\Material.hlsli">
+      <Filter>Renderer\Shaders\Common</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Common\Pipeline.hlsli">
+      <Filter>Renderer\Shaders\Common</Filter>
+    </None>
   </ItemGroup>
 </Project>
