@@ -50,7 +50,7 @@ namespace Input
 	void Input::KeyDown(CoreWindow^ Window, KeyEventArgs^ Args)
 	{
 		if (keyToValuePtr.find(Args->VirtualKey) == keyToValuePtr.end())
-			return;
+			return;			// this Key is not currently listed as an input
 		InputValue* val = keyToValuePtr[Args->VirtualKey];
 		val->fval = val->Magnitude;
 	}
@@ -58,7 +58,7 @@ namespace Input
 	void Input::KeyUp(CoreWindow^ Window, KeyEventArgs^ Args)
 	{
 		if (keyToValuePtr.find(Args->VirtualKey) == keyToValuePtr.end())
-			return;
+			return;			// this Key is not currently listed as an input
 		InputValue* val = keyToValuePtr[Args->VirtualKey];
 		val->fval = 0;
 	}

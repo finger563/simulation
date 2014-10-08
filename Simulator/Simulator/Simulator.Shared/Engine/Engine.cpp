@@ -25,6 +25,8 @@ namespace Engine
 			);
 
 		mInput->Initialize();
+
+		// Maybe have these in an initialization file?
 		mInput->AddInput(
 			"WalkForward",
 			Input::ValueTypes::FLOAT,
