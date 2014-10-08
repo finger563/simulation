@@ -26,7 +26,7 @@ namespace Engine
 
 		gameObjects.push_back(Base::Objects::GameObject<float>());
 		Renderer::BaseObjects::InitCubeMesh(&gameObjects.back().mesh);
-		//mRenderer->SetObjectsInScene(&gameObjects);
+		mRenderer->SetObjectsInScene(&gameObjects);
 
 		mInput->Initialize();
 

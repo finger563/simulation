@@ -112,7 +112,7 @@ namespace Renderer
 
 		// EVERYTHING ABOVE HERE IS REQUIRED TO BE PART OF THIS FUNCTION FOR NOW
 
-		InitGraphics();
+		//InitGraphics();
 		InitPipeline();
 
 		return true;
@@ -142,11 +142,11 @@ namespace Renderer
 		devcon->ClearRenderTargetView(rendertarget.Get(), color);
 
 		// set the vertex buffer
-		UINT stride = sizeof(BaseVertex<float>);
+		UINT stride = sizeof(Base::Vertex);
 		UINT offset = 0;
 		devcon->IASetVertexBuffers(0, 1, vertexbuffer.GetAddressOf(), &stride, &offset);
 		// set the index buffer
-		devcon->IASetIndexBuffer(indexbuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+		devcon->IASetIndexBuffer(indexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// set the primitive topology
 		devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
