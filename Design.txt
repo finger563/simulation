@@ -101,11 +101,6 @@ Next Steps:
     * Shaders
   * Engine
   * App
-* Finish Quaternion camera & object orientation representation
-* Add Camera control 
-  * Flesh out input class & interface
-  * Add control to engine for camera?
-    * or have a callback in the renderer's camera class?
 * Change earth representation to actual mesh
   * each set of triangles on the mesh should correspsond to sub textures
     * this allows us to only load textures into memory which may actually be displayed
@@ -217,6 +212,10 @@ Done:
   * Rendered from above and below
 * Planet Rotation 
   * To work with atmospheric rendering
+NEW:
+* Add Camera control 
+  * Flesh out input class & interface
+  * Add control to engine for camera?
 
 
   Batman:
