@@ -112,10 +112,7 @@ namespace Renderer
 
 	void Renderer::Update()
 	{
-		//time += 0.1f;
-
-		//camera.RotateAroundUp((float)(M_PI_4) / 50.0f);
-		//camera.RotateAroundRight(-(float)(M_PI_4) / 50.0f);
+		time += 0.1f;
 	}
 
 	void Renderer::Render()
@@ -147,7 +144,8 @@ namespace Renderer
 		XMMATRIX matRotateX = XMMatrixRotationX(time / 5.0f);
 		XMMATRIX matRotateY = XMMatrixRotationY(time / 5.0f);
 		XMMATRIX matRotateZ = XMMatrixRotationZ(XMConvertToRadians(0.0f));
-		XMMATRIX matWorld = matRotateX * matRotateY * matRotateZ * matScale * matTranslate;
+		XMMATRIX matRotation = matRotateX * matRotateY * matRotateZ;
+		XMMATRIX matWorld = matRotation * matScale * matTranslate;
 		// END OF STUFF THAT SHOULD BE PART OF OBJECT'S CODE
 
 		camera.UpdateMatrices();
@@ -156,7 +154,7 @@ namespace Renderer
 		CBuffer cbuffer;
 		cbuffer.matWVP = matFinal;
 		// REQUIRED FOR LIGHTING
-		cbuffer.matRotation =  matRotateX * matRotateY * matRotateZ;
+		cbuffer.matRotation = matRotation;	// need to get from object
 		cbuffer.DiffuseVector = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
 		cbuffer.DiffuseColor = XMVectorSet(0.5f, 0.5f, 0.5f, 1.0f);
 		cbuffer.AmbientColor = XMVectorSet(0.2f, 0.2f, 0.2f, 1.0f);
