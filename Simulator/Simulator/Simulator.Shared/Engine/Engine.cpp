@@ -24,6 +24,10 @@ namespace Engine
 			1000.0f														// far plane
 			);
 
+		gameObjects.push_back(Base::Objects::GameObject<float>());
+		Renderer::BaseObjects::InitCubeMesh(&gameObjects.back().mesh);
+		//mRenderer->SetObjectsInScene(&gameObjects);
+
 		mInput->Initialize();
 
 		// Maybe have these in an initialization file?

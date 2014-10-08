@@ -21,7 +21,9 @@ namespace Base
 			QuadTreeNode(
 				QuadTreeNode	*_parent = nullptr,
 				float			_error = 100.0f
-				);
+				) : parent(_parent), error(_error) {}
 		};
 	}
 }
+
+#include "Quadtree.cpp"

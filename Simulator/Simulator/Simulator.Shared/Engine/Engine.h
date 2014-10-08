@@ -17,7 +17,7 @@ namespace Engine
 	internal: // only used by code in this project
 		void SetWindowProperties(double width, double height);
 	private:
-		std::vector<Base::Objects::GameObject<double>*> gameObjects;
+		std::vector<Base::Objects::GameObject<float>> gameObjects;
 		WindowProperties windowProperties;
 	public:
 		Engine();

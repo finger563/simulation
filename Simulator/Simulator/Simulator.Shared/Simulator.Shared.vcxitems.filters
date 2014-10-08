@@ -59,6 +59,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Lighting\Material.h">
       <Filter>Renderer\Lighting</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Mesh\Mesh.h">
+      <Filter>Base\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Objects\BaseObjects.h">
+      <Filter>Renderer\Objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />
@@ -83,6 +89,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Camera\Camera.cpp">
       <Filter>Renderer\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Objects\BaseObjects.cpp">
+      <Filter>Renderer\Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -133,6 +142,12 @@
     </Filter>
     <Filter Include="Renderer\Shaders\Common">
       <UniqueIdentifier>{7c0bcce6-f4c8-4c3e-99a6-944736e993eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\Mesh">
+      <UniqueIdentifier>{c1ee72a4-8253-420d-9b5d-b27f651f2ac7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Objects">
+      <UniqueIdentifier>{5a8c2e3f-2f5f-474d-a6e8-10c3aef10f26}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

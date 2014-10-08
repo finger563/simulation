@@ -4,6 +4,7 @@
 #include "..\Math\Matrix.h"
 #include "BoundingObjects.h"
 #include "..\Data Structures\QuadTree.h"
+#include "..\Mesh\Mesh.h"
 
 namespace Base
 {
@@ -18,11 +19,16 @@ namespace Base
 
 			// QuadTree for surface mesh (used by potentially physics and renderer subsystems)
 			// Note that this is filled out separately
-			DataStructures::QuadTreeNode<T>*	rootQT;	
+			DataStructures::QuadTreeNode<T>*	rootQT;
+			Mesh*								mesh;
 
 			BoundingSphere<T>	boundingSphere;
 			AABB<T>				boundingBox;
 			OOBB<T>				orientedBoundingBox;
+
+			GameObject() : rootQT(nullptr), mesh(nullptr), position(Vector<3, T>({ 0, 0, 0 })), velocity(position), orientation(Vector<4, T>(velocity, 0))
+			{}
+			GameObject(Vector<3, T>& pos) : GameObject(), position(pos) {}
 		};
 	}
 }

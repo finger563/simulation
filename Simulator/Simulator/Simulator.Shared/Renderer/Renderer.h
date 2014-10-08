@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Base\Base.h"
+#include "..\Base\Base.h"
 
+#include "Objects\BaseObjects.h"
 #include "Vertex.h"
 #include "Camera\Camera.h"
 #include "Lighting\Light.h"
@@ -38,10 +39,11 @@ namespace Renderer
 			float NearPlane,
 			float FarPlane
 			);
-
+		void SetObjectsInScene(std::vector<Base::Objects::GameObject<float>>* _objects);
 	private:
 		float time;										// time value (this should be removed)
 		Camera camera;									// Camera used to render the scene
+		std::vector<Base::Objects::GameObject<float>>* objects;
 
 		std::vector<DirectionalLight> directionalLights;// Vector containing all directional lights in a scene
 		std::vector<PointLight> pointLights;			// Vector containing all point lights in a scene
@@ -57,6 +59,7 @@ namespace Renderer
 
 		ComPtr<ID3D11Buffer> vertexbuffer;				// Dx11.2 GPU vertex buffer interface
 		ComPtr<ID3D11Buffer> indexbuffer;				// Dx11.2 GPU index buffer interface
+		int numIndices;									// number of indices to draw
 		ComPtr<ID3D11InputLayout> inputlayout;
 
 		ComPtr<ID3D11VertexShader> vertexshader;		// should be moved to shader subsystem

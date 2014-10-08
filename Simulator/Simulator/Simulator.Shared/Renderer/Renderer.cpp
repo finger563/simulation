@@ -166,18 +166,18 @@ namespace Renderer
 
 		CBuffer cbuffer;
 		cbuffer.matWVP = matFinal;
-		// REQUIRED FOR LIGHTING
+
+		// Lighting related
 		cbuffer.matRotation = matRotation;	// need to get from object
 		cbuffer.DiffuseVector = directionalLights[0].Position;
 		cbuffer.DiffuseColor = directionalLights[0].Diffuse;
 		cbuffer.AmbientColor = directionalLights[0].Ambient;
-		// END REQUIRED FOR LIGHTING
 
 		// set the new values for the constant buffer
 		devcon->UpdateSubresource(constantbuffer.Get(), 0, 0, &cbuffer, 0, 0);
 
 		// draw 3 vertices, starting from vertex 0
-		devcon->DrawIndexed(36, 0, 0);
+		devcon->DrawIndexed(numIndices, 0, 0);
 
 		swapchain->Present(1, 0);	// swap the back buffer and the front buffer
 		return;
@@ -226,6 +226,47 @@ namespace Renderer
 	void Renderer::Yaw(float Angle)
 	{
 		camera.RotateAroundUp(Angle);
+	}
+
+
+	void Renderer::SetObjectsInScene(std::vector<Base::Objects::GameObject<float>>* _objects)
+	{
+		numIndices = 0;
+		std::vector<Base::Vertex> OurVertices;
+		std::vector<UINT> OurIndices;
+		for (unsigned int i = 0; i < _objects->size(); i++)
+		{
+			for (unsigned int j = 0; j < (*_objects)[i].mesh->vertices.size(); j++)
+			{
+				OurVertices.push_back((*_objects)[i].mesh->vertices[j]);
+			}
+			for (unsigned int j = 0; j < (*_objects)[i].mesh->indices.size(); j++)
+			{
+				OurIndices.push_back((*_objects)[i].mesh->indices[j]);
+			}
+		}
+
+		numIndices = OurIndices.size();
+		
+		// create the vertex buffer
+		D3D11_BUFFER_DESC vertexBD = { 0 };
+		vertexBD.ByteWidth = sizeof(Base::Vertex) * OurVertices.size();
+		vertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+		D3D11_SUBRESOURCE_DATA vertexSRD = { OurVertices.data() , 0, 0 };
+
+		dev->CreateBuffer(&vertexBD, &vertexSRD, &vertexbuffer);
+
+		// create the index buffer
+		// buffer description
+		D3D11_BUFFER_DESC indexBD = { 0 };
+		indexBD.ByteWidth = sizeof(UINT) * OurIndices.size();    // indices are stored in short values
+		indexBD.BindFlags = D3D11_BIND_INDEX_BUFFER;
+
+		// subresource data
+		D3D11_SUBRESOURCE_DATA indexSRD = { OurIndices.data() , 0, 0 };
+
+		dev->CreateBuffer(&indexBD, &indexSRD, &indexbuffer);
 	}
 
 	void Renderer::InitGraphics()
@@ -286,6 +327,8 @@ namespace Renderer
 			20, 21, 22,    // side 6
 			22, 21, 23,
 		};
+
+		numIndices = ARRAYSIZE(OurIndices);
 
 		// create the index buffer
 		// buffer description

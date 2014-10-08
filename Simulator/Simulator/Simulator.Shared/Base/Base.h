@@ -4,6 +4,8 @@
 
 #include "Data Structures\QuadTree.h"
 
+#include "Mesh\Mesh.h"
+
 #include "Math\Matrix.h"
 #include "Math\Vector.h"
 #include "Math\Quaternion.h"
