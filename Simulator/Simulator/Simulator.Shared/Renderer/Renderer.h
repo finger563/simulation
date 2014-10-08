@@ -43,7 +43,9 @@ namespace Renderer
 		float time;										// time value (this should be removed)
 		Camera camera;									// Camera used to render the scene
 
-		std::vector<Light*> lights;						// Vector containing all lights in a scene
+		std::vector<DirectionalLight> directionalLights;// Vector containing all directional lights in a scene
+		std::vector<PointLight> pointLights;			// Vector containing all point lights in a scene
+		std::vector<SpotLight> spotLights;				// Vector containing all spot lights in a scene
 
 		ComPtr<ID3D11Device2> dev;						// Dx11.2 device interface
 		ComPtr<ID3D11DeviceContext2> devcon;			// Dx11.2 device context interface

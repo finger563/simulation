@@ -8,6 +8,17 @@ namespace Renderer
 	{
 		time = 0.0f;
 
+		directionalLights.push_back(
+			DirectionalLight( 
+				XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f),	// position
+				XMVectorSet(0.5f, 0.5f, 0.5f, 1.0f),	// diffuse
+				XMVectorSet(0.2f, 0.2f, 0.2f, 1.0f),	// ambient
+				XMVectorSet(0.2f, 0.2f, 0.2f, 1.0f)		// specular
+				)
+			);
+
+		// EVERYTHING UNDER HERE IS REQUIRED TO BE PART OF THIS FUNCTION FOR NOW
+
 		// Define temporary pointers to a device and a device context
 		ComPtr<ID3D11Device> dev11;
 		ComPtr<ID3D11DeviceContext> devcon11;
@@ -99,6 +110,8 @@ namespace Renderer
 
 		dev->CreateDepthStencilView(zbuffertexture.Get(), &dsvd, &zbuffer);
 
+		// EVERYTHING ABOVE HERE IS REQUIRED TO BE PART OF THIS FUNCTION FOR NOW
+
 		InitGraphics();
 		InitPipeline();
 
@@ -155,9 +168,9 @@ namespace Renderer
 		cbuffer.matWVP = matFinal;
 		// REQUIRED FOR LIGHTING
 		cbuffer.matRotation = matRotation;	// need to get from object
-		cbuffer.DiffuseVector = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
-		cbuffer.DiffuseColor = XMVectorSet(0.5f, 0.5f, 0.5f, 1.0f);
-		cbuffer.AmbientColor = XMVectorSet(0.2f, 0.2f, 0.2f, 1.0f);
+		cbuffer.DiffuseVector = directionalLights[0].Position;
+		cbuffer.DiffuseColor = directionalLights[0].Diffuse;
+		cbuffer.AmbientColor = directionalLights[0].Ambient;
 		// END REQUIRED FOR LIGHTING
 
 		// set the new values for the constant buffer
@@ -321,7 +334,7 @@ namespace Renderer
 
 		dev->CreateBuffer(&bd, nullptr, &constantbuffer);
 		devcon->VSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());
-		// WOULD NEED TO USE PSSetConstantBuffers IF THE PS NEEDED IT
+		devcon->PSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());
 	}
 
 	// this function loads a file into an Array^
