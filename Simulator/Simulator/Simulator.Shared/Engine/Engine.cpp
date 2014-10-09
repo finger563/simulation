@@ -99,24 +99,25 @@ namespace Engine
 		mInput->Update();
 
 		float walk = 0;
-		float strafe = 0;
-		float pitch = 0;
-		float yaw = 0;
 		walk += mInput->GetInput("WalkForward").fval;
 		walk -= mInput->GetInput("WalkBackward").fval;
+		float strafe = 0;
 		strafe += mInput->GetInput("StrafeRight").fval;
 		strafe -= mInput->GetInput("StrafeLeft").fval;
+		float pitch = 0;
 		pitch += mInput->GetInput("PitchUp").fval;
 		pitch -= mInput->GetInput("PitchDown").fval;
+		float yaw = 0;
 		yaw += mInput->GetInput("YawRight").fval;
 		yaw -= mInput->GetInput("YawLeft").fval;
-		mRenderer->Pitch(pitch);
-		mRenderer->Yaw(yaw);
-		mRenderer->Walk(walk);
-		mRenderer->Strafe(strafe);
 
-		gameObjects[0].position.vals[0] = cos(SimulationTime) * 3.0;
-		gameObjects[0].position.vals[2] = sin(SimulationTime) * 3.0;
+		mRenderer->GetCameraPtr()->Pitch(pitch);
+		mRenderer->GetCameraPtr()->Yaw(yaw);
+		mRenderer->GetCameraPtr()->Walk(walk);
+		mRenderer->GetCameraPtr()->Strafe(strafe);
+
+		gameObjects[0].position.vals[0] = (float)cos(SimulationTime) * 3.0f;
+		gameObjects[0].position.vals[2] = (float)sin(SimulationTime) * 3.0f;
 
 		mPhysics->Update();
 		mRenderer->Update();

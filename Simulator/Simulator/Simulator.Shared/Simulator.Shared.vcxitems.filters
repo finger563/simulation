@@ -62,6 +62,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Objects\BaseObjects.h">
       <Filter>Renderer\Objects</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Shader.h">
+      <Filter>Renderer\Shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />
@@ -89,6 +92,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Objects\BaseObjects.cpp">
       <Filter>Renderer\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Shader.cpp">
+      <Filter>Renderer\Shaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

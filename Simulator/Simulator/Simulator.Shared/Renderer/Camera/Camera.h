@@ -22,15 +22,27 @@ namespace Renderer
 		XMMATRIX ViewMatrix;
 		XMMATRIX ProjMatrix;
 
+		void Set(
+			XMVECTOR position,
+			XMVECTOR view,
+			XMVECTOR up,
+			float fovY,
+			float aspectRatio,
+			float nearPlane,
+			float farPlane);
+
 		void UpdateMatrices();			// called in Renderer::Render() before sending matrices to GPU
 
 		void Strafe(float Dist);		// + = right, - = left
 		void Walk(float Dist);			// + = forward, - = back
+		void Pitch(float Angle);
+		void Roll(float Angle);
+		void Yaw(float Angle);
 
 		void RotateAroundPoint(XMVECTOR& Point, XMVECTOR& Axis, float Angle);
 		void RotateByAxisAngle(XMVECTOR& Axis, float Angle);
 		void RotateAroundUp(float Angle);				// + = CW, - = CCW
 		void RotateAroundRight(float Angle);			// + = down, - = up
-		void RotateAroundView(float Angle);				
+		void RotateAroundView(float Angle);		
 	};
 }

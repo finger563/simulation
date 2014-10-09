@@ -3,6 +3,25 @@
 
 using namespace Renderer;
 
+void Camera::Set(
+	XMVECTOR position,
+	XMVECTOR view,
+	XMVECTOR up,
+	float fovY,
+	float aspectRatio,
+	float nearPlane,
+	float farPlane)
+{
+	Position = position;
+	View = view;
+	Up = up;
+	Right = XMVector3Cross(-View, Up);
+	FoVY = fovY;
+	Aspect = aspectRatio;
+	NearPlane = nearPlane;
+	FarPlane = farPlane;
+}
+
 void Camera::Strafe(float Dist)
 {
 	Position = Position + Right * Dist;
@@ -11,6 +30,21 @@ void Camera::Strafe(float Dist)
 void Camera::Walk(float Dist)
 {
 	Position = Position + View * Dist;
+}
+
+void Camera::Pitch(float Angle)
+{
+	RotateAroundRight(Angle);
+}
+
+void Camera::Roll(float Angle)
+{
+	RotateAroundView(Angle);
+}
+
+void Camera::Yaw(float Angle)
+{
+	RotateAroundUp(Angle);
 }
 
 void Camera::UpdateMatrices()

@@ -23,6 +23,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Camera\Camera.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Objects\BaseObjects.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Renderer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Shader.cpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Base.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Data Structures\QuadTree.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Math\Quaternion.h" />
@@ -47,6 +48,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Shaders\ConstantBuffers.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Shader.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectCapability Include="SourceItemsFromImports" />

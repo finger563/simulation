@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Renderer.h"
-#include <fstream>
 
 namespace Renderer
 {
@@ -113,7 +112,11 @@ namespace Renderer
 		// EVERYTHING ABOVE HERE IS REQUIRED TO BE PART OF THIS FUNCTION FOR NOW
 
 		//InitGraphics();
-		InitPipeline();
+		//InitPipeline();
+
+		shader.SetHandles(dev, devcon);
+		shader.Initialize();
+		shader.Apply();
 
 		return true;
 	}
@@ -173,7 +176,7 @@ namespace Renderer
 		cbuffer.AmbientColor = directionalLights[0].Ambient;
 
 		// set the new values for the constant buffer
-		devcon->UpdateSubresource(constantbuffer.Get(), 0, 0, &cbuffer, 0, 0);
+		devcon->UpdateSubresource(shader.constantbuffer.Get(), 0, 0, &cbuffer, 0, 0);
 
 		// draw 3 vertices, starting from vertex 0
 		devcon->DrawIndexed(numIndices, 0, 0);
@@ -192,42 +195,17 @@ namespace Renderer
 		float FarPlane
 		)
 	{
-		camera.Position = XMVectorSet(position[0],position[1],position[2],0);
-		camera.View = XMVectorSet(view[0], view[1], view[2], 0);
-		camera.Up = XMVectorSet(up[0], up[1], up[2], 0);
-		camera.Right = XMVector3Cross(-camera.View, camera.Up);
-		camera.FoVY = FoVY;
-		camera.Aspect = AspectRatio;
-		camera.NearPlane = NearPlane;
-		camera.FarPlane = FarPlane;
+		camera.Set(
+			XMVectorSet(position[0], position[1], position[2], 0),
+			XMVectorSet(view[0], view[1], view[2], 0),
+			XMVectorSet(up[0], up[1], up[2], 0),
+			FoVY,
+			AspectRatio,
+			NearPlane,
+			FarPlane
+			);
 	}
-
-	void Renderer::Walk(float Dist)
-	{
-		camera.Walk(Dist);
-	}
-
-	void Renderer::Strafe(float Dist)
-	{
-		camera.Strafe(Dist);
-	}
-
-	void Renderer::Pitch(float Angle)
-	{
-		camera.RotateAroundRight(Angle);
-	}
-
-	void Renderer::Roll(float Angle)
-	{
-		camera.RotateAroundView(Angle);
-	}
-
-	void Renderer::Yaw(float Angle)
-	{
-		camera.RotateAroundUp(Angle);
-	}
-
-
+	
 	void Renderer::SetObjectsInScene(std::vector<Base::Objects::GameObject<float>>* _objects)
 	{
 		objects = _objects;
@@ -267,140 +245,5 @@ namespace Renderer
 		D3D11_SUBRESOURCE_DATA indexSRD = { OurIndices.data() , 0, 0 };
 
 		dev->CreateBuffer(&indexBD, &indexSRD, &indexbuffer);
-	}
-
-	void Renderer::InitGraphics()
-	{
-		Base::Vertex OurVertices[] = {
-				{ -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },    // side 1
-				{ 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
-				{ -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
-				{ 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
-
-				{ -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f },    // side 2
-				{ -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f },
-				{ 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f },
-				{ 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f },
-
-				{ -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f },    // side 3
-				{ -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f },
-				{ 1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f },
-				{ 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f },
-
-				{ -1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f },    // side 4
-				{ 1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f },
-				{ -1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f },
-				{ 1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f },
-
-				{ 1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f },    // side 5
-				{ 1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f },
-				{ 1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
-				{ 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
-
-				{ -1.0f, -1.0f, -1.0f, -1.0f, 0.0f, 0.0f },    // side 6
-				{ -1.0f, -1.0f, 1.0f, -1.0f, 0.0f, 0.0f },
-				{ -1.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f },
-				{ -1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f },
-		};
-		
-		// create the vertex buffer
-		D3D11_BUFFER_DESC vertexBD = { 0 };
-		vertexBD.ByteWidth = sizeof(Base::Vertex) * ARRAYSIZE(OurVertices);
-		vertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-
-		D3D11_SUBRESOURCE_DATA vertexSRD = { OurVertices, 0, 0 };
-
-		dev->CreateBuffer(&vertexBD, &vertexSRD, &vertexbuffer);
-		
-		short OurIndices[] =
-		{
-			0, 1, 2,    // side 1
-			2, 1, 3,
-			4, 5, 6,    // side 2
-			6, 5, 7,
-			8, 9, 10,    // side 3
-			10, 9, 11,
-			12, 13, 14,    // side 4
-			14, 13, 15,
-			16, 17, 18,    // side 5
-			18, 17, 19,
-			20, 21, 22,    // side 6
-			22, 21, 23,
-		};
-
-		numIndices = ARRAYSIZE(OurIndices);
-
-		// create the index buffer
-		// buffer description
-		D3D11_BUFFER_DESC indexBD = { 0 };
-		indexBD.ByteWidth = sizeof(short) * ARRAYSIZE(OurIndices);    // indices are stored in short values
-		indexBD.BindFlags = D3D11_BIND_INDEX_BUFFER;
-
-		// subresource data
-		D3D11_SUBRESOURCE_DATA indexSRD = { OurIndices, 0, 0 };
-
-		dev->CreateBuffer(&indexBD, &indexSRD, &indexbuffer);
-	}
-
-	void Renderer::InitPipeline()
-	{
-		// load the shader files
-		Platform::Array<byte>^ VSFile = LoadShaderFile("VertexShader.cso");
-		Platform::Array<byte>^ PSFile = LoadShaderFile("PixelShader.cso");
-
-		// create the shader objects
-		dev->CreateVertexShader(VSFile->Data, VSFile->Length, nullptr, &vertexshader);
-		dev->CreatePixelShader(PSFile->Data, PSFile->Length, nullptr, &pixelshader);
-
-		// set the shader objects as the active shaders
-		devcon->VSSetShader(vertexshader.Get(), nullptr, 0);
-		devcon->PSSetShader(pixelshader.Get(), nullptr, 0);
-
-		// initialize input layout
-		D3D11_INPUT_ELEMENT_DESC ied[] =
-		{
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			//{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		};
-
-		// create the input layout
-		dev->CreateInputLayout(ied, ARRAYSIZE(ied), VSFile->Data, VSFile->Length, &inputlayout);
-		devcon->IASetInputLayout(inputlayout.Get());
-
-		// NEEDS TO BE MOVED TO SHADER SUBSYSTEM
-		D3D11_BUFFER_DESC bd = { 0 };
-
-		bd.Usage = D3D11_USAGE_DEFAULT;
-		bd.ByteWidth = sizeof(CBuffer);		// must always be a multiple of 16 bytes
-		bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-
-		dev->CreateBuffer(&bd, nullptr, &constantbuffer);
-		devcon->VSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());
-		devcon->PSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());
-	}
-
-	// this function loads a file into an Array^
-	Platform::Array<byte>^ LoadShaderFile(std::string File)
-	{
-		Platform::Array<byte>^ FileData = nullptr;
-
-		// open the file
-		std::ifstream VertexFile(File, std::ios::in | std::ios::binary | std::ios::ate);
-
-		// if open was successful
-		if (VertexFile.is_open())
-		{
-			// find the length of the file
-			int Length = (int)VertexFile.tellg();
-
-			// collect the file data
-			FileData = ref new Platform::Array<byte>(Length);
-			VertexFile.seekg(0, std::ios::beg);
-			VertexFile.read(reinterpret_cast<char*>(FileData->Data), Length);
-			VertexFile.close();
-		}
-
-		return FileData;
 	}
 }
