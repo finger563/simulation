@@ -3,7 +3,6 @@
 #include "..\Base\Base.h"
 
 #include "Objects\BaseObjects.h"
-#include "Vertex.h"
 #include "Camera\Camera.h"
 #include "Lighting\Light.h"
 #include "Shaders\ConstantBuffers.h"

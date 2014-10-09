@@ -271,7 +271,7 @@ namespace Renderer
 
 	void Renderer::InitGraphics()
 	{
-		BaseVertex<float> OurVertices[] = {
+		Base::Vertex OurVertices[] = {
 				{ -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },    // side 1
 				{ 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
 				{ -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
@@ -305,7 +305,7 @@ namespace Renderer
 		
 		// create the vertex buffer
 		D3D11_BUFFER_DESC vertexBD = { 0 };
-		vertexBD.ByteWidth = sizeof(BaseVertex<float>) * ARRAYSIZE(OurVertices);
+		vertexBD.ByteWidth = sizeof(Base::Vertex) * ARRAYSIZE(OurVertices);
 		vertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
 		D3D11_SUBRESOURCE_DATA vertexSRD = { OurVertices, 0, 0 };

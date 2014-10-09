@@ -47,7 +47,6 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Shaders\ConstantBuffers.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectCapability Include="SourceItemsFromImports" />

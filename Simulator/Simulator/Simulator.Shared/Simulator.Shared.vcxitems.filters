@@ -38,9 +38,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Subsystem.h">
       <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Vertex.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Camera\Camera.h">
       <Filter>Renderer\Camera</Filter>
     </ClInclude>
