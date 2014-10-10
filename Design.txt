@@ -85,6 +85,12 @@ Goals:
 
 Next Steps:
 -----------
+* Improvements based on Sample application (VS2013 sample dx Universal app)
+  * Asynchronous (multithreaded) appraoch to loading and generating resources
+  * Better adaptation to screen size (window size dependent resources)
+  * Better adaptation to screen orientation
+  * 2d/text rendering 
+  * Better handling of callbacks (device lost, etc.)
 * Finish Transition to DX11.2
   * Uses only MSVS 2013, Windows 8.1 SDK (no need for 2010 & june 2010 sdk)
 * Modularize engine:
