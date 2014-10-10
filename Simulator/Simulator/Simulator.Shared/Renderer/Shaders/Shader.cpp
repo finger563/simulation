@@ -11,8 +11,8 @@ using namespace DirectX;
 
 void Shader::SetHandles(ComPtr<ID3D11Device2> _dev, ComPtr<ID3D11DeviceContext2> _devcon)
 {
-	dev = _dev;
-	devcon = _devcon;
+	_dev.CopyTo(&dev);
+	_devcon.CopyTo(&devcon);
 }
 
 void Shader::Initialize()
