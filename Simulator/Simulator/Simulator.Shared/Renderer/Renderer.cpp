@@ -95,7 +95,7 @@ namespace Renderer
 		texd.Height = (UINT)(Window->Bounds.Height);
 		texd.ArraySize = 1;
 		texd.MipLevels = 1;
-		texd.SampleDesc.Count = 1;
+		//texd.SampleDesc.Count = 1;
 		texd.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		texd.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
