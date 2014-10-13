@@ -48,6 +48,8 @@ namespace Renderer
 		void SetObjectsInScene(std::vector<Base::Objects::GameObject<float>>* _objects);
 
 	private:
+		void InitStates();								// For initializing the rasterizer etc. states.
+
 		Camera camera;									// Camera used to render the scene
 		std::vector<Base::Objects::GameObject<float>>* objects;	// pointer to objects created and maintained by Engine
 
@@ -68,5 +70,8 @@ namespace Renderer
 		ComPtr<ID3D11Buffer> vertexbuffer;				// Dx11.2 GPU vertex buffer interface
 		ComPtr<ID3D11Buffer> indexbuffer;				// Dx11.2 GPU index buffer interface
 		int numIndices;									// number of indices to draw
+
+		ComPtr<ID3D11RasterizerState> defaultrasterizerstate;		// Rasterizer state (default)
+		ComPtr<ID3D11RasterizerState> wireframerasterizerstate;		// Rasterizer state (wireframe)
 	};
 }

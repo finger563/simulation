@@ -146,6 +146,8 @@ namespace Renderer
 
 		dev->CreateDepthStencilView(zbuffertexture.Get(), &dsvd, &zbuffer);
 
+		InitStates();
+
 		// EVERYTHING ABOVE HERE IS REQUIRED TO BE PART OF THIS FUNCTION FOR NOW
 		
 		shader.SetHandles(dev, devcon);
@@ -153,6 +155,29 @@ namespace Renderer
 		shader.Apply();
 
 		return true;
+	}
+
+	void Renderer::InitStates()
+	{
+		D3D11_RASTERIZER_DESC rd;
+		rd.FillMode = D3D11_FILL_SOLID;
+		rd.CullMode = D3D11_CULL_BACK;
+		rd.FrontCounterClockwise = FALSE;
+		rd.DepthClipEnable = TRUE;
+		rd.ScissorEnable = FALSE;
+		rd.AntialiasedLineEnable = FALSE;
+		rd.MultisampleEnable = FALSE;
+		rd.DepthBias = 0;
+		rd.DepthBiasClamp = 0.0f;
+		rd.SlopeScaledDepthBias = 0.0f;
+
+		dev->CreateRasterizerState(&rd, &defaultrasterizerstate);
+
+		// set the changed values for wireframe mode
+		rd.FillMode = D3D11_FILL_WIREFRAME;
+		rd.AntialiasedLineEnable = TRUE;
+
+		dev->CreateRasterizerState(&rd, &wireframerasterizerstate);
 	}
 
 	bool Renderer::UnInitialize()
@@ -211,6 +236,11 @@ namespace Renderer
 
 		// set the new values for the constant buffer
 		devcon->UpdateSubresource(shader.constantbuffer.Get(), 0, 0, &cbuffer, 0, 0);
+
+		// Set the rasterizer state here if we want to
+		//devcon->RSSetState(wireframerasterizerstate.Get());
+		// or
+		devcon->RSSetState(defaultrasterizerstate.Get());
 
 		// draw 3 vertices, starting from vertex 0
 		devcon->DrawIndexed(numIndices, 0, 0);
