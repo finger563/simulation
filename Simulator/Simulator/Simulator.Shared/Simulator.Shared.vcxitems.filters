@@ -65,6 +65,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Shader.h">
       <Filter>Renderer\Shaders</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)App.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />

@@ -110,10 +110,7 @@ namespace Renderer
 		dev->CreateDepthStencilView(zbuffertexture.Get(), &dsvd, &zbuffer);
 
 		// EVERYTHING ABOVE HERE IS REQUIRED TO BE PART OF THIS FUNCTION FOR NOW
-
-		//InitGraphics();
-		//InitPipeline();
-
+		
 		shader.SetHandles(dev, devcon);
 		shader.Initialize();
 		shader.Apply();

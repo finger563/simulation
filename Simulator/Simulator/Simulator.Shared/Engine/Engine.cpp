@@ -19,7 +19,7 @@ namespace Engine
 			Vector<3, float>({ 0.0, 0.0, -5.0 }),						// position
 			Vector<3, float>({ 0.0, 0.0, 1.0 }),						// view
 			Vector<3, float>({ 0.0, 1.0, 0.0 }),						// up
-			45.0f,														// FOVY
+			60.0f,														// FOVY
 			(float)(windowProperties.Width / windowProperties.Height),	// aspect ratio
 			1.0f,														// near plane
 			1000.0f														// far plane

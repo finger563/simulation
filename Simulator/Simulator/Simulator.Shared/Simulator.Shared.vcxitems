@@ -24,6 +24,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Objects\BaseObjects.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Renderer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Shader.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)App.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Base.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Data Structures\QuadTree.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Math\Quaternion.h" />
