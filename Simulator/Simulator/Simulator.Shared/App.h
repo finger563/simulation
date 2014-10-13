@@ -33,17 +33,17 @@ namespace App
 
 		// Window event handlers.
 #if !(WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
-		void OnWindowSizeChanged(Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::WindowSizeChangedEventArgs^ args);
+		void OnWindowSizeChanged(Windows::UI::Core::CoreWindow^ Sender, Windows::UI::Core::WindowSizeChangedEventArgs^ Args);
 #endif
-		void OnVisibilityChanged(Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::VisibilityChangedEventArgs^ args);
-		void OnWindowClosed(Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::CoreWindowEventArgs^ args);
+		void OnVisibilityChanged(Windows::UI::Core::CoreWindow^ Sender, Windows::UI::Core::VisibilityChangedEventArgs^ Args);
+		void OnWindowClosed(Windows::UI::Core::CoreWindow^ Sender, Windows::UI::Core::CoreWindowEventArgs^ Args);
 
 		// DisplayInformation event handlers.
 #if !(WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
-		void OnDpiChanged(Windows::Graphics::Display::DisplayInformation^ sender, Platform::Object^ args);
-		void OnOrientationChanged(Windows::Graphics::Display::DisplayInformation^ sender, Platform::Object^ args);
+		void OnDpiChanged(Windows::Graphics::Display::DisplayInformation^ Sender, Platform::Object^ Args);
+		void OnOrientationChanged(Windows::Graphics::Display::DisplayInformation^ Sender, Platform::Object^ Args);
 #endif
-		void OnDisplayContentsInvalidated(Windows::Graphics::Display::DisplayInformation^ sender, Platform::Object^ args);
+		void OnDisplayContentsInvalidated(Windows::Graphics::Display::DisplayInformation^ Sender, Platform::Object^ Args);
 	};
 }
 

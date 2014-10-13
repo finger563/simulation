@@ -10,6 +10,7 @@ using namespace Windows::ApplicationModel;
 using namespace Windows::ApplicationModel::Core;
 using namespace Windows::ApplicationModel::Activation;
 using namespace Windows::UI::Core;
+using namespace Windows::UI::Input;
 using namespace Windows::UI::Popups;
 using namespace Windows::System;
 using namespace Windows::Foundation;
@@ -68,6 +69,30 @@ void App::App::SetWindow(CoreWindow^ Window)
 		<CoreWindow^, PointerEventArgs^>(mEngine->mInput, &Input::Input::PointerWheelChanged);
 
 	mEngine->SetWindowProperties(Window->Bounds.Width, Window->Bounds.Height);
+
+
+	DisplayInformation^ currentDisplayInformation = DisplayInformation::GetForCurrentView();
+
+	DisplayInformation::DisplayContentsInvalidated +=
+		ref new TypedEventHandler<DisplayInformation^, Object^>(this, &App::OnDisplayContentsInvalidated);
+
+#if !(WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
+	Window->SizeChanged +=
+		ref new TypedEventHandler<CoreWindow^, WindowSizeChangedEventArgs^>(this, &App::OnWindowSizeChanged);
+
+	currentDisplayInformation->DpiChanged +=
+		ref new TypedEventHandler<DisplayInformation^, Object^>(this, &App::OnDpiChanged);
+
+	currentDisplayInformation->OrientationChanged +=
+		ref new TypedEventHandler<DisplayInformation^, Object^>(this, &App::OnOrientationChanged);
+
+	// Disable all pointer visual feedback for better performance when touching.
+	// This is not supported on Windows Phone applications.
+	auto pointerVisualizationSettings = PointerVisualizationSettings::GetForCurrentView();
+	pointerVisualizationSettings->IsContactFeedbackEnabled = false;
+	pointerVisualizationSettings->IsBarrelButtonFeedbackEnabled = false;
+#endif
+
 }
 
 void App::App::Load(String^ EntryPoint) {}
@@ -96,11 +121,74 @@ void App::App::OnActivated(CoreApplicationView^ CoreAppView, IActivatedEventArgs
 	Window->Activate();
 }
 
-void App::App::OnSuspending(Object^ Sender, SuspendingEventArgs^ Args) {} // Save the state of the simulator here
+// Save the state of the simulator here
+void App::App::OnSuspending(Object^ Sender, SuspendingEventArgs^ Args) 
+{
+	// Save app state asynchronously after requesting a deferral. Holding a deferral
+	// indicates that the application is busy performing suspending operations. Be
+	// aware that a deferral may not be held indefinitely. After about five seconds,
+	// the app will be forced to exit.
+	SuspendingDeferral^ deferral = Args->SuspendingOperation->GetDeferral();
 
-void App::App::OnResuming(Object^ Sender, Object^ Args) {} // Load the state of the simulator here
+	create_task([this, deferral]()
+	{
+		// NEED TO CALL THE TRIM FUNCTION ON THE DEVICE RESOURCES
+		// ->Trim();
+
+		// Insert your code here.
+
+		deferral->Complete();
+	});
+}
+
+// Load the state of the simulator here
+void App::App::OnResuming(Object^ Sender, Object^ Args) 
+{
+	// Restore any data or state that was unloaded on suspend. By default, data
+	// and state are persisted when resuming from suspend. Note that this event
+	// does not occur if the app was previously terminated.
+
+	// Insert your code here.
+}
+
+// Window event handlers.
+
+void App::App::OnVisibilityChanged(CoreWindow^ sender, VisibilityChangedEventArgs^ Args)
+{
+	WindowVisible = Args->Visible;
+}
 
 void App::App::OnClosed(CoreWindow^ Sender, CoreWindowEventArgs^ Args)
 {
 	WindowClosed = true;
 }
+
+#if !(WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
+void App::App::OnWindowSizeChanged(CoreWindow^ sender, WindowSizeChangedEventArgs^ args)
+{
+	//m_deviceResources->SetLogicalSize(Size(sender->Bounds.Width, sender->Bounds.Height));
+	//m_main->CreateWindowSizeDependentResources();
+}
+#endif
+
+// DisplayInformation event handlers.
+
+void App::App::OnDisplayContentsInvalidated(DisplayInformation^ sender, Object^ args)
+{
+	//m_deviceResources->ValidateDevice();
+}
+
+
+#if !(WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
+void App::App::OnDpiChanged(DisplayInformation^ sender, Object^ args)
+{
+	//m_deviceResources->SetDpi(sender->LogicalDpi);
+	//m_main->CreateWindowSizeDependentResources();
+}
+
+void App::App::OnOrientationChanged(DisplayInformation^ sender, Object^ args)
+{
+	//m_deviceResources->SetCurrentOrientation(sender->CurrentOrientation);
+	//m_main->CreateWindowSizeDependentResources();
+}
+#endif
