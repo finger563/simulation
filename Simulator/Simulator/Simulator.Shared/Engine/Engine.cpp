@@ -6,9 +6,10 @@ namespace Engine
 
 	Engine::Engine()
 	{
-		mRenderer = ref new Renderer::Renderer();
+		mRenderer = std::unique_ptr<Renderer::Renderer>(new Renderer::Renderer());
+		mPhysics = std::unique_ptr<Physics::Physics>(new Physics::Physics());
+
 		mInput = ref new Input::Input();
-		mPhysics = ref new Physics::Physics();
 	}
 
 	bool Engine::Initialize()

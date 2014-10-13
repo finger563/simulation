@@ -7,15 +7,13 @@
 
 namespace Engine
 {
-	ref class Engine sealed : public Base::ISubsystem
+	class Engine : public Base::ISubsystem
 	{
 		struct WindowProperties
 		{
 			double Width;
 			double Height;
 		};
-	internal: // only used by code in this project
-		void SetWindowProperties(double width, double height);
 	private:
 		double SimulationTime;
 		std::vector<Base::Objects::GameObject<float>> gameObjects;
@@ -27,10 +25,13 @@ namespace Engine
 		virtual void Update();
 		virtual bool UnInitialize();
 
+		void SetWindowProperties(double width, double height);
+
 		Input::Input^ GetInput();
 
-		property Physics::Physics^		mPhysics;
-		property Input::Input^			mInput;
-		property Renderer::Renderer^	mRenderer;
+		std::unique_ptr<Physics::Physics>	mPhysics;
+		std::unique_ptr<Renderer::Renderer>	mRenderer;
+
+		Input::Input^						mInput;
 	};
 }

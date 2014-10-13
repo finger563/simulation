@@ -51,7 +51,7 @@ void App::App::Initialize(CoreApplicationView^ AppView)
 
 	WindowClosed = false;
 
-	mEngine = ref new Engine::Engine();
+	mEngine = std::unique_ptr<Engine::Engine>(new Engine::Engine());
 }
 
 void App::App::SetWindow(CoreWindow^ Window)

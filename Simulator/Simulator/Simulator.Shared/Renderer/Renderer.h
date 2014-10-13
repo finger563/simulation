@@ -16,21 +16,28 @@ using namespace DirectX;
 
 namespace Renderer
 {
-	interface class IRenderer : public Base::ISubsystem
+	interface IRenderer : public Base::ISubsystem
 	{
 		virtual void Render() = 0;
+		virtual void CreateWindowSizeDependentResources() = 0;
 	};
 
-	ref class Renderer : public IRenderer
+	class Renderer : public IRenderer
 	{
 	public:
 		virtual bool Initialize();
+		virtual void CreateWindowSizeDependentResources();
 		virtual void Update();
 		virtual bool UnInitialize();
 
 		virtual void Render();
 
-	internal: // only used by code in this project
+		// must overload these for now because
+		// (1) we are creating engine/renderer using unique_ptr
+		// (2) the XMVECTOR/XMMATRIX must be 16 byte aligned
+		void* operator new(size_t);
+		void operator delete(void*);
+
 		void SetCamera(
 			Vector<3, float> position,
 			Vector<3, float> view,

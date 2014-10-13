@@ -22,25 +22,9 @@ namespace Input
 		InputValue() { fval = 0; }
 		InputValue(ValueTypes t, float mag);
 	};
-	
-	interface class IInput : public Base::ISubsystem
-	{
-	};
 
-	ref class Input : public IInput
+	ref class Input		// needs to be ref (makes it WinRT class) so that it's functions can be used for callbacks 
 	{
-	private:
-		std::map<Platform::String^, InputValue> nameToValue;
-		std::map<Windows::System::VirtualKey, InputValue*> keyToValuePtr;
-		void ClearInputs();
-	internal:
-		bool AddInput(
-			Platform::String^ name,
-			ValueTypes t,
-			float magnitude,
-			Windows::System::VirtualKey initialKey
-			);
-		InputValue& GetInput(Platform::String^ name);
 	public:
 		virtual bool Initialize();
 		virtual void Update();
@@ -50,5 +34,17 @@ namespace Input
 		void KeyUp(CoreWindow^ Window, KeyEventArgs^ Args);
 		void PointerPressed(CoreWindow^ Window, PointerEventArgs^ Args);
 		void PointerWheelChanged(CoreWindow^ Window, PointerEventArgs^ Args);
+	internal:			// used in this project only
+		bool AddInput(
+			Platform::String^ name,
+			ValueTypes t,
+			float magnitude,
+			Windows::System::VirtualKey initialKey
+			);
+		InputValue& GetInput(Platform::String^ name);
+	private:
+		std::map<Platform::String^, InputValue> nameToValue;
+		std::map<Windows::System::VirtualKey, InputValue*> keyToValuePtr;
+		void ClearInputs();
 	};
 }

@@ -12,7 +12,7 @@ namespace App
 	private:
 		bool WindowClosed;
 		bool WindowVisible;
-		Engine::Engine^ mEngine;
+		std::unique_ptr<Engine::Engine> mEngine;
 	public:
 		App();
 		// some functions called by Windows

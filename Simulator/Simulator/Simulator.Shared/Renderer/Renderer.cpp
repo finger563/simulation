@@ -3,6 +3,20 @@
 
 namespace Renderer
 {
+	void* Renderer::operator new(size_t size)
+	{
+		// XMVECTOR && XMMATRIX must be 16 byte aligned
+		void* storage = _aligned_malloc(size, 16);
+		if (nullptr == storage)
+			throw "ALLOCATION FAIL : NO FREE MEMORY";
+		return storage;
+	}
+
+	void Renderer::operator delete(void* ptr)
+	{
+		_aligned_free(ptr);
+	}
+
 	bool Renderer::Initialize()
 	{
 		directionalLights.push_back(
@@ -118,6 +132,11 @@ namespace Renderer
 		shader.Apply();
 
 		return true;
+	}
+
+	void Renderer::CreateWindowSizeDependentResources()
+	{
+
 	}
 
 	void Renderer::InitStates()
