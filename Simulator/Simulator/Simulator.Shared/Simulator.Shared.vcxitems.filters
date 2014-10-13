@@ -66,6 +66,15 @@
       <Filter>Renderer\Shaders</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)App.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Device Resources\DeviceResources.h">
+      <Filter>Renderer\Device Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Text\TextRenderer.h">
+      <Filter>Renderer\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Helper.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />
@@ -96,6 +105,12 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Shader.cpp">
       <Filter>Renderer\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Text\TextRenderer.cpp">
+      <Filter>Renderer\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Device Resources\DeviceResources.cpp">
+      <Filter>Renderer\Device Resources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +167,12 @@
     </Filter>
     <Filter Include="Renderer\Objects">
       <UniqueIdentifier>{5a8c2e3f-2f5f-474d-a6e8-10c3aef10f26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Device Resources">
+      <UniqueIdentifier>{e55ba544-1caa-4c33-82d3-fa1f14572de4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Text">
+      <UniqueIdentifier>{88099d4e-ae06-4c00-95f1-33812027ce5a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
