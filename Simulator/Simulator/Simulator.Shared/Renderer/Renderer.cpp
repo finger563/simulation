@@ -3,6 +3,10 @@
 
 namespace Renderer
 {
+	Renderer::Renderer()
+	{
+	}
+
 	void* Renderer::operator new(size_t size)
 	{
 		// XMVECTOR && XMMATRIX must be 16 byte aligned
@@ -28,115 +32,30 @@ namespace Renderer
 				)
 			);
 
-		// EVERYTHING UNDER HERE IS REQUIRED TO BE PART OF THIS FUNCTION FOR NOW
-
 		objects = nullptr;
 
-		// Define temporary pointers to a device and a device context
-		ComPtr<ID3D11Device> dev11;
-		ComPtr<ID3D11DeviceContext> devcon11;
-
-		// Create the device and device context objects
-		D3D11CreateDevice(
-			nullptr,
-			D3D_DRIVER_TYPE_HARDWARE,
-			nullptr,
-			0,
-			nullptr,
-			0,
-			D3D11_SDK_VERSION,
-			&dev11,
-			nullptr,
-			&devcon11);
-
-		// Convert the pointers from the DirectX 11 versions to the DirectX 11.1 versions
-		dev11.As(&dev);
-		devcon11.As(&devcon);
-
-		// First, convert our ID3D11Device2 into an IDXGIDevice2
-		ComPtr<IDXGIDevice2> dxgiDevice;
-		dev.As(&dxgiDevice);
-
-		// Second, use the IDXGIDevice2 interface to get access to the adapter
-		ComPtr<IDXGIAdapter> dxgiAdapter;
-		dxgiDevice->GetAdapter(&dxgiAdapter);
-
-		// Third, use the IDXGIAdapter interface to get access to the factory
-		ComPtr<IDXGIFactory2> dxgiFactory;
-		dxgiAdapter->GetParent(__uuidof(IDXGIFactory2), &dxgiFactory);
-
-		// set up the swap chain description
-		DXGI_SWAP_CHAIN_DESC1 scd = { 0 };
-		scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;    // how the swap chain should be used
-		scd.BufferCount = 2;                                  // a front buffer and a back buffer
-		scd.Format = DXGI_FORMAT_B8G8R8A8_UNORM;              // the most common swap chain format
-		scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;    // the recommended flip mode
-		scd.SampleDesc.Count = 1;                             // disable anti-aliasing
- 
-		CoreWindow^ Window = CoreWindow::GetForCurrentThread();    // get the window pointer
-
-		dxgiFactory->CreateSwapChainForCoreWindow(
-			dev.Get(),                                  // address of the device
-			reinterpret_cast<IUnknown*>(Window),        // address of the window
-			&scd,                                       // address of the swap chain description
-			nullptr,                                    // advanced
-			&swapchain);                                // address of the new swap chain pointer
-
-		// TO RENDER TO THE BACK BUFFER
-		// get a pointer directly to the back buffer
-		ComPtr<ID3D11Texture2D> backbuffer;
-		swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), &backbuffer);
-
-		// create a render target pointing to the back buffer
-		dev->CreateRenderTargetView(backbuffer.Get(), nullptr, &rendertarget);
-
-		// set the viewport
-		D3D11_VIEWPORT viewport = { 0 };
-
-		viewport.TopLeftX = 0;
-		viewport.TopLeftY = 0;
-		viewport.Width = Window->Bounds.Width;
-		viewport.Height = Window->Bounds.Height;
-		viewport.MinDepth = 0;    // the closest an object can be on the depth buffer is 0.0
-		viewport.MaxDepth = 1;    // the farthest an object can be on the depth buffer is 1.0
-
-		devcon->RSSetViewports(1, &viewport);
-
-		// enabling Depth Buffering
-		D3D11_TEXTURE2D_DESC texd = { 0 };
-
-		texd.Width = (UINT)(Window->Bounds.Width);
-		texd.Height = (UINT)(Window->Bounds.Height);
-		texd.ArraySize = 1;
-		texd.MipLevels = 1;
-		//texd.SampleDesc.Count = 1;
-		texd.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		texd.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-
-		ComPtr<ID3D11Texture2D> zbuffertexture;
-		dev->CreateTexture2D(&texd, nullptr, &zbuffertexture);
-
-		D3D11_DEPTH_STENCIL_VIEW_DESC dsvd;
-		ZeroMemory(&dsvd, sizeof(dsvd));
-
-		dsvd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-
-		dev->CreateDepthStencilView(zbuffertexture.Get(), &dsvd, &zbuffer);
+		// Constructor here makes all the D3D11 and D2D initialization
+		// Note: it only does the window-independent init
+		deviceResources = std::make_shared<DeviceResources>();
+		// We need to configure the window-dependent resources and members:
+		// Obtain a pointer to the window
+		CoreWindow^ Window = CoreWindow::GetForCurrentThread();
+		deviceResources->SetWindow(Window);
+		// Register to be notified if the Device is lost or recreated
+		deviceResources->RegisterDeviceNotify(this);
 
 		InitStates();
-
-		// EVERYTHING ABOVE HERE IS REQUIRED TO BE PART OF THIS FUNCTION FOR NOW
 		
-		shader.SetHandles(dev, devcon);
-		shader.Initialize();
-		shader.Apply();
+		shader = std::make_unique<Shader>(deviceResources);
+
+		shader->Initialize();
+		shader->Apply();
 
 		return true;
 	}
 
 	void Renderer::CreateWindowSizeDependentResources()
 	{
-
 	}
 
 	void Renderer::InitStates()
@@ -153,13 +72,17 @@ namespace Renderer
 		rd.DepthBiasClamp = 0.0f;
 		rd.SlopeScaledDepthBias = 0.0f;
 
-		dev->CreateRasterizerState(&rd, &defaultrasterizerstate);
+		ThrowIfFailed(
+			deviceResources->GetD3DDevice()->CreateRasterizerState(&rd, &defaultrasterizerstate)
+			);
 
 		// set the changed values for wireframe mode
 		rd.FillMode = D3D11_FILL_WIREFRAME;
 		rd.AntialiasedLineEnable = TRUE;
 
-		dev->CreateRasterizerState(&rd, &wireframerasterizerstate);
+		ThrowIfFailed(
+			deviceResources->GetD3DDevice()->CreateRasterizerState(&rd, &wireframerasterizerstate)
+			);
 	}
 
 	bool Renderer::UnInitialize()
@@ -174,26 +97,31 @@ namespace Renderer
 
 	void Renderer::Render()
 	{
-		// set our new render target object as the active render target
-		devcon->OMSetRenderTargets(1, rendertarget.GetAddressOf(), zbuffer.Get());
-		// can use this to set multiple render targets (number, list)
+		auto context = deviceResources->GetD3DDeviceContext();
 
-		// clear the depth buffer
-		devcon->ClearDepthStencilView(zbuffer.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+		// set our new render target object as the active render target
+		ID3D11RenderTargetView *const targets[] = { deviceResources->GetBackBufferRenderTargetView() };
+		context->OMSetRenderTargets(1, targets, deviceResources->GetDepthStencilView());
+
+		// Reset the viewport to target the whole screen.
+		auto viewport = deviceResources->GetScreenViewport();
+		context->RSSetViewports(1, &viewport);
 
 		// clear the back buffer to a deep blue
-		float color[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
-		devcon->ClearRenderTargetView(rendertarget.Get(), color);
+		context->ClearRenderTargetView(deviceResources->GetBackBufferRenderTargetView(), DirectX::Colors::CornflowerBlue);
+		
+		// clear the depth buffer
+		context->ClearDepthStencilView(deviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		// set the vertex buffer
 		UINT stride = sizeof(Base::Vertex);
 		UINT offset = 0;
-		devcon->IASetVertexBuffers(0, 1, vertexbuffer.GetAddressOf(), &stride, &offset);
+		context->IASetVertexBuffers(0, 1, vertexbuffer.GetAddressOf(), &stride, &offset);
 		// set the index buffer
-		devcon->IASetIndexBuffer(indexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		context->IASetIndexBuffer(indexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// set the primitive topology
-		devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		
 		XMMATRIX matTranslate = XMMatrixTranslation((*objects)[0].position[0], (*objects)[0].position[1], (*objects)[0].position[2]);
 		XMMATRIX matScale = XMMatrixScaling((*objects)[0].scale[0], (*objects)[0].scale[1], (*objects)[0].scale[2]);
@@ -217,17 +145,17 @@ namespace Renderer
 		cbuffer.AmbientColor = directionalLights[0].Ambient;
 
 		// set the new values for the constant buffer
-		devcon->UpdateSubresource(shader.constantbuffer.Get(), 0, 0, &cbuffer, 0, 0);
+		context->UpdateSubresource(shader->constantbuffer.Get(), 0, 0, &cbuffer, 0, 0);
 
 		// Set the rasterizer state here if we want to
 		//devcon->RSSetState(wireframerasterizerstate.Get());
 		// or
-		devcon->RSSetState(defaultrasterizerstate.Get());
+		context->RSSetState(defaultrasterizerstate.Get());
 
 		// draw 3 vertices, starting from vertex 0
-		devcon->DrawIndexed(numIndices, 0, 0);
+		context->DrawIndexed(numIndices, 0, 0);
 
-		swapchain->Present(1, 0);	// swap the back buffer and the front buffer
+		deviceResources->GetSwapChain()->Present(1, 0);	// swap the back buffer and the front buffer
 		return;
 	}
 
@@ -254,6 +182,7 @@ namespace Renderer
 	
 	void Renderer::SetObjectsInScene(std::vector<Base::Objects::GameObject<float>>* _objects)
 	{
+		// update the objects pointer that we use in the renderer
 		objects = _objects;
 		numIndices = 0;
 		std::vector<Base::Vertex> OurVertices;
@@ -270,26 +199,42 @@ namespace Renderer
 			}
 		}
 
-		numIndices = OurIndices.size();
+		// update the number of indices to be rendered by the renderer
+		numIndices = (int)OurIndices.size();
 		
 		// create the vertex buffer
 		D3D11_BUFFER_DESC vertexBD = { 0 };
-		vertexBD.ByteWidth = sizeof(Base::Vertex) * OurVertices.size();
+		vertexBD.ByteWidth = sizeof(Base::Vertex) * (int)OurVertices.size();
 		vertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
 		D3D11_SUBRESOURCE_DATA vertexSRD = { OurVertices.data() , 0, 0 };
 
-		dev->CreateBuffer(&vertexBD, &vertexSRD, &vertexbuffer);
+		ThrowIfFailed(
+			deviceResources->GetD3DDevice()->CreateBuffer(&vertexBD, &vertexSRD, &vertexbuffer)
+			);
 
 		// create the index buffer
 		// buffer description
 		D3D11_BUFFER_DESC indexBD = { 0 };
-		indexBD.ByteWidth = sizeof(UINT) * OurIndices.size();    // indices are stored in short values
+		indexBD.ByteWidth = sizeof(UINT) * (int)OurIndices.size();    // indices are stored in short values
 		indexBD.BindFlags = D3D11_BIND_INDEX_BUFFER;
 
 		// subresource data
 		D3D11_SUBRESOURCE_DATA indexSRD = { OurIndices.data() , 0, 0 };
 
-		dev->CreateBuffer(&indexBD, &indexSRD, &indexbuffer);
+		ThrowIfFailed(
+			deviceResources->GetD3DDevice()->CreateBuffer(&indexBD, &indexSRD, &indexbuffer)
+			);
+	}
+
+
+	// Notifies renderers that device resources need to be released.
+	void Renderer::OnDeviceLost()
+	{
+	}
+
+	// Notifies renderers that device resources may now be recreated.
+	void Renderer::OnDeviceRestored()
+	{
 	}
 }

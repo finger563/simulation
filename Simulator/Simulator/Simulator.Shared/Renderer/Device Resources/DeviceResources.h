@@ -30,7 +30,7 @@ namespace Renderer
 
 		// D3D Accessors.
 		ID3D11Device2*			GetD3DDevice() const					{ return m_d3dDevice.Get(); }
-		ID3D11DeviceContext2*	GetD3DDeviceContext() const				{ return m_d3dContext.Get(); }
+		ID3D11DeviceContext2*	GetD3DDeviceContext() const 			{ return m_d3dContext.Get(); }
 		IDXGISwapChain1*		GetSwapChain() const					{ return m_swapChain.Get(); }
 		D3D_FEATURE_LEVEL		GetDeviceFeatureLevel() const			{ return m_d3dFeatureLevel; }
 		ID3D11RenderTargetView*	GetBackBufferRenderTargetView() const	{ return m_d3dRenderTargetView.Get(); }

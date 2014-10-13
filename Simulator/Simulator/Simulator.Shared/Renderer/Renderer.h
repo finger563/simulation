@@ -22,18 +22,22 @@ namespace Renderer
 		virtual void CreateWindowSizeDependentResources() = 0;
 	};
 
-	class Renderer : public IRenderer
+	class Renderer : public IRenderer, public IDeviceNotify
 	{
 	public:
+		Renderer();
 		virtual bool Initialize();
 		virtual void CreateWindowSizeDependentResources();
 		virtual void Update();
 		virtual bool UnInitialize();
 
+		virtual void OnDeviceLost();
+		virtual void OnDeviceRestored();
+
 		virtual void Render();
 
 		// must overload these for now because
-		// (1) we are creating engine/renderer using unique_ptr
+		// (1) we are creating engine=>renderer using unique_ptr
 		// (2) the XMVECTOR/XMMATRIX must be 16 byte aligned
 		void* operator new(size_t);
 		void operator delete(void*);
@@ -56,7 +60,7 @@ namespace Renderer
 		Camera camera;									// Camera used to render the scene
 		std::vector<Base::Objects::GameObject<float>>* objects;	// pointer to objects created and maintained by Engine
 
-		Shader shader;									// shader to be applied
+		std::unique_ptr<Shader> shader;									// shader to be applied
 
 		std::vector<DirectionalLight> directionalLights;// Vector containing all directional lights in a scene
 		std::vector<PointLight> pointLights;			// Vector containing all point lights in a scene
@@ -69,16 +73,16 @@ namespace Renderer
 		ComPtr<ID3D11RasterizerState> defaultrasterizerstate;		// Rasterizer state (default)
 		ComPtr<ID3D11RasterizerState> wireframerasterizerstate;		// Rasterizer state (wireframe)
 
-		//std::shared_ptr<DeviceResources> deviceResources;
+		std::shared_ptr<DeviceResources> deviceResources;
 
 		// Everything below here is now contained within device resources
 
-		ComPtr<ID3D11Device2> dev;						// Dx11.2 device interface
-		ComPtr<ID3D11DeviceContext2> devcon;			// Dx11.2 device context interface
+		//ComPtr<ID3D11Device2> dev;						// Dx11.2 device interface
+		//ComPtr<ID3D11DeviceContext2> devcon;			// Dx11.2 device context interface
 
-		ComPtr<IDXGISwapChain1> swapchain;				// Dx11.2 swap chain interface
-		ComPtr<ID3D11RenderTargetView> rendertarget;	// Dx11.2 render target interface
+		//ComPtr<IDXGISwapChain1> swapchain;				// Dx11.2 swap chain interface
+		//ComPtr<ID3D11RenderTargetView> rendertarget;	// Dx11.2 render target interface
 
-		ComPtr<ID3D11DepthStencilView> zbuffer;			// Dx11.2 z-buffer interface
+		//ComPtr<ID3D11DepthStencilView> zbuffer;			// Dx11.2 z-buffer interface
 	};
 }

@@ -3,6 +3,8 @@
 #include "pch.h"
 
 #include "ConstantBuffers.h"
+#include "..\Helper.h"
+#include "..\Device Resources\DeviceResources.h"
 
 using namespace Microsoft::WRL;
 using namespace Windows::UI::Core;
@@ -16,10 +18,13 @@ namespace Renderer
 	class Shader
 	{
 	private:
-		ComPtr<ID3D11Device2> dev;						// pointer to renderer's device handle
-		ComPtr<ID3D11DeviceContext2> devcon;			// pointer to renderer's device context handle
+		std::shared_ptr<DeviceResources> deviceResources;
+
+		// Everything below here is now contained within device resources
+		//ComPtr<ID3D11Device2> dev;						// pointer to renderer's device handle
+		//ComPtr<ID3D11DeviceContext2> devcon;			// pointer to renderer's device context handle
 	public:
-		void SetHandles(ComPtr<ID3D11Device2> _dev, ComPtr<ID3D11DeviceContext2> _devcon);
+		Shader(const std::shared_ptr<DeviceResources>& deviceResources);
 		void Initialize();
 		void UnInitialize();
 		void Apply();

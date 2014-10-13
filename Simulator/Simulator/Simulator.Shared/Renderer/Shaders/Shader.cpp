@@ -8,11 +8,10 @@ using namespace Microsoft::WRL;
 using namespace Windows::UI::Core;
 using namespace DirectX;
 
-
-void Shader::SetHandles(ComPtr<ID3D11Device2> _dev, ComPtr<ID3D11DeviceContext2> _devcon)
+Shader::Shader(const std::shared_ptr<DeviceResources>& devResources) :
+deviceResources(devResources)
 {
-	_dev.CopyTo(&dev);
-	_devcon.CopyTo(&devcon);
+
 }
 
 void Shader::Initialize()
@@ -22,8 +21,8 @@ void Shader::Initialize()
 	Platform::Array<byte>^ PSFile = LoadShaderFile("PixelShader.cso");
 
 	// create the shader objects
-	dev->CreateVertexShader(VSFile->Data, VSFile->Length, nullptr, &vertexshader);
-	dev->CreatePixelShader(PSFile->Data, PSFile->Length, nullptr, &pixelshader);
+	deviceResources->GetD3DDevice()->CreateVertexShader(VSFile->Data, VSFile->Length, nullptr, &vertexshader);
+	deviceResources->GetD3DDevice()->CreatePixelShader(PSFile->Data, PSFile->Length, nullptr, &pixelshader);
 
 
 	// initialize input layout
@@ -35,7 +34,7 @@ void Shader::Initialize()
 	};
 
 	// create the input layout
-	dev->CreateInputLayout(ied, ARRAYSIZE(ied), VSFile->Data, VSFile->Length, &inputlayout);
+	deviceResources->GetD3DDevice()->CreateInputLayout(ied, ARRAYSIZE(ied), VSFile->Data, VSFile->Length, &inputlayout);
 
 	// initialize the constant buffer
 	D3D11_BUFFER_DESC bd = { 0 };
@@ -45,7 +44,7 @@ void Shader::Initialize()
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
 	// create the constant buffer
-	dev->CreateBuffer(&bd, nullptr, &constantbuffer);
+	deviceResources->GetD3DDevice()->CreateBuffer(&bd, nullptr, &constantbuffer);
 }
 
 void Shader::UnInitialize()
@@ -56,13 +55,13 @@ void Shader::UnInitialize()
 void Shader::Apply()
 {
 	// set the input layout as the active input layout
-	devcon->IASetInputLayout(inputlayout.Get());
+	deviceResources->GetD3DDeviceContext()->IASetInputLayout(inputlayout.Get());
 	// set the shader objects as the active shaders
-	devcon->VSSetShader(vertexshader.Get(), nullptr, 0);
-	devcon->PSSetShader(pixelshader.Get(), nullptr, 0);
+	deviceResources->GetD3DDeviceContext()->VSSetShader(vertexshader.Get(), nullptr, 0);
+	deviceResources->GetD3DDeviceContext()->PSSetShader(pixelshader.Get(), nullptr, 0);
 	// set the constant buffer for the vertex and pixel shaders
-	devcon->VSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());
-	devcon->PSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());
+	deviceResources->GetD3DDeviceContext()->VSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());
+	deviceResources->GetD3DDeviceContext()->PSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());
 }
 
 // this function loads a file into an Array^
