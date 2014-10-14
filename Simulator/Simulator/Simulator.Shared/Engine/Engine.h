@@ -9,15 +9,9 @@ namespace Engine
 {
 	class Engine : public Base::ISubsystem
 	{
-		struct WindowProperties
-		{
-			double Width;
-			double Height;
-		};
 	private:
 		double SimulationTime;
 		std::vector<Base::Objects::GameObject<float>> gameObjects;
-		WindowProperties windowProperties;
 	public:
 		Engine();
 
@@ -27,14 +21,15 @@ namespace Engine
 
 		virtual void OnSuspending();
 		virtual void OnResuming();
-
-		void SetWindowProperties(double width, double height);
-
+		
 		Input::Input^ GetInput();
 
 		std::unique_ptr<Physics::Physics>	mPhysics;
 		std::unique_ptr<Renderer::Renderer>	mRenderer;
 
 		Input::Input^						mInput;
+
+		// Cached reference to the Window.
+		Platform::Agile<Windows::UI::Core::CoreWindow> mWindow;
 	};
 }

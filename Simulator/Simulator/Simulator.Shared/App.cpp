@@ -56,8 +56,7 @@ void App::App::Initialize(CoreApplicationView^ AppView)
 
 void App::App::SetWindow(CoreWindow^ Window)
 {
-
-	mEngine->SetWindowProperties(Window->Bounds.Width, Window->Bounds.Height);
+	mEngine->mWindow = Window;
 
 	// Window Handlers
 
@@ -194,7 +193,6 @@ void App::App::OnDisplayContentsInvalidated(DisplayInformation^ sender, Object^ 
 {
 	mEngine->mRenderer->OnDisplayContentsInvalidated(sender, args);
 }
-
 
 #if !(WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
 void App::App::OnDpiChanged(DisplayInformation^ sender, Object^ args)

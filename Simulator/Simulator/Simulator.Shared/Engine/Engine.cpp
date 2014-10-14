@@ -21,7 +21,7 @@ namespace Engine
 			Vector<3, float>({ 0.0, 0.0, 1.0 }),						// view
 			Vector<3, float>({ 0.0, 1.0, 0.0 }),						// up
 			45.0f,														// FOVY
-			(float)(windowProperties.Width / windowProperties.Height),	// aspect ratio
+			(float)(mWindow->Bounds.Width / mWindow->Bounds.Height),	// aspect ratio
 			1.0f,														// near plane
 			1000.0f														// far plane
 			);
@@ -138,12 +138,6 @@ namespace Engine
 		mRenderer->Update();
 		mRenderer->Render();
 		return;
-	}
-
-	void Engine::SetWindowProperties(double width, double height)
-	{
-		windowProperties.Height = height;
-		windowProperties.Width = width;
 	}
 
 	Input::Input^ Engine::GetInput()
