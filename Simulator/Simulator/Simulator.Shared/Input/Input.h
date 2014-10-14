@@ -30,6 +30,9 @@ namespace Input
 		virtual void Update();
 		virtual bool UnInitialize();
 
+		virtual void OnSuspending();
+		virtual void OnResuming();
+
 		void KeyDown(CoreWindow^ Window, KeyEventArgs^ Args);
 		void KeyUp(CoreWindow^ Window, KeyEventArgs^ Args);
 		void PointerPressed(CoreWindow^ Window, PointerEventArgs^ Args);

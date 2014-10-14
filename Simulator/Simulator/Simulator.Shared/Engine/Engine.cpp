@@ -93,6 +93,20 @@ namespace Engine
 		return true;
 	}
 
+	void Engine::OnSuspending()
+	{
+		mRenderer->OnSuspending();
+		mPhysics->OnSuspending();
+		mInput->OnSuspending();
+	}
+
+	void Engine::OnResuming()
+	{
+		mRenderer->OnResuming();
+		mPhysics->OnResuming();
+		mInput->OnResuming();
+	}
+
 	void Engine::Update()
 	{
 		SimulationTime += 0.05;

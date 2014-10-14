@@ -10,10 +10,6 @@
 #include "Device Resources\DeviceResources.h"
 #include "Text\TextRenderer.h"
 
-using namespace Microsoft::WRL;
-using namespace Windows::UI::Core;
-using namespace DirectX;
-
 namespace Renderer
 {
 	interface IRenderer : public Base::ISubsystem
@@ -30,6 +26,18 @@ namespace Renderer
 		virtual void CreateWindowSizeDependentResources();
 		virtual void Update();
 		virtual bool UnInitialize();
+
+		virtual void OnSuspending();
+		virtual void OnResuming();
+
+#if !(WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
+		virtual void OnWindowSizeChanged(Windows::UI::Core::CoreWindow^ Sender, Windows::UI::Core::WindowSizeChangedEventArgs^ Args);
+#endif
+		virtual void OnDisplayContentsInvalidated(Windows::Graphics::Display::DisplayInformation^ Sender, Platform::Object^ Args);
+#if !(WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
+		virtual void OnDpiChanged(Windows::Graphics::Display::DisplayInformation^ Sender, Platform::Object^ Args);
+		virtual void OnOrientationChanged(Windows::Graphics::Display::DisplayInformation^ Sender, Platform::Object^ Args);
+#endif
 
 		virtual void OnDeviceLost();
 		virtual void OnDeviceRestored();

@@ -64,6 +64,19 @@ void Shader::Apply()
 	deviceResources->GetD3DDeviceContext()->PSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());
 }
 
+void Shader::Reset()
+{
+	inputlayout.Reset();
+
+	constantbuffer.Reset();
+
+	vertexshader.Reset();
+	pixelshader.Reset();
+	geometryshader.Reset();
+	hullshader.Reset();
+	domainshader.Reset();
+}
+
 // this function loads a file into an Array^
 Platform::Array<byte>^ Renderer::LoadShaderFile(std::string File)
 {

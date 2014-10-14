@@ -28,6 +28,7 @@ namespace Renderer
 		void Initialize();
 		void UnInitialize();
 		void Apply();
+		void Reset();
 
 		ComPtr<ID3D11InputLayout> inputlayout;			// describes semantics of vertex attributes : possibly different per shader
 

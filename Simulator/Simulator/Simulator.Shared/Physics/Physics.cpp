@@ -19,6 +19,16 @@ namespace Physics
 
 	}
 
+	void Physics::OnResuming()
+	{
+
+	}
+
+	void Physics::OnSuspending()
+	{
+
+	}
+
 	void Physics::SetSimulationType()
 	{
 

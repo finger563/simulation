@@ -25,6 +25,9 @@ namespace Engine
 		virtual void Update();
 		virtual bool UnInitialize();
 
+		virtual void OnSuspending();
+		virtual void OnResuming();
+
 		void SetWindowProperties(double width, double height);
 
 		Input::Input^ GetInput();

@@ -1,13 +1,24 @@
 #include "pch.h"
 #include "Renderer.h"
 
+using namespace concurrency;
+using namespace Windows::ApplicationModel;
+using namespace Windows::ApplicationModel::Core;
+using namespace Windows::ApplicationModel::Activation;
+using namespace Windows::UI::Core;
+using namespace Windows::UI::Input;
+using namespace Windows::System;
+using namespace Windows::Foundation;
+using namespace Windows::Graphics::Display;
+using namespace Platform;
+
 namespace Renderer
 {
 	Renderer::Renderer()
 	{
 	}
 
-	void* Renderer::operator new(size_t size)
+	void *Renderer::operator new(size_t size)
 	{
 		// XMVECTOR && XMMATRIX must be 16 byte aligned
 		void* storage = _aligned_malloc(size, 16);
@@ -56,6 +67,36 @@ namespace Renderer
 
 	void Renderer::CreateWindowSizeDependentResources()
 	{
+		Size outputSize = deviceResources->GetOutputSize();
+		float aspectRatio = outputSize.Width / outputSize.Height;
+		float fovAngleY = 70.0f * XM_PI / 180.0f;
+
+		// This is a simple example of change that can be made when the app is in
+		// portrait or snapped view.
+		if (aspectRatio < 1.0f)
+		{
+			fovAngleY *= 2.0f;
+		}
+
+		// Note that the OrientationTransform3D matrix is post-multiplied here
+		// in order to correctly orient the scene to match the display orientation.
+		// This post-multiplication step is required for any draw calls that are
+		// made to the swap chain render target. For draw calls to other targets,
+		// this transform should not be applied.
+
+		// This sample makes use of a right-handed coordinate system using row-major matrices.
+		XMMATRIX perspectiveMatrix = XMMatrixPerspectiveFovRH(
+			fovAngleY,
+			aspectRatio,
+			0.01f,
+			100.0f
+			);
+
+		XMFLOAT4X4 orientation = deviceResources->GetOrientationTransform3D();
+
+		XMMATRIX orientationMatrix = XMLoadFloat4x4(&orientation);
+
+		// NEED TO DO SOMETHING HERE WITH ORIENTATION MATRIX
 	}
 
 	void Renderer::InitStates()
@@ -159,15 +200,8 @@ namespace Renderer
 		return;
 	}
 
-	void Renderer::SetCamera(
-		Vector<3, float> position,
-		Vector<3, float> view,
-		Vector<3, float> up,
-		float FoVY,
-		float AspectRatio,
-		float NearPlane,
-		float FarPlane
-		)
+	void Renderer::SetCamera( Vector<3, float> position, Vector<3, float> view, Vector<3, float> up,
+		float FoVY, float AspectRatio, float NearPlane, float FarPlane )
 	{
 		camera.Set(
 			XMVectorSet(position[0], position[1], position[2], 0),
@@ -227,14 +261,59 @@ namespace Renderer
 			);
 	}
 
+	void Renderer::OnSuspending()
+	{
+		deviceResources->Trim();
+	}
+
+	void Renderer::OnResuming()
+	{
+
+	}
+
+#if !(WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
+	void Renderer::OnWindowSizeChanged(CoreWindow^ Sender, WindowSizeChangedEventArgs^ Args)
+	{
+		deviceResources->SetLogicalSize(Size(Sender->Bounds.Width, Sender->Bounds.Height));
+		CreateWindowSizeDependentResources();
+	}
+#endif
+
+	// DisplayInformation event handlers.
+
+	void Renderer::OnDisplayContentsInvalidated(DisplayInformation^ Sender, Object^ Args)
+	{
+		deviceResources->ValidateDevice();
+	}
+
+#if !(WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
+	void Renderer::OnDpiChanged(DisplayInformation^ Sender, Object^ Args)
+	{
+		deviceResources->SetDpi(Sender->LogicalDpi);
+		CreateWindowSizeDependentResources();
+	}
+
+	void Renderer::OnOrientationChanged(DisplayInformation^ Sender, Object^ Args)
+	{
+		deviceResources->SetCurrentOrientation(Sender->CurrentOrientation);
+		CreateWindowSizeDependentResources();
+	}
+#endif
 
 	// Notifies renderers that device resources need to be released.
 	void Renderer::OnDeviceLost()
 	{
+		vertexbuffer.Reset();
+		indexbuffer.Reset();
+		defaultrasterizerstate.Reset();
+		wireframerasterizerstate.Reset();
+
+		shader->Reset();
 	}
 
 	// Notifies renderers that device resources may now be recreated.
 	void Renderer::OnDeviceRestored()
 	{
+		shader->Initialize();
 	}
 }

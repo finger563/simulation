@@ -28,10 +28,8 @@ namespace App
 		void OnSuspending(Object^ Sender, Windows::ApplicationModel::SuspendingEventArgs^ Args);
 		// Load the state of the simulator here
 		void OnResuming(Object^ Sender, Object^ Args); 
-		// Save the state of the simulator here
-		void OnClosed(CoreWindow^ Sender, CoreWindowEventArgs^ Args);
 
-		// Window event handlers.
+		// Window Event Handlers
 #if !(WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
 		void OnWindowSizeChanged(Windows::UI::Core::CoreWindow^ Sender, Windows::UI::Core::WindowSizeChangedEventArgs^ Args);
 #endif

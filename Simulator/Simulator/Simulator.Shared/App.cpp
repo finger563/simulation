@@ -56,29 +56,24 @@ void App::App::Initialize(CoreApplicationView^ AppView)
 
 void App::App::SetWindow(CoreWindow^ Window)
 {
-	Window->Closed += ref new TypedEventHandler
-		<CoreWindow^, CoreWindowEventArgs^>(this, &App::OnClosed);
-
-	Window->PointerPressed += ref new TypedEventHandler
-		<CoreWindow^, PointerEventArgs^>(mEngine->mInput, &Input::Input::PointerPressed);
-	Window->KeyDown += ref new TypedEventHandler
-		<CoreWindow^, KeyEventArgs^>(mEngine->mInput, &Input::Input::KeyDown);
-	Window->KeyUp += ref new TypedEventHandler
-		<CoreWindow^, KeyEventArgs^>(mEngine->mInput, &Input::Input::KeyUp);
-	Window->PointerWheelChanged += ref new TypedEventHandler
-		<CoreWindow^, PointerEventArgs^>(mEngine->mInput, &Input::Input::PointerWheelChanged);
 
 	mEngine->SetWindowProperties(Window->Bounds.Width, Window->Bounds.Height);
 
+	// Window Handlers
+
+	Window->Closed += ref new TypedEventHandler
+		<CoreWindow^, CoreWindowEventArgs^>(this, &App::OnWindowClosed);
+
+	Window->VisibilityChanged +=
+		ref new TypedEventHandler<CoreWindow^, VisibilityChangedEventArgs^>(this, &App::OnVisibilityChanged);
 
 	DisplayInformation^ currentDisplayInformation = DisplayInformation::GetForCurrentView();
-
-	DisplayInformation::DisplayContentsInvalidated +=
-		ref new TypedEventHandler<DisplayInformation^, Object^>(this, &App::OnDisplayContentsInvalidated);
 
 #if !(WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
 	Window->SizeChanged +=
 		ref new TypedEventHandler<CoreWindow^, WindowSizeChangedEventArgs^>(this, &App::OnWindowSizeChanged);
+
+	// DisplayInformation Event Handlers
 
 	currentDisplayInformation->DpiChanged +=
 		ref new TypedEventHandler<DisplayInformation^, Object^>(this, &App::OnDpiChanged);
@@ -93,32 +88,57 @@ void App::App::SetWindow(CoreWindow^ Window)
 	pointerVisualizationSettings->IsBarrelButtonFeedbackEnabled = false;
 #endif
 
+	DisplayInformation::DisplayContentsInvalidated +=
+		ref new TypedEventHandler<DisplayInformation^, Object^>(this, &App::OnDisplayContentsInvalidated);
+
+	// Input Handlers
+
+	Window->PointerPressed += ref new TypedEventHandler
+		<CoreWindow^, PointerEventArgs^>(mEngine->mInput, &Input::Input::PointerPressed);
+	Window->KeyDown += ref new TypedEventHandler
+		<CoreWindow^, KeyEventArgs^>(mEngine->mInput, &Input::Input::KeyDown);
+	Window->KeyUp += ref new TypedEventHandler
+		<CoreWindow^, KeyEventArgs^>(mEngine->mInput, &Input::Input::KeyUp);
+	Window->PointerWheelChanged += ref new TypedEventHandler
+		<CoreWindow^, PointerEventArgs^>(mEngine->mInput, &Input::Input::PointerWheelChanged);
+
+	// should set window here? for the renderer's deviceResources?
 }
 
-void App::App::Load(String^ EntryPoint) {}
+void App::App::Load(String^ EntryPoint) 
+{
+	if (mEngine == nullptr)
+	{
+		mEngine = std::unique_ptr<Engine::Engine>(new Engine::Engine());
+	}
+}
 
 void App::App::Run()
 {
 	mEngine->Initialize(); // INITIALIZE THE SIMULATOR
 
-	// Obtain a pointer to the window
-	CoreWindow^ Window = CoreWindow::GetForCurrentThread();
-
 	while (!WindowClosed)
 	{
-		Window->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
+		if (WindowVisible)
+		{
+			CoreWindow::GetForCurrentThread()->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
 
-		mEngine->Update();		// HANDLES EVERYTHING FOR THE SIMULATOR
+			mEngine->Update();		// HANDLES EVERYTHING FOR THE SIMULATOR
+		}
+		else
+		{
+			CoreWindow::GetForCurrentThread()->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessOneAndAllPending);
+		}
 	}
 }
 
 void App::App::Uninitialize() {}
 
-// an "event" that is called when the application window is ready to be activated
+// an event that is called when the application window is ready to be activated
 void App::App::OnActivated(CoreApplicationView^ CoreAppView, IActivatedEventArgs^ Args)
 {
-	CoreWindow^ Window = CoreWindow::GetForCurrentThread();
-	Window->Activate();
+	// Run() won't start until the CoreWindow is activated.
+	CoreWindow::GetForCurrentThread()->Activate();
 }
 
 // Save the state of the simulator here
@@ -132,10 +152,7 @@ void App::App::OnSuspending(Object^ Sender, SuspendingEventArgs^ Args)
 
 	create_task([this, deferral]()
 	{
-		// NEED TO CALL THE TRIM FUNCTION ON THE DEVICE RESOURCES
-		// ->Trim();
-
-		// Insert your code here.
+		mEngine->OnSuspending();
 
 		deferral->Complete();
 	});
@@ -149,6 +166,7 @@ void App::App::OnResuming(Object^ Sender, Object^ Args)
 	// does not occur if the app was previously terminated.
 
 	// Insert your code here.
+	mEngine->OnResuming();
 }
 
 // Window event handlers.
@@ -158,7 +176,7 @@ void App::App::OnVisibilityChanged(CoreWindow^ sender, VisibilityChangedEventArg
 	WindowVisible = Args->Visible;
 }
 
-void App::App::OnClosed(CoreWindow^ Sender, CoreWindowEventArgs^ Args)
+void App::App::OnWindowClosed(CoreWindow^ Sender, CoreWindowEventArgs^ Args)
 {
 	WindowClosed = true;
 }
@@ -166,8 +184,7 @@ void App::App::OnClosed(CoreWindow^ Sender, CoreWindowEventArgs^ Args)
 #if !(WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
 void App::App::OnWindowSizeChanged(CoreWindow^ sender, WindowSizeChangedEventArgs^ args)
 {
-	//m_deviceResources->SetLogicalSize(Size(sender->Bounds.Width, sender->Bounds.Height));
-	//m_main->CreateWindowSizeDependentResources();
+	mEngine->mRenderer->OnWindowSizeChanged(sender, args);
 }
 #endif
 
@@ -175,20 +192,18 @@ void App::App::OnWindowSizeChanged(CoreWindow^ sender, WindowSizeChangedEventArg
 
 void App::App::OnDisplayContentsInvalidated(DisplayInformation^ sender, Object^ args)
 {
-	//m_deviceResources->ValidateDevice();
+	mEngine->mRenderer->OnDisplayContentsInvalidated(sender, args);
 }
 
 
 #if !(WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
 void App::App::OnDpiChanged(DisplayInformation^ sender, Object^ args)
 {
-	//m_deviceResources->SetDpi(sender->LogicalDpi);
-	//m_main->CreateWindowSizeDependentResources();
+	mEngine->mRenderer->OnDpiChanged(sender, args);
 }
 
 void App::App::OnOrientationChanged(DisplayInformation^ sender, Object^ args)
 {
-	//m_deviceResources->SetCurrentOrientation(sender->CurrentOrientation);
-	//m_main->CreateWindowSizeDependentResources();
+	mEngine->mRenderer->OnOrientationChanged(sender, args);
 }
 #endif

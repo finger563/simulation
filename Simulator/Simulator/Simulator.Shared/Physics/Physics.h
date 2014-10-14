@@ -18,6 +18,9 @@ namespace Physics
 		virtual void Update();
 		virtual bool UnInitialize();
 
+		virtual void OnSuspending();
+		virtual void OnResuming();
+
 		virtual void SetSimulationType();
 
 		virtual void StepObjects();

@@ -24,6 +24,16 @@ namespace Input
 		return true;
 	}
 
+	void Input::OnSuspending()
+	{
+
+	}
+
+	void Input::OnResuming()
+	{
+
+	}
+
 	void Input::Update()
 	{
 	}
