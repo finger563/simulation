@@ -189,10 +189,7 @@ namespace Renderer
 		// or
 		context->RSSetState(defaultrasterizerstate.Get());
 
-		// draw 3 vertices, starting from vertex 0
 		context->DrawIndexed(numIndices, 0, 0);
-
-		deviceResources->GetSwapChain()->Present(1, 0);	// swap the back buffer and the front buffer
 		return;
 	}
 

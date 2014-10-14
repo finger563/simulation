@@ -167,6 +167,8 @@ namespace Engine
 		mypoint.x = 0;
 		mypoint.y = 0;
 		mTextRenderer->Render(renderString, mypoint);
+
+		deviceResources->Present();
 		return;
 	}
 
