@@ -18,17 +18,22 @@ namespace Renderer
 		virtual void CreateWindowSizeDependentResources() = 0;
 	};
 
-	class Renderer : public IRenderer, public IDeviceNotify
+	class Renderer : public IRenderer
 	{
 	public:
-		Renderer();
+		Renderer(const std::shared_ptr<DeviceResources>& deviceResources);
 		virtual bool Initialize();
 		virtual void CreateWindowSizeDependentResources();
 		virtual void Update();
 		virtual bool UnInitialize();
 
+		virtual void Render();
+
 		virtual void OnSuspending();
 		virtual void OnResuming();
+
+		void CreateDeviceDependentResources();
+		void ReleaseDeviceDependentResources();
 
 #if !(WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
 		virtual void OnWindowSizeChanged(Windows::UI::Core::CoreWindow^ Sender, Windows::UI::Core::WindowSizeChangedEventArgs^ Args);
@@ -38,11 +43,6 @@ namespace Renderer
 		virtual void OnDpiChanged(Windows::Graphics::Display::DisplayInformation^ Sender, Platform::Object^ Args);
 		virtual void OnOrientationChanged(Windows::Graphics::Display::DisplayInformation^ Sender, Platform::Object^ Args);
 #endif
-
-		virtual void OnDeviceLost();
-		virtual void OnDeviceRestored();
-
-		virtual void Render();
 
 		// must overload these for now because
 		// (1) we are creating engine=>renderer using unique_ptr
@@ -82,15 +82,5 @@ namespace Renderer
 		ComPtr<ID3D11RasterizerState> wireframerasterizerstate;		// Rasterizer state (wireframe)
 
 		std::shared_ptr<DeviceResources> deviceResources;
-
-		// Everything below here is now contained within device resources
-
-		//ComPtr<ID3D11Device2> dev;						// Dx11.2 device interface
-		//ComPtr<ID3D11DeviceContext2> devcon;			// Dx11.2 device context interface
-
-		//ComPtr<IDXGISwapChain1> swapchain;				// Dx11.2 swap chain interface
-		//ComPtr<ID3D11RenderTargetView> rendertarget;	// Dx11.2 render target interface
-
-		//ComPtr<ID3D11DepthStencilView> zbuffer;			// Dx11.2 z-buffer interface
 	};
 }

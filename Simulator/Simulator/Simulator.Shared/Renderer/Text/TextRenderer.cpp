@@ -36,8 +36,23 @@ m_deviceResources(deviceResources)
 }
 
 // Renders a frame to the screen.
-void TextRenderer::Render(Platform::String^ Text, POINT pos)
+void TextRenderer::Render(Platform::String^ Text, POINT& Pos)
 {
+	ThrowIfFailed(
+		m_deviceResources->GetDWriteFactory()->CreateTextLayout(
+		Text->Data(),
+		(uint32)Text->Length(),
+		m_textFormat.Get(),
+		240.0f, // Max width of the input text.
+		50.0f, // Max height of the input text.
+		&m_textLayout
+		)
+		);
+
+	ThrowIfFailed(
+		m_textLayout->GetMetrics(&m_textMetrics)
+		);
+
 	ID2D1DeviceContext* context = m_deviceResources->GetD2DDeviceContext();
 	Windows::Foundation::Size logicalSize = m_deviceResources->GetLogicalSize();
 
@@ -82,4 +97,30 @@ void TextRenderer::CreateDeviceDependentResources()
 void TextRenderer::ReleaseDeviceDependentResources()
 {
 	m_whiteBrush.Reset();
+}
+
+
+bool TextRenderer::Initialize()
+{
+	return true;
+}
+
+void TextRenderer::Update()
+{
+
+}
+
+bool TextRenderer::UnInitialize()
+{
+	return true;
+}
+
+void TextRenderer::OnSuspending()
+{
+
+}
+
+void TextRenderer::OnResuming()
+{
+
 }

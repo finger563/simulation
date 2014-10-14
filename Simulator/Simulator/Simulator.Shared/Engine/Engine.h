@@ -7,11 +7,13 @@
 
 namespace Engine
 {
-	class Engine : public Base::ISubsystem
+	class Engine : public Base::ISubsystem, public Renderer::IDeviceNotify
 	{
 	private:
 		double SimulationTime;
 		std::vector<Base::Objects::GameObject<float>> gameObjects;
+
+		std::shared_ptr<Renderer::DeviceResources> deviceResources;
 	public:
 		Engine();
 
@@ -21,11 +23,15 @@ namespace Engine
 
 		virtual void OnSuspending();
 		virtual void OnResuming();
+
+		virtual void OnDeviceLost();
+		virtual void OnDeviceRestored();
 		
 		Input::Input^ GetInput();
 
-		std::unique_ptr<Physics::Physics>	mPhysics;
-		std::unique_ptr<Renderer::Renderer>	mRenderer;
+		std::unique_ptr<Physics::Physics>		mPhysics;
+		std::unique_ptr<Renderer::Renderer>		mRenderer;
+		std::unique_ptr<Renderer::TextRenderer>	mTextRenderer;
 
 		Input::Input^						mInput;
 

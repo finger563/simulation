@@ -100,8 +100,6 @@ void App::App::SetWindow(CoreWindow^ Window)
 		<CoreWindow^, KeyEventArgs^>(mEngine->mInput, &Input::Input::KeyUp);
 	Window->PointerWheelChanged += ref new TypedEventHandler
 		<CoreWindow^, PointerEventArgs^>(mEngine->mInput, &Input::Input::PointerWheelChanged);
-
-	// should set window here? for the renderer's deviceResources?
 }
 
 void App::App::Load(String^ EntryPoint) 

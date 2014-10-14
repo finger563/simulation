@@ -6,15 +6,22 @@ namespace Engine
 
 	Engine::Engine()
 	{
-		mRenderer = std::unique_ptr<Renderer::Renderer>(new Renderer::Renderer());
-		mPhysics = std::unique_ptr<Physics::Physics>(new Physics::Physics());
-
+		// need to initialize input here; it needs to be used before initialize() is called
 		mInput = ref new Input::Input();
 	}
 
 	bool Engine::Initialize()
 	{
 		SimulationTime = 0;
+
+		// Constructor here makes all the D3D11 and D2D initialization
+		// Note: it only does the window-independent init
+		deviceResources = std::make_shared<Renderer::DeviceResources>();
+		// Register to be notified if the Device is lost or recreated
+		deviceResources->RegisterDeviceNotify(this);
+
+		mRenderer = std::unique_ptr<Renderer::Renderer>(new Renderer::Renderer(deviceResources));
+
 		mRenderer->Initialize();
 		mRenderer->SetCamera(
 			Vector<3, float>({ 0.0, 0.0, -5.0 }),						// position
@@ -29,6 +36,8 @@ namespace Engine
 		gameObjects.push_back(Base::Objects::GameObject<float>());
 		Renderer::BaseObjects::InitCubeMesh(&gameObjects.back().mesh);
 		mRenderer->SetObjectsInScene(&gameObjects);
+
+		mTextRenderer = std::unique_ptr<Renderer::TextRenderer>(new Renderer::TextRenderer(deviceResources));
 
 		mInput->Initialize();
 
@@ -83,7 +92,8 @@ namespace Engine
 			0.05f,
 			Windows::System::VirtualKey::Down
 			);
-
+		
+		mPhysics = std::unique_ptr<Physics::Physics>(new Physics::Physics());
 		mPhysics->Initialize();
 		return true;
 	}
@@ -105,6 +115,21 @@ namespace Engine
 		mRenderer->OnResuming();
 		mPhysics->OnResuming();
 		mInput->OnResuming();
+	}
+
+	// Notifies renderers that device resources need to be released.
+	void Engine::OnDeviceLost()
+	{
+		mRenderer->ReleaseDeviceDependentResources();
+		mTextRenderer->ReleaseDeviceDependentResources();
+	}
+
+	// Notifies renderers that device resources may now be recreated.
+	void Engine::OnDeviceRestored()
+	{
+		mRenderer->CreateDeviceDependentResources();
+		mTextRenderer->CreateDeviceDependentResources();
+		mRenderer->CreateWindowSizeDependentResources();
 	}
 
 	void Engine::Update()
@@ -137,6 +162,11 @@ namespace Engine
 		mPhysics->Update();
 		mRenderer->Update();
 		mRenderer->Render();
+		Platform::String^ renderString = L"Hello World!";
+		POINT mypoint = POINT();
+		mypoint.x = 0;
+		mypoint.y = 0;
+		mTextRenderer->Render(renderString, mypoint);
 		return;
 	}
 

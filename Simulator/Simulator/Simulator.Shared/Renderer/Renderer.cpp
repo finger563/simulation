@@ -14,7 +14,8 @@ using namespace Platform;
 
 namespace Renderer
 {
-	Renderer::Renderer()
+	Renderer::Renderer(const std::shared_ptr<DeviceResources>& devResources) :
+		deviceResources(devResources)
 	{
 	}
 
@@ -45,15 +46,10 @@ namespace Renderer
 
 		objects = nullptr;
 
-		// Constructor here makes all the D3D11 and D2D initialization
-		// Note: it only does the window-independent init
-		deviceResources = std::make_shared<DeviceResources>();
 		// We need to configure the window-dependent resources and members:
 		// Obtain a pointer to the window
 		CoreWindow^ Window = CoreWindow::GetForCurrentThread();
 		deviceResources->SetWindow(Window);
-		// Register to be notified if the Device is lost or recreated
-		deviceResources->RegisterDeviceNotify(this);
 
 		InitStates();
 		
@@ -301,7 +297,7 @@ namespace Renderer
 #endif
 
 	// Notifies renderers that device resources need to be released.
-	void Renderer::OnDeviceLost()
+	void Renderer::ReleaseDeviceDependentResources()
 	{
 		vertexbuffer.Reset();
 		indexbuffer.Reset();
@@ -312,7 +308,7 @@ namespace Renderer
 	}
 
 	// Notifies renderers that device resources may now be recreated.
-	void Renderer::OnDeviceRestored()
+	void Renderer::CreateDeviceDependentResources()
 	{
 		shader->Initialize();
 	}
