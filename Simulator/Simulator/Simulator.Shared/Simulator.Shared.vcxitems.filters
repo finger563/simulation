@@ -8,9 +8,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Math\Vector.h">
       <Filter>Base\Math</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Math\Matrix.h">
-      <Filter>Base\Math</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Objects\GameObject.h">
       <Filter>Base\Objects</Filter>
     </ClInclude>

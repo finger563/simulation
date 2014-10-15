@@ -150,11 +150,11 @@ namespace Renderer
 		// set the primitive topology
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		
-		XMMATRIX matTranslate = XMMatrixTranslation((*objects)[0].position[0], (*objects)[0].position[1], (*objects)[0].position[2]);
-		XMMATRIX matScale = XMMatrixScaling((*objects)[0].scale[0], (*objects)[0].scale[1], (*objects)[0].scale[2]);
-		XMMATRIX matRotateX = XMMatrixRotationX((*objects)[0].orientation[0]);
-		XMMATRIX matRotateY = XMMatrixRotationY((*objects)[0].orientation[1]);
-		XMMATRIX matRotateZ = XMMatrixRotationZ((*objects)[0].orientation[2]);
+		XMMATRIX matTranslate = XMMatrixTranslationFromVector((*objects)[0].position);
+		XMMATRIX matScale = XMMatrixScalingFromVector((*objects)[0].scale);
+		XMMATRIX matRotateX = XMMatrixRotationX(XMVectorGetByIndex((*objects)[0].orientation,0));
+		XMMATRIX matRotateY = XMMatrixRotationY(XMVectorGetByIndex((*objects)[0].orientation,1));
+		XMMATRIX matRotateZ = XMMatrixRotationZ(XMVectorGetByIndex((*objects)[0].orientation,2));
 		XMMATRIX matRotation = matRotateX * matRotateY * matRotateZ;
 
 		XMMATRIX matWorld = matRotation * matScale * matTranslate;
@@ -183,13 +183,13 @@ namespace Renderer
 		return;
 	}
 
-	void Renderer::SetCamera( Vector<3, float> position, Vector<3, float> view, Vector<3, float> up,
+	void Renderer::SetCamera( Vector position, Vector view, Vector up,
 		float FoVY, float AspectRatio, float NearPlane, float FarPlane )
 	{
 		camera.Set(
-			XMVectorSet(position[0], position[1], position[2], 0),
-			XMVectorSet(view[0], view[1], view[2], 0),
-			XMVectorSet(up[0], up[1], up[2], 0),
+			position,
+			view,
+			up,
 			FoVY,
 			AspectRatio,
 			NearPlane,
@@ -197,7 +197,7 @@ namespace Renderer
 			);
 	}
 	
-	void Renderer::SetObjectsInScene(std::vector<Base::Objects::GameObject<float>>* _objects)
+	void Renderer::SetObjectsInScene(std::vector<Base::Objects::GameObject>* _objects)
 	{
 		// update the objects pointer that we use in the renderer
 		objects = _objects;

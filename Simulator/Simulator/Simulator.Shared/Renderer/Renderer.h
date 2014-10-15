@@ -51,22 +51,22 @@ namespace Renderer
 		void operator delete(void*);
 
 		void SetCamera(
-			Vector<3, float> position,
-			Vector<3, float> view,
-			Vector<3, float> up,
+			Vector position,
+			Vector view,
+			Vector up,
 			float FoVY,
 			float AspectRatio,
 			float NearPlane,
 			float FarPlane
 			);
 		Camera* GetCameraPtr() { return &camera; }
-		void SetObjectsInScene(std::vector<Base::Objects::GameObject<float>>* _objects);
+		void SetObjectsInScene(std::vector<Base::Objects::GameObject>* _objects);
 
 	private:
 		void InitStates();								// For initializing the rasterizer etc. states.
 
 		Camera camera;									// Camera used to render the scene
-		std::vector<Base::Objects::GameObject<float>>* objects;	// pointer to objects created and maintained by Engine
+		std::vector<Base::Objects::GameObject>* objects;	// pointer to objects created and maintained by Engine
 
 		std::unique_ptr<Shader> shader;									// shader to be applied
 

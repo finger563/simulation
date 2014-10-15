@@ -24,16 +24,16 @@ namespace Engine
 
 		mRenderer->Initialize();
 		mRenderer->SetCamera(
-			Vector<3, float>({ 0.0, 0.0, -5.0 }),						// position
-			Vector<3, float>({ 0.0, 0.0, 1.0 }),						// view
-			Vector<3, float>({ 0.0, 1.0, 0.0 }),						// up
+			Vector(XMVectorSet(0.0, 0.0, -5.0, 0.0)),						// position
+			Vector(XMVectorSet(0.0, 0.0, 1.0, 0.0)),						// view
+			Vector(XMVectorSet( 0.0, 1.0, 0.0, 0.0 )),						// up
 			45.0f,														// FOVY
 			(float)(mWindow->Bounds.Width / mWindow->Bounds.Height),	// aspect ratio
 			1.0f,														// near plane
 			1000.0f														// far plane
 			);
 
-		gameObjects.push_back(Base::Objects::GameObject<float>());
+		gameObjects.push_back(Base::Objects::GameObject());
 		Renderer::BaseObjects::InitCubeMesh(&gameObjects.back().mesh);
 		Renderer::BaseObjects::InitSphereMesh(&gameObjects.back().mesh);
 		mRenderer->SetObjectsInScene(&gameObjects);
@@ -157,8 +157,7 @@ namespace Engine
 		mRenderer->GetCameraPtr()->Walk(walk);
 		mRenderer->GetCameraPtr()->Strafe(strafe);
 
-		gameObjects[0].position.vals[0] = (float)cos(SimulationTime) * 3.0f;
-		gameObjects[0].position.vals[2] = (float)sin(SimulationTime) * 3.0f;
+		gameObjects[0].position = XMVectorSet((float)cos(SimulationTime) * 3.0f,(float)sin(SimulationTime) * 3.0f,0,0);
 
 		mPhysics->Update();
 		mRenderer->Update();

@@ -34,7 +34,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Subsystem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Engine\Engine.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Input\Input.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)Base\Math\Matrix.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Math\Vector.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Objects\BoundingObjects.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Objects\Ellipsoid.h" />

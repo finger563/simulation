@@ -6,7 +6,6 @@ namespace Base
 {
 	namespace DataStructures
 	{
-		template<typename T>
 		struct QuadTreeNode
 		{
 			QuadTreeNode				*parent;		// parent of this node
@@ -14,9 +13,9 @@ namespace Base
 			float						error;			// deviation of this node from the actual mesh
 			std::vector<uint32>			indices;		// array of indices for this node's mesh
 
-			Objects::BoundingSphere<T>	boundingSphere;
-			Objects::AABB<T>			boundingBox;
-			Objects::OOBB<T>			orientedBoundingBox;
+			Objects::BoundingSphere	boundingSphere;
+			Objects::AABB			boundingBox;
+			Objects::OOBB			orientedBoundingBox;
 
 			QuadTreeNode(
 				QuadTreeNode	*_parent = nullptr,

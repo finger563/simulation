@@ -11,7 +11,7 @@ namespace Engine
 	{
 	private:
 		double SimulationTime;
-		std::vector<Base::Objects::GameObject<float>> gameObjects;
+		std::vector<Base::Objects::GameObject> gameObjects;
 	public:
 		Engine();
 
