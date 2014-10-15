@@ -35,6 +35,7 @@ namespace Engine
 
 		gameObjects.push_back(Base::Objects::GameObject<float>());
 		Renderer::BaseObjects::InitCubeMesh(&gameObjects.back().mesh);
+		Renderer::BaseObjects::InitSphereMesh(&gameObjects.back().mesh);
 		mRenderer->SetObjectsInScene(&gameObjects);
 
 		mTextRenderer = std::unique_ptr<Renderer::TextRenderer>(new Renderer::TextRenderer(deviceResources));
