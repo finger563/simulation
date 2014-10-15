@@ -15,6 +15,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)Base\Data Structures\QuadTree.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Base\Math\Vector.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Base\Objects\Ellipsoid.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)App.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Engine\Engine.cpp" />

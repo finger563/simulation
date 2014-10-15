@@ -61,8 +61,8 @@ void TextRenderer::Render(Platform::String^ Text, POINT& Pos)
 
 	// Position on the bottom right corner
 	D2D1::Matrix3x2F screenTranslation = D2D1::Matrix3x2F::Translation(
-		Pos.x,
-		Pos.y
+		(float)Pos.x,
+		(float)Pos.y
 		);
 
 	context->SetTransform(screenTranslation * m_deviceResources->GetOrientationTransform2D());

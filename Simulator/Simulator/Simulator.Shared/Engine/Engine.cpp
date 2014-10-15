@@ -24,9 +24,9 @@ namespace Engine
 
 		mRenderer->Initialize();
 		mRenderer->SetCamera(
-			Vector(XMVectorSet(0.0, 0.0, -5.0, 0.0)),						// position
-			Vector(XMVectorSet(0.0, 0.0, 1.0, 0.0)),						// view
-			Vector(XMVectorSet( 0.0, 1.0, 0.0, 0.0 )),						// up
+			VectorInit({ 0.0, 0.0, -5.0, 0.0 }),						// position
+			VectorInit({ 0.0, 0.0, 1.0, 0.0 }),							// view
+			VectorInit({ 0.0, 1.0, 0.0, 0.0 }),							// up
 			45.0f,														// FOVY
 			(float)(mWindow->Bounds.Width / mWindow->Bounds.Height),	// aspect ratio
 			1.0f,														// near plane
@@ -164,8 +164,8 @@ namespace Engine
 		mRenderer->Render();
 		Platform::String^ renderString = L"How long can I make this string?";
 		POINT mypoint = POINT();
-		mypoint.x = 100;
-		mypoint.y = 100;
+		mypoint.x = 100 + (long)cos(SimulationTime)*100;
+		mypoint.y = 100 + (long)sin(SimulationTime) * 100;
 		mTextRenderer->Render(renderString, mypoint);
 
 		deviceResources->Present();

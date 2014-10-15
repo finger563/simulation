@@ -24,9 +24,9 @@ namespace Renderer
 		XMMATRIX OrientMatrix;		// matrix used to store the orientation of the screen
 
 		void Set(
-			XMVECTOR position,
-			XMVECTOR view,
-			XMVECTOR up,
+			XMVECTOR& position,
+			XMVECTOR& view,
+			XMVECTOR& up,
 			float fovY,
 			float aspectRatio,
 			float nearPlane,

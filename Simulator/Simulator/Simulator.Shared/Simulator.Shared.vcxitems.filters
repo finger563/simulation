@@ -109,6 +109,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Device Resources\DeviceResources.cpp">
       <Filter>Renderer\Device Resources</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Base\Math\Vector.cpp">
+      <Filter>Base\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Base">

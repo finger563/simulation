@@ -4,9 +4,9 @@
 using namespace Renderer;
 
 void Camera::Set(
-	XMVECTOR position,
-	XMVECTOR view,
-	XMVECTOR up,
+	XMVECTOR& position,
+	XMVECTOR& view,
+	XMVECTOR& up,
 	float fovY,
 	float aspectRatio,
 	float nearPlane,
