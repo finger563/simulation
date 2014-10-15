@@ -20,6 +20,7 @@ void Camera::Set(
 	Aspect = aspectRatio;
 	NearPlane = nearPlane;
 	FarPlane = farPlane;
+	OrientMatrix = XMMatrixIdentity();
 }
 
 void Camera::Strafe(float Dist)

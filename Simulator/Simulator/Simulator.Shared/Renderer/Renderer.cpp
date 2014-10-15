@@ -80,19 +80,9 @@ namespace Renderer
 		// made to the swap chain render target. For draw calls to other targets,
 		// this transform should not be applied.
 
-		// This sample makes use of a right-handed coordinate system using row-major matrices.
-		XMMATRIX perspectiveMatrix = XMMatrixPerspectiveFovRH(
-			fovAngleY,
-			aspectRatio,
-			0.01f,
-			100.0f
-			);
-
 		XMFLOAT4X4 orientation = deviceResources->GetOrientationTransform3D();
 
-		XMMATRIX orientationMatrix = XMLoadFloat4x4(&orientation);
-
-		// NEED TO DO SOMETHING HERE WITH ORIENTATION MATRIX
+		camera.OrientMatrix = XMLoadFloat4x4(&orientation);
 	}
 
 	void Renderer::InitStates()
@@ -170,7 +160,7 @@ namespace Renderer
 		XMMATRIX matWorld = matRotation * matScale * matTranslate;
 
 		camera.UpdateMatrices();
-		XMMATRIX matFinal = matWorld * camera.ViewMatrix * camera.ProjMatrix;
+		XMMATRIX matFinal = matWorld * camera.ViewMatrix * camera.ProjMatrix * camera.OrientMatrix;
 
 		CBuffer cbuffer;
 		cbuffer.matWVP = matFinal;

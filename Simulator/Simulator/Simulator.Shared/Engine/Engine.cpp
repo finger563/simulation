@@ -162,10 +162,10 @@ namespace Engine
 		mPhysics->Update();
 		mRenderer->Update();
 		mRenderer->Render();
-		Platform::String^ renderString = L"Hello World!";
+		Platform::String^ renderString = L"How long can I make this string?";
 		POINT mypoint = POINT();
-		mypoint.x = 0;
-		mypoint.y = 0;
+		mypoint.x = 100;
+		mypoint.y = 100;
 		mTextRenderer->Render(renderString, mypoint);
 
 		deviceResources->Present();

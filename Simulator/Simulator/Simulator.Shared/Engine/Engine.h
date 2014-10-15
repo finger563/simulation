@@ -12,8 +12,6 @@ namespace Engine
 	private:
 		double SimulationTime;
 		std::vector<Base::Objects::GameObject<float>> gameObjects;
-
-		std::shared_ptr<Renderer::DeviceResources> deviceResources;
 	public:
 		Engine();
 
@@ -32,6 +30,8 @@ namespace Engine
 		std::unique_ptr<Physics::Physics>		mPhysics;
 		std::unique_ptr<Renderer::Renderer>		mRenderer;
 		std::unique_ptr<Renderer::TextRenderer>	mTextRenderer;
+
+		std::shared_ptr<Renderer::DeviceResources> deviceResources;
 
 		Input::Input^						mInput;
 

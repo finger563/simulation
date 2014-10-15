@@ -19,8 +19,9 @@ namespace Renderer
 		float NearPlane;
 		float FarPlane;
 
-		XMMATRIX ViewMatrix;
-		XMMATRIX ProjMatrix;
+		XMMATRIX ViewMatrix;		// matrix used to store the view of the camera
+		XMMATRIX ProjMatrix;		// matrix used to store the projection for the camera
+		XMMATRIX OrientMatrix;		// matrix used to store the orientation of the screen
 
 		void Set(
 			XMVECTOR position,

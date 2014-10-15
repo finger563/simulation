@@ -43,7 +43,7 @@ void TextRenderer::Render(Platform::String^ Text, POINT& Pos)
 		Text->Data(),
 		(uint32)Text->Length(),
 		m_textFormat.Get(),
-		240.0f, // Max width of the input text.
+		100.0f, // Max width of the input text.
 		50.0f, // Max height of the input text.
 		&m_textLayout
 		)
@@ -61,8 +61,8 @@ void TextRenderer::Render(Platform::String^ Text, POINT& Pos)
 
 	// Position on the bottom right corner
 	D2D1::Matrix3x2F screenTranslation = D2D1::Matrix3x2F::Translation(
-		logicalSize.Width - m_textMetrics.layoutWidth,
-		logicalSize.Height - m_textMetrics.height
+		Pos.x,
+		Pos.y
 		);
 
 	context->SetTransform(screenTranslation * m_deviceResources->GetOrientationTransform2D());
