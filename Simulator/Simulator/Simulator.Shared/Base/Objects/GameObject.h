@@ -19,7 +19,7 @@ namespace Base
 			// QuadTree for surface mesh (used by potentially physics and renderer subsystems)
 			// Note that this is filled out separately
 			DataStructures::QuadTreeNode*	rootQT;
-			Mesh*								mesh;
+			Mesh*							mesh;
 			Vector scale;			// x,y,z scale factors
 
 			BoundingSphere	boundingSphere;

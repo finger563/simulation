@@ -16,6 +16,7 @@
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)Base\Data Structures\QuadTree.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Base\Math\Vector.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Base\Mesh\Mesh.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Base\Objects\Ellipsoid.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)App.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Engine\Engine.cpp" />
@@ -24,6 +25,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Camera\Camera.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Device Resources\DeviceResources.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Objects\BaseObjects.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Objects\ROAM.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Renderer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Shader.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Text\TextRenderer.cpp" />
@@ -47,6 +49,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Lighting\Light.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Lighting\Material.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Objects\BaseObjects.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Objects\ROAM.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Renderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)pch.h" />
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">

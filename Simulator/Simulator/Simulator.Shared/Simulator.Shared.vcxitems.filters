@@ -72,6 +72,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Helper.h">
       <Filter>Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Objects\ROAM.h">
+      <Filter>Renderer\Objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />
@@ -111,6 +114,12 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)Base\Math\Vector.cpp">
       <Filter>Base\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\Objects\ROAM.cpp">
+      <Filter>Renderer\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Base\Mesh\Mesh.cpp">
+      <Filter>Base\Mesh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
