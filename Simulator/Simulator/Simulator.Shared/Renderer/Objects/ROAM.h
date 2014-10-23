@@ -1,7 +1,7 @@
 #pragma once
 
 #include "pch.h"
-#include <queue>
+#include <set>
 
 #include "Base\Mesh\Mesh.h"
 
@@ -24,18 +24,18 @@ namespace Renderer
 
 	struct Diamond
 	{
-		Triangle* p0, p1;		// parent triangles (i.e. triangles that will remain after merge)
-		Triangle* c0, c1;		// children (of the two parents)
+		Triangle *parents[2];		// parent triangles (i.e. triangles that will remain after merge)
+		Triangle *children[4];		// children (of the two parents)
 	};
 
 	class roam
 	{
 	private:
-		std::priority_queue<Triangle*> split;
-		std::priority_queue<Diamond*> merge;
+		std::set<Triangle*> split;
+		std::set<Diamond*> merge;
 		std::list<Triangle> triangles;
 
-		void recursiveSplit(std::vector<Base::Vertex>& vBuffer, Triangle& tri, UINT depth);
+		void recursiveSplit(std::vector<Base::Vertex>& vBuffer, Triangle* tri, UINT depth);
 		void recursiveMerge();
 
 	public:
