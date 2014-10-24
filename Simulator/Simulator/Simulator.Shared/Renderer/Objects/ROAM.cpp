@@ -3,15 +3,12 @@
 
 using namespace Renderer;
 
-void roam::Init(std::vector<Base::Vertex>& initVerts, std::vector<Triangle>& initTris, UINT depth)
+void roam::Init(std::vector<Base::Vertex>& verts, std::vector<Triangle>& initTris, UINT depth)
 {
-	// copy initial triangles 
-	for (std::vector<Triangle>::iterator it = initTris.begin(); it != initTris.end(); ++it)
-	{
-		triangles.push_back(*it);	// add the initial triangles
-	}
+	// copy initial triangles
+	triangles.insert(triangles.end(), initTris.begin(), initTris.end());
 	// add triangles to split queue
-	for (std::list<Triangle>::iterator it = triangles.begin(); it != triangles.end(); ++it)
+	for (std::vector<Triangle>::iterator it = triangles.begin(); it != triangles.end(); ++it)
 	{
 	}
 	// go through and split the queue
@@ -36,6 +33,9 @@ void roam::recursiveSplit(std::vector<Base::Vertex>& vBuffer, Triangle* tri, UIN
 		Diamond diamond;
 		diamond.parents[0] = tri;
 		diamond.parents[1] = tri->base;
+		// add new tris to triangle list
+		// add new diamond to diamond list
+
 		diamond.children[0] = &t0;
 		diamond.children[1] = &t1;
 		diamond.children[2] = &tb0;

@@ -20,6 +20,41 @@ namespace Renderer
 		Triangle* left;			// shares edge to the left of midpoint (i0->ia)
 		Triangle* right;		// shares edge to the right of midpoint (i1->ia)
 		Diamond* diamond;		// set if the triangle is part of a diamond
+
+		Triangle() : diamond(nullptr), base(nullptr), left(nullptr), right(nullptr), error(1.0f), level(0) {}
+
+		Triangle& operator = (const Triangle &t)
+		{
+			Triangle tmp(t);
+			tmp.swap(*this);
+			return *this;
+		}
+
+		void swap(Triangle &t)
+		{
+			std::swap(this->ia, t.ia);
+			std::swap(this->i0, t.i0);
+			std::swap(this->i1, t.i1);
+			std::swap(this->level, t.level);
+			std::swap(this->error, t.error);
+			std::swap(this->base, t.base);
+			std::swap(this->left, t.left);
+			std::swap(this->right, t.right);
+			std::swap(this->diamond, t.diamond);
+		}
+
+		inline bool operator < (const Triangle& rhs) const 
+		{
+			return this->error < rhs.error;
+		}
+		inline bool operator >(const Triangle& rhs) const
+		{
+			return !(*this < rhs);
+		}
+		inline bool operator == (const Triangle& rhs) const
+		{
+			return !(*this < rhs) && !(*this > rhs);
+		}
 	};
 
 	struct Diamond
@@ -33,14 +68,14 @@ namespace Renderer
 	private:
 		std::set<Triangle*> split;
 		std::set<Diamond*> merge;
-		std::list<Triangle> triangles;
+		std::vector<Triangle> triangles;
 
 		void recursiveSplit(std::vector<Base::Vertex>& vBuffer, Triangle* tri, UINT depth);
 		void recursiveMerge();
 
 	public:
 		// initialize the list of triangles and split them (setting up queues) until <depth> is reached
-		void Init(std::vector<Base::Vertex>& initVerts, std::vector<Triangle>& initTris, UINT depth);
+		void Init(std::vector<Base::Vertex>& verts, std::vector<Triangle>& initTris, UINT depth);
 		// split all triangles in split queue whose error is greater than <error>
 		void Split(std::vector<Base::Vertex>& vBuffer, float error);
 		// merge all triangles in merge queue whose error is less than <error>
