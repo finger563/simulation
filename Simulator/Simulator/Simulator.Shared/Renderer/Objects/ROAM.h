@@ -71,14 +71,18 @@ namespace Renderer
 		std::vector<Triangle> triangles;
 
 		void recursiveSplit(std::vector<Base::Vertex>& vBuffer, Triangle* tri, UINT depth);
+		void nonGenerativeSplit(Triangle* tri);
 		void recursiveMerge();
 
 	public:
+		void GenerateCube(std::vector<Base::Vertex>& verts, UINT depth);
 		// initialize the list of triangles and split them (setting up queues) until <depth> is reached
 		void Init(std::vector<Base::Vertex>& verts, std::vector<Triangle>& initTris, UINT depth);
 		// split all triangles in split queue whose error is greater than <error>
-		void Split(std::vector<Base::Vertex>& vBuffer, float error);
+		void Split(float error);
 		// merge all triangles in merge queue whose error is less than <error>
-		void Merge(std::vector<Base::Vertex>& vBuffer, float error);
+		void Merge(float error);
+		// get the indices of all active triangles
+		std::vector<UINT> GetIndices();
 	};
 }

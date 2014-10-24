@@ -36,6 +36,10 @@ namespace Engine
 		gameObjects.push_back(Base::Objects::GameObject());
 		//Renderer::BaseObjects::InitCubeMesh(&gameObjects.back().mesh);
 		Renderer::BaseObjects::InitSphereMesh(&gameObjects.back().mesh);
+		Renderer::roam myroam;
+		myroam.GenerateCube(gameObjects.back().mesh->vertices, 6);
+		myroam.Split(0.3f);
+		gameObjects.back().mesh->indices = myroam.GetIndices();
 		mRenderer->SetObjectsInScene(&gameObjects);
 
 		mTextRenderer = std::unique_ptr<Renderer::TextRenderer>(new Renderer::TextRenderer(deviceResources));

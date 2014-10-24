@@ -9,6 +9,7 @@
 #include "Shaders\Shader.h"
 #include "Device Resources\DeviceResources.h"
 #include "Text\TextRenderer.h"
+#include "Objects\ROAM.h"
 
 namespace Renderer
 {
