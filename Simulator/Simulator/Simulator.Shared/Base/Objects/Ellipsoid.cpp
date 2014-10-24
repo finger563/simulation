@@ -8,7 +8,7 @@ Ellipsoid::Ellipsoid()
 	rootQT = nullptr;
 }
 
-Ellipsoid::Ellipsoid(double a, double b, double c)
+Ellipsoid::Ellipsoid(float a, float b, float c)
 {
 	rootQT = nullptr;
 

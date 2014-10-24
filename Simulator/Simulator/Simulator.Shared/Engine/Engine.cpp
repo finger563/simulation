@@ -24,9 +24,9 @@ namespace Engine
 
 		mRenderer->Initialize();
 		mRenderer->SetCamera(
-			VectorInit({ 0.0, 0.0, -5.0, 0.0 }),						// position
-			VectorInit({ 0.0, 0.0, 1.0, 0.0 }),							// view
-			VectorInit({ 0.0, 1.0, 0.0, 0.0 }),							// up
+			Base::Math::VectorInit({ 0.0, 0.0, -5.0, 0.0 }),			// position
+			Base::Math::VectorInit({ 0.0, 0.0, 1.0, 0.0 }),				// view
+			Base::Math::VectorInit({ 0.0, 1.0, 0.0, 0.0 }),				// up
 			45.0f,														// FOVY
 			(float)(mWindow->Bounds.Width / mWindow->Bounds.Height),	// aspect ratio
 			1.0f,														// near plane
@@ -34,7 +34,7 @@ namespace Engine
 			);
 
 		gameObjects.push_back(Base::Objects::GameObject());
-		Renderer::BaseObjects::InitCubeMesh(&gameObjects.back().mesh);
+		//Renderer::BaseObjects::InitCubeMesh(&gameObjects.back().mesh);
 		Renderer::BaseObjects::InitSphereMesh(&gameObjects.back().mesh);
 		mRenderer->SetObjectsInScene(&gameObjects);
 

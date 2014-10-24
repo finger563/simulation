@@ -6,10 +6,10 @@ namespace Base
 {
 	struct Vertex
 	{
-		float x, y, z;		// position vector
-		float nx, ny, nz;	// normal vector
-		float tx, ty, tz;	// tangent vector
-		float u, v;			// texture coords [0..1]
+		float pos[3];		// position vector
+		float normal[3];	// normal vector
+		float tangent[3];	// tangent vector
+		float tex[2];		// texture coords [0..1]
 	};
 	struct Mesh
 	{

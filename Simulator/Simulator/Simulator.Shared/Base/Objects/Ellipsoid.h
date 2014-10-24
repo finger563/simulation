@@ -15,7 +15,7 @@ namespace Base
 			Vector						radiusSquared;		// c is towards poles and is therefore y dimension
 
 			Ellipsoid();
-			Ellipsoid(double a, double b, double c);	// set the three radii
+			Ellipsoid(float a, float b, float c);	// set the three radii
 			~Ellipsoid();
 
 			static Vector geodeticToNormal(Vector& geo);
