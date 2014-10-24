@@ -67,18 +67,18 @@ void BaseObjects::InitSphereMesh(Base::Mesh** meshPtr)
 	for (unsigned int i = 0; i < (*meshPtr)->vertices.size(); i++)
 	{
 		float magnitude =
-			(*meshPtr)->vertices[i].x * (*meshPtr)->vertices[i].x +
-			(*meshPtr)->vertices[i].y * (*meshPtr)->vertices[i].y +
-			(*meshPtr)->vertices[i].z * (*meshPtr)->vertices[i].z;
+			(*meshPtr)->vertices[i].pos[0] * (*meshPtr)->vertices[i].pos[0] +
+			(*meshPtr)->vertices[i].pos[1] * (*meshPtr)->vertices[i].pos[1] +
+			(*meshPtr)->vertices[i].pos[2] * (*meshPtr)->vertices[i].pos[2];
 		magnitude = sqrt(magnitude);
 
-		(*meshPtr)->vertices[i].x = (*meshPtr)->vertices[i].x / magnitude;
-		(*meshPtr)->vertices[i].y = (*meshPtr)->vertices[i].y / magnitude;
-		(*meshPtr)->vertices[i].z = (*meshPtr)->vertices[i].z / magnitude;
+		(*meshPtr)->vertices[i].pos[0] = (*meshPtr)->vertices[i].pos[0] / magnitude;
+		(*meshPtr)->vertices[i].pos[1] = (*meshPtr)->vertices[i].pos[1] / magnitude;
+		(*meshPtr)->vertices[i].pos[2] = (*meshPtr)->vertices[i].pos[2] / magnitude;
 
-		(*meshPtr)->vertices[i].nx = (*meshPtr)->vertices[i].x;
-		(*meshPtr)->vertices[i].ny = (*meshPtr)->vertices[i].y;
-		(*meshPtr)->vertices[i].nz = (*meshPtr)->vertices[i].z;	
+		(*meshPtr)->vertices[i].normal[0] = (*meshPtr)->vertices[i].pos[0];
+		(*meshPtr)->vertices[i].normal[1] = (*meshPtr)->vertices[i].pos[1];
+		(*meshPtr)->vertices[i].normal[2] = (*meshPtr)->vertices[i].pos[2];
 	}
 }
 
@@ -103,9 +103,9 @@ void BaseObjects::InitEllipsoidMesh(Base::Mesh** meshPtr)
 
 float VertexDistance(Base::Vertex& v1, Base::Vertex& v2)
 {
-	float x = v2.x - v1.x;
-	float y = v2.y - v1.y;
-	float z = v2.z - v1.z;
+	float x = v2.pos[0] - v1.pos[0];
+	float y = v2.pos[1] - v1.pos[1];
+	float z = v2.pos[2] - v1.pos[2];
 	return sqrt(x*x + y*y + z*z);
 }
 
