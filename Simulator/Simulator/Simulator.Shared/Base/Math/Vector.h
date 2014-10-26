@@ -18,7 +18,7 @@ namespace Base
 		inline Vector VectorLerp(Vector& a, Vector& b, float t) { return DirectX::XMVectorLerp(a, b, t); }
 		inline Vector VectorSize(Vector& a) { return DirectX::XMVector4Length(a); }
 
-		inline void VectorGet(Vector& a, float* vals, int numVals) { DirectX::XMVectorGetByIndexPtr(vals, a, numVals); }
+		inline void VectorGet(Vector& a, float* val, int index) { DirectX::XMVectorGetByIndexPtr(val, a, index); }
 	}
 }
 

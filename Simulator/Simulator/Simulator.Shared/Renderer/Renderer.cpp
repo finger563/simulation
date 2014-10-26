@@ -175,9 +175,9 @@ namespace Renderer
 		context->UpdateSubresource(shader->constantbuffer.Get(), 0, 0, &cbuffer, 0, 0);
 
 		// Set the rasterizer state here if we want to
-		//devcon->RSSetState(wireframerasterizerstate.Get());
+		context->RSSetState(wireframerasterizerstate.Get());
 		// or
-		context->RSSetState(defaultrasterizerstate.Get());
+		//context->RSSetState(defaultrasterizerstate.Get());
 
 		context->DrawIndexed(numIndices, 0, 0);
 		return;

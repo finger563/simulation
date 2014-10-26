@@ -34,11 +34,11 @@ namespace Engine
 			);
 
 		gameObjects.push_back(Base::Objects::GameObject());
-		//Renderer::BaseObjects::InitCubeMesh(&gameObjects.back().mesh);
 		Renderer::BaseObjects::InitSphereMesh(&gameObjects.back().mesh);
 		Renderer::roam myroam;
-		myroam.GenerateCube(gameObjects.back().mesh->vertices, 6);
-		myroam.Split(0.3f);
+		myroam.GenerateCube(gameObjects.back().mesh->vertices, 3);
+		//myroam.Split(0.3f);
+		//myroam.Merge(0.4f);
 		gameObjects.back().mesh->indices = myroam.GetIndices();
 		mRenderer->SetObjectsInScene(&gameObjects);
 
@@ -161,7 +161,7 @@ namespace Engine
 		mRenderer->GetCameraPtr()->Walk(walk);
 		mRenderer->GetCameraPtr()->Strafe(strafe);
 
-		gameObjects[0].position = XMVectorSet((float)cos(SimulationTime) * 3.0f,(float)sin(SimulationTime) * 3.0f,0,0);
+		//gameObjects[0].position = XMVectorSet((float)cos(SimulationTime) * 3.0f,(float)sin(SimulationTime) * 3.0f,0,0);
 
 		mPhysics->Update();
 		mRenderer->Update();
