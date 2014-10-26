@@ -3,10 +3,13 @@
 
 using namespace Renderer;
 
-void roam::GenerateCube(std::vector<Base::Vertex>& verts, UINT depth)
+void roam::GenerateCube(std::vector<Base::Vertex>* verts, UINT depth)
 {
-	int numtris = (1 << (depth + 1)) - 1;
-	triangles.reserve(12 * numtris);
+	vertices = verts;
+	maxDepth = depth;
+	int numtris = (1 << (maxDepth + 1)) - 1;
+	std::vector<Triangle*> triangles;
+	triangles.reserve(12);
 	for (int i = 0; i < 12; i++)
 	{
 		Triangle* newTri = new Triangle();
@@ -98,9 +101,9 @@ void roam::GenerateCube(std::vector<Base::Vertex>& verts, UINT depth)
 	}
 	// go through and split the queue
 	std::multiset<Triangle*>::reverse_iterator tri = split.rbegin();
-	while ((*tri)->level < depth)
+	while ((*tri)->level < maxDepth)
 	{
-		generativeSplit(verts, *tri, depth);
+		recursiveSplit(*tri);
 		tri = split.rbegin();
 	}
 	// determine error for each triangle in mesh
@@ -114,139 +117,100 @@ void roam::GenerateCube(std::vector<Base::Vertex>& verts, UINT depth)
 	merge.clear();
 }
 
-void roam::generativeSplit(std::vector<Base::Vertex>& vBuffer, Triangle* tri, UINT depth)
+void roam::recursiveSplit(Triangle* tri)
 {
-	if (tri->level < depth)
+	bool generate = true;
+	if (tri->t0 != nullptr) // already split so don't do it again
+		generate = false;
+	
+	if (tri->base != nullptr && tri->base->base != tri) // need to make proper diamond
+		recursiveSplit(tri->base);	// need to make base point to tri through splitting
+	
+	if (generate)
 	{
-		Diamond *diamond = nullptr;
-		bool newDiamond = true;
-		UINT centerIndex = 0;
-		if (tri->base->level == tri->level && tri->base->diamond != nullptr )	// base needs to be a parent of a diamond
+		tri->t0 = new Triangle();
+		tri->t1 = new Triangle();
+		//triangles.push_back(tri->t0);
+		//triangles.push_back(tri->t1);
+
+		tri->t0->level = tri->level + 1;
+		tri->t0->error = tri->error * 0.5f;
+		tri->t1->level = tri->level + 1;
+		tri->t1->error = tri->error * 0.5f;
+
+		tri->t0->diamond = nullptr;
+		tri->t1->diamond = nullptr;	// triangles point to diamonds they are PARENTS of
+
+		tri->t0->i0 = tri->ia;
+		tri->t0->i1 = tri->i0;
+
+		tri->t1->i0 = tri->i1;
+		tri->t1->i1 = tri->ia;
+	}
+
+	tri->t0->base = tri->left;
+	tri->t0->left = tri->t1;
+	tri->t1->base = tri->right;
+	tri->t1->right = tri->t0;
+
+	// update the left neighbor to point to t0
+	if (tri->left->base == tri)
+		tri->left->base = tri->t0;
+	else if (tri->left->left == tri)
+		tri->left->left = tri->t0;
+	else if (tri->left->right == tri)
+		tri->left->right = tri->t0;
+	// update the right neighbor to point to t1
+	if (tri->right->base == tri)
+		tri->right->base = tri->t1;
+	else if (tri->right->left == tri)
+		tri->right->left = tri->t1;
+	else if (tri->right->right == tri)
+		tri->right->right = tri->t1;
+	// update the base neighbor to point to t0 & t1
+	if (tri->base->t0 != nullptr)
+	{	// base has been split into children already
+		if (generate)
 		{
-			newDiamond = false;		// diamond made by other split already parent[0], child[0,1] set up already in diamond
-			diamond = tri->base->diamond;
-			centerIndex = tri->base->diamond->children[0]->ia;
-			diamond->parents[1] = tri;
+			tri->t0->ia = tri->base->t0->ia;
+			tri->t1->ia = tri->base->t0->ia;
+			tri->diamond = tri->base->diamond;
+			tri->diamond->parents[1] = tri;
+			tri->diamond->children[2] = tri->t0;
+			tri->diamond->children[3] = tri->t1;
 		}
-		if (newDiamond)
+		tri->base->t0->right = tri->t1;
+		tri->base->t1->left = tri->t0;
+		tri->t0->right = tri->base->t1;
+		tri->t1->left = tri->base->t0;
+	}
+	else
+	{	// base hasn't been split into children yet
+		if (generate)		// make new vertex vc 
 		{
-			// make new vertex vc 
-			Base::Vertex vc = Base::SphericalInterpolate(vBuffer[tri->i0], vBuffer[tri->i1], 0.5f, 1.0f, 0, 0, 0);
-			//Base::Vertex vc = Base::LinearInterpolate(vBuffer[tri->i0], vBuffer[tri->i1], 0.5f);
+			//Base::Vertex vc = Base::SphericalInterpolate((*vertices)[tri->i0], (*vertices)[tri->i1], 0.5f, 1.0f, 0, 0, 0);
+			Base::Vertex vc = Base::LinearInterpolate((*vertices)[tri->i0], (*vertices)[tri->i1], 0.5f);
 			// add vc into vertexBuffer
-			vBuffer.push_back(vc);
+			vertices->push_back(vc);
 			// update center index
-			centerIndex = vBuffer.size() - 1;
+			tri->t0->ia = vertices->size() - 1;
+			tri->t1->ia = vertices->size() - 1;
 
-			diamond = new Diamond();
+			Diamond *diamond = new Diamond();
+			tri->diamond = diamond;
 			diamond->parents[0] = tri;
+			diamond->children[0] = tri->t0;
+			diamond->children[1] = tri->t1;
 		}
-		// add diamond pointer to tri
-		tri->diamond = diamond;
-		// split tri into t0 & t1
-		Triangle *t0 = new Triangle();
-		Triangle *t1 = new Triangle();
-		tri->t0 = t0;
-		tri->t1 = t1;
-		t0->level = tri->level + 1;
-		t0->error = tri->error * 0.5f;
-		t1->level = tri->level + 1;
-		t1->error = tri->error * 0.5f;
-		t0->diamond = nullptr;
-		t1->diamond = nullptr;	// triangles point to diamonds they are PARENTS of
-		t0->base = tri->left;
-		t1->base = tri->right;
-		t0->left = t1;
-		t0->right = nullptr;
-		t1->left = nullptr;
-		t1->right = t0;
-		t0->ia = centerIndex;
-		t1->ia = centerIndex;
-		t0->i0 = tri->ia;
-		t0->i1 = tri->i0;
-		t1->i0 = tri->i1;
-		t1->i1 = tri->ia;
-
-		if (tri->left->base == tri)
-		{
-			tri->left->base = t0;
-		}
-		else if (tri->left->left == tri)
-		{
-			tri->left->left = t0;
-		}
-		else if (tri->left->right == tri)
-		{
-			tri->left->right = t0;
-		}
-
-		if (tri->right->base == tri)
-		{
-			tri->right->base = t1;
-		}
-		else if (tri->right->left == tri)
-		{
-			tri->right->left = t1;
-		}
-		else if (tri->right->right == tri)
-		{
-			tri->right->right = t1;
-		}
-		
-		// add t0 and t1 to triangles list
-		triangles.push_back(t0);
-		triangles.push_back(t1);
-		// update diamond with their pointer
-		if (newDiamond)
-		{
-			diamond->parents[0] = tri;
-			diamond->children[0] = t0;
-			diamond->children[1] = t1;
-		}
-		else
-		{
-			diamond->parents[1] = tri;
-			diamond->children[0]->right = t1;					// tb0 -> t1
-			diamond->children[1]->left = t0;						// tb1 -> t0
-			t0->right = diamond->children[1];	// t0 -> tb1
-			t1->left = diamond->children[0];		// t1 -> tb0
-			diamond->children[2] = t0;
-			diamond->children[3] = t1;
-		}
-		std::multiset<Triangle*>::iterator triIt = std::find(split.begin(), split.end(), tri);
-		if (triIt != split.end())
-			split.erase(triIt);
-		split.insert(t0);
-		split.insert(t1);
+		recursiveSplit(tri->base);
 	}
-}
-
-void roam::nonGenerativeSplit(Triangle* tri)
-{
-	// ensure T and TB are same depth
-	if (tri->base->level < tri->level)
-	{
-		nonGenerativeSplit(tri->base);
-	}
-	// remove the parents from the split q
-	std::multiset<Triangle*>::iterator triIt = std::find(split.begin(), split.end(), tri->diamond->parents[0]);
+	std::multiset<Triangle*>::iterator triIt = std::find(split.begin(), split.end(), tri);
 	if (triIt != split.end())
-		split.erase(triIt);
-	triIt = std::find(split.begin(), split.end(), tri->diamond->parents[1]);
-	if (triIt != split.end())
-		split.erase(triIt);
-	// add the children to the split q (all of them: t0,t1,tb0,tb1)
-	for (int i = 0; i < 4; i++)
 	{
-		if (tri->diamond->children[i] != nullptr)
-		{
-			std::multiset<Triangle*>::iterator it = std::find(split.begin(), split.end(), tri->diamond->children[i]);
-			if (it == split.end())
-				split.insert(tri->diamond->children[i]);
-		}
+		split.erase(triIt);
+		split.insert(tri->t0);
+		split.insert(tri->t1);
 	}
-	// insert the new diamond (every split makes one)
-	//merge.insert(tri->diamond);
 }
 
 void roam::Split(float error)
@@ -255,7 +219,7 @@ void roam::Split(float error)
 	std::set<Triangle*>::reverse_iterator tri = split.rbegin();
 	while ((*tri)->error > error)
 	{
-		nonGenerativeSplit(*tri);
+		recursiveSplit(*tri);
 		tri = split.rbegin();
 	}
 }

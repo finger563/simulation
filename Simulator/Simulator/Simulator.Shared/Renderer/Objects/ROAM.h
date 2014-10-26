@@ -80,15 +80,19 @@ namespace Renderer
 	private:
 		std::multiset<Triangle*, TriPtrComp> split;
 		std::multiset<Diamond*> merge;
-		std::vector<Triangle*> triangles;
+		//std::vector<Triangle*> triangles;
 
-		void generativeSplit(std::vector<Base::Vertex>& vBuffer, Triangle* tri, UINT depth);
+		std::vector<Base::Vertex>* vertices;
+
+		UINT maxDepth;
+
+		void recursiveSplit(Triangle* tri);
 		void nonGenerativeSplit(Triangle* tri);
 		void recursiveMerge();
 
 	public:
 		// initialize the list of triangles and split them (setting up queues) until <depth> is reached
-		void GenerateCube(std::vector<Base::Vertex>& verts, UINT depth);
+		void GenerateCube(std::vector<Base::Vertex>* verts, UINT depth);
 		// split all triangles in split queue whose error is greater than <error>
 		void Split(float error);
 		// merge all triangles in merge queue whose error is less than <error>
