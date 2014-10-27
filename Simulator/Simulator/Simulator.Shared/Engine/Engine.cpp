@@ -194,8 +194,16 @@ namespace Engine
 		lvl3 = mInput->GetInput("level3").fval;
 		lvl4 = mInput->GetInput("level4").fval;
 
-		//myroam.Merge(0.6f);
-		myroam.Split(1.0f - lvl1 - lvl2 - lvl3 - lvl4);
+		if (lvl1)
+			myroam.Split(lvl1);
+		else if (lvl2)
+			myroam.Split(lvl2);
+		else if (lvl3)
+			myroam.Split(lvl3);
+		else if (lvl4)
+			myroam.Split(lvl4);
+
+		myroam.Merge(0.6f);
 		gameObjects.back().mesh->indices = myroam.GetIndices();
 		mRenderer->SetObjectsInScene(&gameObjects);
 
