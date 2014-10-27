@@ -36,11 +36,7 @@ namespace Engine
 
 		gameObjects.push_back(Base::Objects::GameObject());
 		Renderer::BaseObjects::InitSphereMesh(&gameObjects.back().mesh);
-		myroam.GenerateCube(&gameObjects.back().mesh->vertices, 4);
-		//myroam.Split(0.2f);
-		//myroam.Merge(0.6f);
-		gameObjects.back().mesh->indices = myroam.GetIndices();
-		mRenderer->SetObjectsInScene(&gameObjects);
+		myroam.GenerateCube(&gameObjects.back().mesh->vertices, 7);
 
 		mTextRenderer = std::unique_ptr<Renderer::TextRenderer>(new Renderer::TextRenderer(deviceResources));
 
@@ -225,25 +221,24 @@ namespace Engine
 		m3 = mInput->GetInput("merge3").fval;
 		m4 = mInput->GetInput("merge4").fval;
 
-		if (s1)
+		if (s1 > 0.0f)
 			myroam.Split(s1);
-		else if (s2)
+		else if (s2 > 0.0f)
 			myroam.Split(s2);
-		else if (s3)
+		else if (s3 > 0.0f)
 			myroam.Split(s3);
-		else if (s4)
+		else if (s4 > 0.0f)
 			myroam.Split(s4);
 
-		if (m1)
+		if (m1 > 0.0f)
 			myroam.Merge(m1);
-		else if (m2)
+		else if (m2 > 0.0f)
 			myroam.Merge(m2);
-		else if (m3)
+		else if (m3 > 0.0f)
 			myroam.Merge(m3);
-		else if (m4)
+		else if (m4 > 0.0f)
 			myroam.Merge(m4);
 
-		//myroam.Merge(0.6f);
 		gameObjects.back().mesh->indices = myroam.GetIndices();
 		mRenderer->SetObjectsInScene(&gameObjects);
 

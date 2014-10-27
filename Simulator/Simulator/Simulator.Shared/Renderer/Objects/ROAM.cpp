@@ -104,7 +104,7 @@ void roam::GenerateCube(std::vector<Base::Vertex>* verts, UINT depth)
 	Triangle* tri = *split.rbegin();
 	while (tri->level < maxDepth)
 	{
-		recursiveSplit(tri);
+		generativeSplit(tri);
 		tri = *split.rbegin();
 	}
 	// determine error for each triangle in mesh
@@ -113,12 +113,13 @@ void roam::GenerateCube(std::vector<Base::Vertex>* verts, UINT depth)
 	for (unsigned int i = 0; i < 12; i++)
 	{
 		split.insert(triangles[i]);
+		triangles[i]->visible = true;
 	}
 	// build merge queue
 	merge.clear();
 }
 
-void roam::recursiveSplit(Triangle* tri)
+void roam::generativeSplit(Triangle* tri)
 {
 	std::multiset<Triangle*>::iterator triIt = std::find(split.begin(), split.end(), tri);
 	if (triIt != split.end())
@@ -130,7 +131,7 @@ void roam::recursiveSplit(Triangle* tri)
 		generate = true;
 	
 	if (tri->base != nullptr && tri->base->base != tri) // need to make proper diamond
-		recursiveSplit(tri->base);	// need to make base point to tri through splitting
+		generativeSplit(tri->base);	// need to make base point to tri through splitting
 	
 	if (generate)
 	{
@@ -148,6 +149,11 @@ void roam::recursiveSplit(Triangle* tri)
 		tri->t1->i0 = tri->i1;
 		tri->t1->i1 = tri->ia;
 	}
+	tri->t0->visible = true;
+	tri->t1->visible = true;
+	tri->visible = false;
+	split.insert(tri->t0);
+	split.insert(tri->t1);
 
 	tri->t0->base = tri->left;
 	tri->t0->left = tri->t1;
@@ -186,10 +192,6 @@ void roam::recursiveSplit(Triangle* tri)
 		tri->base->t1->left = tri->t0;
 		tri->t0->right = tri->base->t1;
 		tri->t1->left = tri->base->t0;
-		//std::multiset<Diamond*>::iterator diIt = std::find(merge.begin(), merge.end(), tri->diamond);
-		//if (diIt != merge.end())
-		//	merge.erase(diIt);
-		merge.insert(tri->t0->diamond);
 	}
 	else
 	{	// base hasn't been split into children yet
@@ -210,10 +212,52 @@ void roam::recursiveSplit(Triangle* tri)
 			diamond->children[0] = tri->t0;
 			diamond->children[1] = tri->t1;
 		}
-		recursiveSplit(tri->base);
+		generativeSplit(tri->base);
 	}
+}
+
+void roam::nonGenerativeSplit(Triangle* tri)
+{
+	std::multiset<Triangle*>::iterator triIt = std::find(split.begin(), split.end(), tri);
+	split.erase(triIt);
+
+	// update the left neighbor to point to t0
+	if (tri->left->base == tri)
+		tri->left->base = tri->t0;
+	else if (tri->left->left == tri)
+		tri->left->left = tri->t0;
+	else if (tri->left->right == tri)
+		tri->left->right = tri->t0;
+	// update the right neighbor to point to t1
+	if (tri->right->base == tri)
+		tri->right->base = tri->t1;
+	else if (tri->right->left == tri)
+		tri->right->left = tri->t1;
+	else if (tri->right->right == tri)
+		tri->right->right = tri->t1;
+
+	tri->t0->base = tri->left;
+	tri->t0->left = tri->t1;
+	tri->t1->base = tri->right;
+	tri->t1->right = tri->t0;
+	tri->t0->visible = true;
+	tri->t1->visible = true;
+	tri->visible = false;
 	split.insert(tri->t0);
 	split.insert(tri->t1);
+
+	if (tri->base->visible)	// base hasn't been split yet
+		merge.insert(tri->t0->diamond);
+
+	if (tri->base->base != tri) // need to make proper diamond
+	{
+		nonGenerativeSplit(tri->base);	// need to make base point to tri through splitting
+	}
+	// update the base neighbor to point to t0 & t1
+	tri->base->t0->right = tri->t1;
+	tri->base->t1->left = tri->t0;
+	tri->t0->right = tri->base->t1;
+	tri->t1->left = tri->base->t0;
 }
 
 void roam::recursiveMerge(Diamond* diamond)
@@ -221,12 +265,20 @@ void roam::recursiveMerge(Diamond* diamond)
 	Triangle* tri;
 	for (int i = 0; i < 4; i++)
 	{
-		tri = diamond->children[i];		
+		tri = diamond->children[i];	
+		tri->visible = false;
 		std::multiset<Triangle*>::iterator triIt = std::find(split.begin(), split.end(), tri);
 		if (triIt != split.end())
 			split.erase(triIt);
 	}
+	split.insert(diamond->parents[0]);
+	split.insert(diamond->parents[1]);
+
+	//if (diamond->parents[0]->diamond != nullptr && diamond->parents[0]->diamond == diamond->parents[1]->diamond)
+	//	merge.insert(diamond->parents[0]->diamond);
+
 	tri = diamond->parents[0];
+	tri->visible = true;
 	tri->left = tri->t0->base;
 	tri->right = tri->t1->base;
 	tri->base = diamond->parents[1];
@@ -246,6 +298,7 @@ void roam::recursiveMerge(Diamond* diamond)
 		tri->right->right = tri;
 
 	tri = diamond->parents[1];
+	tri->visible = true;
 	tri->left = tri->t0->base;
 	tri->right = tri->t1->base;
 	tri->base = diamond->parents[0];
@@ -263,9 +316,6 @@ void roam::recursiveMerge(Diamond* diamond)
 		tri->right->left = tri;
 	else if (tri->right->right == tri->t1)
 		tri->right->right = tri;
-
-	split.insert(diamond->parents[0]);
-	split.insert(diamond->parents[1]);
 }
 
 void roam::Split(float error)
@@ -275,7 +325,7 @@ void roam::Split(float error)
 	Triangle* tri = *split.rbegin();
 	while (tri->error > error)
 	{
-		recursiveSplit(tri);
+		nonGenerativeSplit(tri);
 		tri = *split.rbegin();
 	}
 }

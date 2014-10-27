@@ -16,6 +16,7 @@ namespace Renderer
 		UINT ia, i0, i1;		// indices into vertex buffer for this triangle
 		UINT level;				// what level of the mesh is this triangle from?
 		float error;			// what is the error between this triangle and its subtriangles
+		bool visible;			// easy test for if it is in the queue
 		Triangle* base;			// shares edge opposite va (ia)
 		Triangle* left;			// shares edge to the left of midpoint (i0->ia)
 		Triangle* right;		// shares edge to the right of midpoint (i1->ia)
@@ -23,7 +24,7 @@ namespace Renderer
 		Triangle* t1;			// right child
 		Diamond* diamond;		// set if the triangle is part of a diamond
 
-		Triangle() : diamond(nullptr), base(nullptr), left(nullptr), right(nullptr), t0(nullptr), t1(nullptr), error(1.0f), level(0) {}
+		Triangle() : diamond(nullptr), base(nullptr), left(nullptr), right(nullptr), t0(nullptr), t1(nullptr), error(1.0f), level(0), visible(false) {}
 
 		Triangle& operator = (const Triangle &t)
 		{
@@ -39,9 +40,12 @@ namespace Renderer
 			std::swap(this->i1, t.i1);
 			std::swap(this->level, t.level);
 			std::swap(this->error, t.error);
+			std::swap(this->visible, t.visible);
 			std::swap(this->base, t.base);
 			std::swap(this->left, t.left);
 			std::swap(this->right, t.right);
+			std::swap(this->t0, t.t0);
+			std::swap(this->t1, t.t1);
 			std::swap(this->diamond, t.diamond);
 		}
 
@@ -107,7 +111,7 @@ namespace Renderer
 
 		UINT maxDepth;
 
-		void recursiveSplit(Triangle* tri);
+		void generativeSplit(Triangle* tri);
 		void nonGenerativeSplit(Triangle* tri);
 		void recursiveMerge(Diamond* diamond);
 
