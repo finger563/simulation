@@ -120,6 +120,11 @@ void roam::GenerateCube(std::vector<Base::Vertex>* verts, UINT depth)
 
 void roam::recursiveSplit(Triangle* tri)
 {
+	std::multiset<Triangle*>::iterator triIt = std::find(split.begin(), split.end(), tri);
+	if (triIt != split.end())
+	{
+		split.erase(triIt);
+	}
 	bool generate = false;
 	if (tri->t0 == nullptr) // haven't generated vertices & diamond
 		generate = true;
@@ -175,15 +180,15 @@ void roam::recursiveSplit(Triangle* tri)
 			tri->t0->diamond->parents[1] = tri;
 			tri->t0->diamond->children[2] = tri->t0;
 			tri->t0->diamond->children[3] = tri->t1;
-			tri->t0->diamond->error = tri->error;
+			tri->t0->diamond->error = tri->t0->error;
 		}
 		tri->base->t0->right = tri->t1;
 		tri->base->t1->left = tri->t0;
 		tri->t0->right = tri->base->t1;
 		tri->t1->left = tri->base->t0;
-		std::multiset<Diamond*>::iterator diIt = std::find(merge.begin(), merge.end(), tri->diamond);
-		if (diIt != merge.end())
-			merge.erase(diIt);
+		//std::multiset<Diamond*>::iterator diIt = std::find(merge.begin(), merge.end(), tri->diamond);
+		//if (diIt != merge.end())
+		//	merge.erase(diIt);
 		merge.insert(tri->t0->diamond);
 	}
 	else
@@ -207,13 +212,8 @@ void roam::recursiveSplit(Triangle* tri)
 		}
 		recursiveSplit(tri->base);
 	}
-	std::multiset<Triangle*>::iterator triIt = std::find(split.begin(), split.end(), tri);
-	if (triIt != split.end())
-	{
-		split.erase(triIt);
-		split.insert(tri->t0);
-		split.insert(tri->t1);
-	}
+	split.insert(tri->t0);
+	split.insert(tri->t1);
 }
 
 void roam::recursiveMerge(Diamond* diamond)
@@ -229,6 +229,7 @@ void roam::recursiveMerge(Diamond* diamond)
 	tri = diamond->parents[0];
 	tri->left = tri->t0->base;
 	tri->right = tri->t1->base;
+	tri->base = diamond->parents[1];
 	// update the left neighbor to point to T
 	if (tri->left->base == tri->t0)
 		tri->left->base = tri;
@@ -247,6 +248,7 @@ void roam::recursiveMerge(Diamond* diamond)
 	tri = diamond->parents[1];
 	tri->left = tri->t0->base;
 	tri->right = tri->t1->base;
+	tri->base = diamond->parents[0];
 	// update the left neighbor to point to TB
 	if (tri->left->base == tri->t0)
 		tri->left->base = tri;

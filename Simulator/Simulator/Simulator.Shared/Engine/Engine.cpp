@@ -101,28 +101,54 @@ namespace Engine
 			);
 
 		mInput->AddInput(
-			"level1",
+			"split1",
 			Input::ValueTypes::FLOAT,
 			0.5f,
 			Windows::System::VirtualKey::Number1
 			);
 		mInput->AddInput(
-			"level2",
+			"split2",
 			Input::ValueTypes::FLOAT,
 			0.25f,
 			Windows::System::VirtualKey::Number2
 			);
 		mInput->AddInput(
-			"level3",
+			"split3",
 			Input::ValueTypes::FLOAT,
 			0.125f,
 			Windows::System::VirtualKey::Number3
 			);
 		mInput->AddInput(
-			"level4",
+			"split4",
 			Input::ValueTypes::FLOAT,
 			0.0625f,
 			Windows::System::VirtualKey::Number4
+			);
+
+
+		mInput->AddInput(
+			"merge1",
+			Input::ValueTypes::FLOAT,
+			0.51f,
+			Windows::System::VirtualKey::Number5
+			);
+		mInput->AddInput(
+			"merge2",
+			Input::ValueTypes::FLOAT,
+			0.251f,
+			Windows::System::VirtualKey::Number6
+			);
+		mInput->AddInput(
+			"merge3",
+			Input::ValueTypes::FLOAT,
+			0.1251f,
+			Windows::System::VirtualKey::Number7
+			);
+		mInput->AddInput(
+			"merge4",
+			Input::ValueTypes::FLOAT,
+			0.06251f,
+			Windows::System::VirtualKey::Number8
 			);
 		
 		mPhysics = std::unique_ptr<Physics::Physics>(new Physics::Physics());
@@ -188,22 +214,36 @@ namespace Engine
 		mRenderer->GetCameraPtr()->Walk(walk);
 		mRenderer->GetCameraPtr()->Strafe(strafe);
 
-		float lvl1, lvl2, lvl3, lvl4;
-		lvl1 = mInput->GetInput("level1").fval;
-		lvl2 = mInput->GetInput("level2").fval;
-		lvl3 = mInput->GetInput("level3").fval;
-		lvl4 = mInput->GetInput("level4").fval;
+		float s1, s2, s3, s4;
+		s1 = mInput->GetInput("split1").fval;
+		s2 = mInput->GetInput("split2").fval;
+		s3 = mInput->GetInput("split3").fval;
+		s4 = mInput->GetInput("split4").fval;
+		float m1, m2, m3, m4;
+		m1 = mInput->GetInput("merge1").fval;
+		m2 = mInput->GetInput("merge2").fval;
+		m3 = mInput->GetInput("merge3").fval;
+		m4 = mInput->GetInput("merge4").fval;
 
-		if (lvl1)
-			myroam.Split(lvl1);
-		else if (lvl2)
-			myroam.Split(lvl2);
-		else if (lvl3)
-			myroam.Split(lvl3);
-		else if (lvl4)
-			myroam.Split(lvl4);
+		if (s1)
+			myroam.Split(s1);
+		else if (s2)
+			myroam.Split(s2);
+		else if (s3)
+			myroam.Split(s3);
+		else if (s4)
+			myroam.Split(s4);
 
-		myroam.Merge(0.6f);
+		if (m1)
+			myroam.Merge(m1);
+		else if (m2)
+			myroam.Merge(m2);
+		else if (m3)
+			myroam.Merge(m3);
+		else if (m4)
+			myroam.Merge(m4);
+
+		//myroam.Merge(0.6f);
 		gameObjects.back().mesh->indices = myroam.GetIndices();
 		mRenderer->SetObjectsInScene(&gameObjects);
 
