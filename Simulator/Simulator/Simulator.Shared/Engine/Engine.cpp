@@ -4,6 +4,7 @@
 namespace Engine
 {
 
+	Renderer::roam myroam;
 	Engine::Engine()
 	{
 		// need to initialize input here; it needs to be used before initialize() is called
@@ -35,10 +36,9 @@ namespace Engine
 
 		gameObjects.push_back(Base::Objects::GameObject());
 		Renderer::BaseObjects::InitSphereMesh(&gameObjects.back().mesh);
-		Renderer::roam myroam;
-		myroam.GenerateCube(gameObjects.back().mesh->vertices, 3);
-		//myroam.Split(0.3f);
-		//myroam.Merge(0.4f);
+		myroam.GenerateCube(&gameObjects.back().mesh->vertices, 4);
+		//myroam.Split(0.2f);
+		//myroam.Merge(0.6f);
 		gameObjects.back().mesh->indices = myroam.GetIndices();
 		mRenderer->SetObjectsInScene(&gameObjects);
 
@@ -47,55 +47,82 @@ namespace Engine
 		mInput->Initialize();
 
 		// Maybe have these in an initialization file?
+		float movementSpeed = 0.1f;
+		float roatationSpeed = 0.025f;
 		mInput->AddInput(
 			"WalkForward",
 			Input::ValueTypes::FLOAT,
-			0.5f,
+			movementSpeed,
 			Windows::System::VirtualKey::W
 			);
 		mInput->AddInput(
 			"WalkBackward",
 			Input::ValueTypes::FLOAT,
-			0.5f,
+			movementSpeed,
 			Windows::System::VirtualKey::S
 			);
 		mInput->AddInput(
 			"StrafeRight",
 			Input::ValueTypes::FLOAT,
-			0.5f,
+			movementSpeed,
 			Windows::System::VirtualKey::D
 			);
 		mInput->AddInput(
 			"StrafeLeft",
 			Input::ValueTypes::FLOAT,
-			0.5f,
+			movementSpeed,
 			Windows::System::VirtualKey::A
 			);
 
 		mInput->AddInput(
 			"YawRight",
 			Input::ValueTypes::FLOAT,
-			0.05f,
+			roatationSpeed,
 			Windows::System::VirtualKey::Right
 			);
 		mInput->AddInput(
 			"YawLeft",
 			Input::ValueTypes::FLOAT,
-			0.05f,
+			roatationSpeed,
 			Windows::System::VirtualKey::Left
 			);
 
 		mInput->AddInput(
 			"PitchUp",
 			Input::ValueTypes::FLOAT,
-			0.05f,
+			roatationSpeed,
 			Windows::System::VirtualKey::Up
 			);
 		mInput->AddInput(
 			"PitchDown",
 			Input::ValueTypes::FLOAT,
-			0.05f,
+			roatationSpeed,
 			Windows::System::VirtualKey::Down
+			);
+
+		mInput->AddInput(
+			"level1",
+			Input::ValueTypes::FLOAT,
+			0.5f,
+			Windows::System::VirtualKey::Number1
+			);
+		mInput->AddInput(
+			"level2",
+			Input::ValueTypes::FLOAT,
+			0.25f,
+			Windows::System::VirtualKey::Number2
+			);
+		mInput->AddInput(
+			"level3",
+			Input::ValueTypes::FLOAT,
+			0.125f,
+			Windows::System::VirtualKey::Number3
+			);
+		mInput->AddInput(
+			"level4",
+			Input::ValueTypes::FLOAT,
+			0.0625f,
+			Windows::System::VirtualKey::Number4
 			);
 		
 		mPhysics = std::unique_ptr<Physics::Physics>(new Physics::Physics());
@@ -160,6 +187,16 @@ namespace Engine
 		mRenderer->GetCameraPtr()->Yaw(yaw);
 		mRenderer->GetCameraPtr()->Walk(walk);
 		mRenderer->GetCameraPtr()->Strafe(strafe);
+
+		float lvl1, lvl2, lvl3, lvl4;
+		lvl1 = mInput->GetInput("level1").fval;
+		lvl2 = mInput->GetInput("level2").fval;
+		lvl3 = mInput->GetInput("level3").fval;
+		lvl4 = mInput->GetInput("level4").fval;
+
+		myroam.Split(1.0f - lvl1 - lvl2 - lvl3 - -lvl4);
+		gameObjects.back().mesh->indices = myroam.GetIndices();
+		mRenderer->SetObjectsInScene(&gameObjects);
 
 		//gameObjects[0].position = XMVectorSet((float)cos(SimulationTime) * 3.0f,(float)sin(SimulationTime) * 3.0f,0,0);
 

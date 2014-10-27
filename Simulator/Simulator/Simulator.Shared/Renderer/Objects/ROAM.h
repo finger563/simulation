@@ -88,7 +88,7 @@ namespace Renderer
 
 		void recursiveSplit(Triangle* tri);
 		void nonGenerativeSplit(Triangle* tri);
-		void recursiveMerge();
+		void recursiveMerge(Diamond* diamond);
 
 	public:
 		// initialize the list of triangles and split them (setting up queues) until <depth> is reached

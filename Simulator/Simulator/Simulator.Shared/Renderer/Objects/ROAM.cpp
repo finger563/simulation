@@ -94,6 +94,7 @@ void roam::GenerateCube(std::vector<Base::Vertex>* verts, UINT depth)
 	triangles[11]->i0 = 6;
 	triangles[11]->i1 = 3;
 
+	split.clear();
 	// add triangles to split queue
 	for (unsigned int i = 0; i < triangles.size(); i++)
 	{
@@ -119,9 +120,9 @@ void roam::GenerateCube(std::vector<Base::Vertex>* verts, UINT depth)
 
 void roam::recursiveSplit(Triangle* tri)
 {
-	bool generate = true;
-	if (tri->t0 != nullptr) // already split so don't do it again
-		generate = false;
+	bool generate = false;
+	if (tri->t0 == nullptr) // haven't generated vertices & diamond
+		generate = true;
 	
 	if (tri->base != nullptr && tri->base->base != tri) // need to make proper diamond
 		recursiveSplit(tri->base);	// need to make base point to tri through splitting
@@ -130,8 +131,6 @@ void roam::recursiveSplit(Triangle* tri)
 	{
 		tri->t0 = new Triangle();
 		tri->t1 = new Triangle();
-		//triangles.push_back(tri->t0);
-		//triangles.push_back(tri->t1);
 
 		tri->t0->level = tri->level + 1;
 		tri->t0->error = tri->error * 0.5f;
@@ -178,18 +177,20 @@ void roam::recursiveSplit(Triangle* tri)
 			tri->diamond->parents[1] = tri;
 			tri->diamond->children[2] = tri->t0;
 			tri->diamond->children[3] = tri->t1;
+			tri->diamond->error = tri->t0->error;
 		}
 		tri->base->t0->right = tri->t1;
 		tri->base->t1->left = tri->t0;
 		tri->t0->right = tri->base->t1;
 		tri->t1->left = tri->base->t0;
+		merge.insert(tri->diamond);
 	}
 	else
 	{	// base hasn't been split into children yet
 		if (generate)		// make new vertex vc 
 		{
-			//Base::Vertex vc = Base::SphericalInterpolate((*vertices)[tri->i0], (*vertices)[tri->i1], 0.5f, 1.0f, 0, 0, 0);
-			Base::Vertex vc = Base::LinearInterpolate((*vertices)[tri->i0], (*vertices)[tri->i1], 0.5f);
+			Base::Vertex vc = Base::SphericalInterpolate((*vertices)[tri->i0], (*vertices)[tri->i1], 0.5f, 1.0f, 0, 0, 0);
+			//Base::Vertex vc = Base::LinearInterpolate((*vertices)[tri->i0], (*vertices)[tri->i1], 0.5f);
 			// add vc into vertexBuffer
 			vertices->push_back(vc);
 			// update center index
@@ -213,9 +214,56 @@ void roam::recursiveSplit(Triangle* tri)
 	}
 }
 
+void roam::recursiveMerge(Diamond* diamond)
+{
+	Triangle* tri;
+	for (int i = 0; i < 4; i++)
+	{
+		tri = diamond->children[i];		
+		std::multiset<Triangle*>::iterator triIt = std::find(split.begin(), split.end(), tri);
+		if (triIt != split.end())
+			split.erase(triIt);
+	}
+	tri = diamond->parents[0];
+	// update the left neighbor to point to T
+	if (tri->left->base == tri->t0)
+		tri->left->base = tri;
+	else if (tri->left->left == tri->t0)
+		tri->left->left = tri;
+	else if (tri->left->right == tri->t0)
+		tri->left->right = tri;
+	// update the right neighbor to point to T
+	if (tri->right->base == tri->t1)
+		tri->right->base = tri;
+	else if (tri->right->left == tri->t1)
+		tri->right->left = tri;
+	else if (tri->right->right == tri->t1)
+		tri->right->right = tri;
+
+	tri = diamond->parents[1];
+	// update the left neighbor to point to TB
+	if (tri->left->base == tri)
+		tri->left->base = tri->t0;
+	else if (tri->left->left == tri)
+		tri->left->left = tri->t0;
+	else if (tri->left->right == tri)
+		tri->left->right = tri->t0;
+	// update the right neighbor to point to TB
+	if (tri->right->base == tri->t1)
+		tri->right->base = tri;
+	else if (tri->right->left == tri->t1)
+		tri->right->left = tri;
+	else if (tri->right->right == tri->t1)
+		tri->right->right = tri;
+
+	split.insert(diamond->parents[0]);
+	split.insert(diamond->parents[1]);
+}
+
 void roam::Split(float error)
 {
-	// take from front of split queue
+	if (split.size() == 0)
+		return;
 	std::set<Triangle*>::reverse_iterator tri = split.rbegin();
 	while ((*tri)->error > error)
 	{
@@ -226,10 +274,14 @@ void roam::Split(float error)
 
 void roam::Merge(float error)
 {
-	// take from front of merge queue
-	// while front of merge queue has less error than $error$
-	//		merge front of merge queue : get parents from diamond
-	//		take from front of merge queue
+	if (merge.size() == 0)
+		return;
+	std::set<Diamond*>::iterator diamond = merge.begin();
+	while ((*diamond)->error < error)
+	{
+		recursiveMerge(*diamond);
+		diamond = merge.begin();
+	}
 }
 
 std::vector<UINT> roam::GetIndices()
