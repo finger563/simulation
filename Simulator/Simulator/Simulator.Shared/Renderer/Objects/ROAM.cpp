@@ -209,9 +209,11 @@ void roam::recursiveSplit(Triangle* tri)
 	}
 	std::multiset<Triangle*>::iterator triIt = std::find(split.begin(), split.end(), tri);
 	if (triIt != split.end())
+	{
 		split.erase(triIt);
-	split.insert(tri->t0);
-	split.insert(tri->t1);
+		split.insert(tri->t0);
+		split.insert(tri->t1);
+	}
 }
 
 void roam::recursiveMerge(Diamond* diamond)
