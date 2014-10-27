@@ -73,14 +73,35 @@ namespace Renderer
 		float error;
 		Triangle *parents[2];		// parent triangles (i.e. triangles that will remain after merge)
 		Triangle *children[4];		// children (of the two parents)
+
+		inline bool operator < (const Diamond& rhs) const
+		{
+			return this->error < rhs.error;
+		}
+	};
+
+	struct DiamondPtrComp
+	{
+		bool operator()(const Diamond* lhs, const Diamond* rhs) const
+		{
+			if (lhs != nullptr && rhs != nullptr)
+			{
+				return *lhs < *rhs;
+			}
+			else if (lhs == nullptr)
+			{
+				return false;
+			}
+			else
+				return true;
+		}
 	};
 	
 	class roam
 	{
 	private:
 		std::multiset<Triangle*, TriPtrComp> split;
-		std::multiset<Diamond*> merge;
-		//std::vector<Triangle*> triangles;
+		std::multiset<Diamond*, DiamondPtrComp> merge;
 
 		std::vector<Base::Vertex>* vertices;
 
