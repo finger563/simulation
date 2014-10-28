@@ -17,6 +17,7 @@ namespace Base
 		inline Vector VectorDiv(Vector& a, Vector& b) { return DirectX::XMVectorDivide(a, b); }
 		inline Vector VectorLerp(Vector& a, Vector& b, float t) { return DirectX::XMVectorLerp(a, b, t); }
 		inline Vector VectorSize(Vector& a) { return DirectX::XMVector4Length(a); }
+		inline Vector VectorNorm(Vector& a) { return DirectX::XMVector4Normalize(a); }
 
 		inline void VectorGet(Vector& a, float* val, int index) { DirectX::XMVectorGetByIndexPtr(val, a, index); }
 	}
