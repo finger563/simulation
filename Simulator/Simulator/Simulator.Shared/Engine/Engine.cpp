@@ -255,9 +255,9 @@ namespace Engine
 		gameObjects.back().mesh->indices = myroam.GetIndices();
 		mRenderer->SetObjectsInScene(&gameObjects);
 
-		if (mInput->GetInput("defaultRS").bval)
+		if (mInput->GetInput("defaultRS").fval)
 			mRenderer->SetRasterizerState("default");
-		if (mInput->GetInput("wireframeRS").bval)
+		if (mInput->GetInput("wireframeRS").fval)
 			mRenderer->SetRasterizerState("wireframe");
 
 		//gameObjects[0].position = XMVectorSet((float)cos(SimulationTime) * 3.0f,(float)sin(SimulationTime) * 3.0f,0,0);

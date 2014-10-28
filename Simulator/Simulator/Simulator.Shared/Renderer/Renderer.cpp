@@ -115,11 +115,11 @@ namespace Renderer
 	void Renderer::SetRasterizerState(Platform::String^ state)
 	{
 		auto context = deviceResources->GetD3DDeviceContext();		
-		if (Platform::String::CompareOrdinal(state, "default"))
+		if (state->Equals("default"))
 		{
 			context->RSSetState(defaultrasterizerstate.Get());
 		}
-		else if (Platform::String::CompareOrdinal(state, "wireframe"))
+		else if (state->Equals("wireframe"))
 		{
 			context->RSSetState(wireframerasterizerstate.Get());
 		}
