@@ -1,0 +1,66 @@
+Engine Design:
+--------------
+* GPU Pro 3 : Section V : Chapter 1 : Z3 Culling
+* GPU Pro 3 : Section V : Chapter 2 : A Quaternion Based Rendering Pipeline
+* GPU Pro 3 : Section V : Chapter 4 : Designing a Data Driven Renderer
+* GPU Pro 5 : Section V : Chapter 1 : Quaternions Revisited
+* GPU Pro 5 : Section V : Chapter 3 : Managing Transformations in Hierarchy
+
+Bounding Volume Hierarchy:
+--------------------------
+* GPU Pro : Section III : Chapter 1 : Quadtree Displacement Mapping with Height Blending
+* GPU Pro 4 : Section VI : Chapter 1 : Bit-Trail Traversal for Stackless LBVH on DirectCompute
+* GPU Pro 5 : Section VI : Chapter 3 : Quadtrees on the GPU
+
+Chunked LoD:
+------------
+
+Procedural Object Creation:
+---------------------------
+
+Terrain:
+--------
+* GPU Pro 2 : Section II : Chapter 3 : Large Scale Terrain Rendering for Outdoor Games
+* GPU Pro 3 : Section I : Chapter 2 : RT Deformable Terrain Rendering with DX11
+* GPU Pro 4 : Section I : Chapter 1 : GPU Terrain Subdivision and Tessellation
+
+Atmospheric Scattering:
+-----------------------
+* GPU Pro 3 : Section II : Chapter 2 : Approx to the Chapman Grazing Incidence Function
+
+Clouds:
+-------
+* GPU Pro : Section V : Chapter 6 : RT Screen Space Cloud Lighting
+
+Trees:
+------
+* GPU Pro 2 : Section I : Chapter 3 : Procedural Content Generation on the GPU
+
+Grass:
+------
+* GPU Pro 5 : Section III : Chapter 1 : Screen Space Grass
+
+Water:
+------
+* GPU Pro 2 : Section I : Chapter 1 : Terrain and Ocean Rendering with Hardware Tessellation
+* GPU Pro 2 : Section VII : Chapter 3 : Simple and Fast Fluids
+* GPU Pro 3 : Section II : Chapter 3 : Volumetric RT Water and Foam Rendering
+* GPU Pro 5 : Section I : Chapter 4 : Simple Rasterization Based Liquids
+
+Physics:
+--------
+* Physics API:
+** PHYSX:
+
+** JSBSIM:
+
+** HAVOK:
+
+* Fluids:
+
+* Explosions:
+
+* Collision Detection:
+** GPU Pro : Section X : Chapter 4 : Spatial Binning on the GPU
+** GPU Pro : Section X : Chapter 5 : RT Interaction between Particles and the Dynamic Mesh on the GPU
+** GPU Pro 5 : Section VI : Two-Level Constraint Solver and Pipelined Local Batching for Rigid Body Simulation on GPUs
