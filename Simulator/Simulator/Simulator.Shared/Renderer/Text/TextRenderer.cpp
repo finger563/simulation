@@ -43,7 +43,7 @@ void TextRenderer::Render(Platform::String^ Text, POINT& Pos)
 		Text->Data(),
 		(uint32)Text->Length(),
 		m_textFormat.Get(),
-		100.0f, // Max width of the input text.
+		500.0f, // Max width of the input text.
 		50.0f, // Max height of the input text.
 		&m_textLayout
 		)
