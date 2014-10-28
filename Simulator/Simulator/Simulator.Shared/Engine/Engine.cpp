@@ -47,104 +47,104 @@ namespace Engine
 		float roatationSpeed = 0.025f;
 		mInput->AddInput(
 			"WalkForward",
+			Windows::System::VirtualKey::W,
 			Input::ValueTypes::FLOAT,
-			movementSpeed,
-			Windows::System::VirtualKey::W
+			movementSpeed
 			);
 		mInput->AddInput(
 			"WalkBackward",
+			Windows::System::VirtualKey::S,
 			Input::ValueTypes::FLOAT,
-			movementSpeed,
-			Windows::System::VirtualKey::S
+			movementSpeed
 			);
 		mInput->AddInput(
 			"StrafeRight",
+			Windows::System::VirtualKey::D,
 			Input::ValueTypes::FLOAT,
-			movementSpeed,
-			Windows::System::VirtualKey::D
+			movementSpeed
 			);
 		mInput->AddInput(
 			"StrafeLeft",
+			Windows::System::VirtualKey::A,
 			Input::ValueTypes::FLOAT,
-			movementSpeed,
-			Windows::System::VirtualKey::A
+			movementSpeed
 			);
 
 		mInput->AddInput(
 			"YawRight",
+			Windows::System::VirtualKey::Right,
 			Input::ValueTypes::FLOAT,
-			roatationSpeed,
-			Windows::System::VirtualKey::Right
+			roatationSpeed
 			);
 		mInput->AddInput(
 			"YawLeft",
+			Windows::System::VirtualKey::Left,
 			Input::ValueTypes::FLOAT,
-			roatationSpeed,
-			Windows::System::VirtualKey::Left
+			roatationSpeed
 			);
 
 		mInput->AddInput(
 			"PitchUp",
+			Windows::System::VirtualKey::Up,
 			Input::ValueTypes::FLOAT,
-			roatationSpeed,
-			Windows::System::VirtualKey::Up
+			roatationSpeed
 			);
 		mInput->AddInput(
 			"PitchDown",
+			Windows::System::VirtualKey::Down,
 			Input::ValueTypes::FLOAT,
-			roatationSpeed,
-			Windows::System::VirtualKey::Down
+			roatationSpeed
 			);
 
 		mInput->AddInput(
 			"split1",
+			Windows::System::VirtualKey::Number1,
 			Input::ValueTypes::FLOAT,
-			0.5f,
-			Windows::System::VirtualKey::Number1
+			0.5f
 			);
 		mInput->AddInput(
 			"split2",
+			Windows::System::VirtualKey::Number2,
 			Input::ValueTypes::FLOAT,
-			0.25f,
-			Windows::System::VirtualKey::Number2
+			0.25f
 			);
 		mInput->AddInput(
 			"split3",
+			Windows::System::VirtualKey::Number3,
 			Input::ValueTypes::FLOAT,
-			0.125f,
-			Windows::System::VirtualKey::Number3
+			0.125f
 			);
 		mInput->AddInput(
 			"split4",
+			Windows::System::VirtualKey::Number4,
 			Input::ValueTypes::FLOAT,
-			0.0625f,
-			Windows::System::VirtualKey::Number4
+			0.0625f
 			);
 
 
 		mInput->AddInput(
 			"merge1",
+			Windows::System::VirtualKey::Number5,
 			Input::ValueTypes::FLOAT,
-			0.51f,
-			Windows::System::VirtualKey::Number5
+			0.51f
 			);
 		mInput->AddInput(
 			"merge2",
+			Windows::System::VirtualKey::Number6,
 			Input::ValueTypes::FLOAT,
-			0.251f,
-			Windows::System::VirtualKey::Number6
+			0.251f
 			);
 		mInput->AddInput(
 			"merge3",
+			Windows::System::VirtualKey::Number7,
 			Input::ValueTypes::FLOAT,
-			0.1251f,
-			Windows::System::VirtualKey::Number7
+			0.1251f
 			);
 		mInput->AddInput(
 			"merge4",
+			Windows::System::VirtualKey::Number8,
 			Input::ValueTypes::FLOAT,
-			0.06251f,
-			Windows::System::VirtualKey::Number8
+			0.06251f
 			);
 		
 		mPhysics = std::unique_ptr<Physics::Physics>(new Physics::Physics());

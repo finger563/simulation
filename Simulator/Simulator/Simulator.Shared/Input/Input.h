@@ -19,8 +19,14 @@ namespace Input
 			int ival;
 			bool bval;
 		};
-		InputValue() { fval = 0; }
-		InputValue(ValueTypes t, float mag);
+		union
+		{
+			float clear_fval;
+			int clear_ival;
+			bool clear_bval;
+		};
+		InputValue() { fval = 1; clear_fval = 0; }
+		InputValue(ValueTypes t, float mag, float clear=0);
 	};
 
 	ref class Input		// needs to be ref (makes it WinRT class) so that it's functions can be used for callbacks 
@@ -40,9 +46,10 @@ namespace Input
 	internal:			// used in this project only
 		bool AddInput(
 			Platform::String^ name,
+			Windows::System::VirtualKey initialKey,
 			ValueTypes t,
 			float magnitude,
-			Windows::System::VirtualKey initialKey
+			float clear = 0
 			);
 		InputValue& GetInput(Platform::String^ name);
 	private:

@@ -7,11 +7,12 @@ using namespace Windows::UI::Popups;
 namespace Input
 {
 
-	InputValue::InputValue(ValueTypes t, float mag)
+	InputValue::InputValue(ValueTypes t, float mag, float clear)
 	{
 		Type = t;
 		Magnitude = mag;
-		fval = 0;
+		fval = clear;
+		clear_fval = clear;
 	}
 
 	bool Input::Initialize()
@@ -40,14 +41,15 @@ namespace Input
 
 	bool Input::AddInput(
 		Platform::String^ name,
+		VirtualKey initialKey,
 		ValueTypes t,
 		float magnitude,
-		VirtualKey initialKey
+		float clear
 		)
 	{
 		if (keyToValuePtr.find(initialKey) != keyToValuePtr.end())
 			return false;		// another input already uses this key
-		nameToValue[name] = InputValue(t, magnitude);
+		nameToValue[name] = InputValue(t, magnitude, clear);
 		keyToValuePtr[initialKey] = &nameToValue[name];
 		return true;
 	}
@@ -70,7 +72,7 @@ namespace Input
 		if (keyToValuePtr.find(Args->VirtualKey) == keyToValuePtr.end())
 			return;			// this Key is not currently listed as an input
 		InputValue* val = keyToValuePtr[Args->VirtualKey];
-		val->fval = 0;
+		val->fval = val->clear_fval;
 	}
 
 	void Input::PointerPressed(CoreWindow^ Window, PointerEventArgs^ Args)
