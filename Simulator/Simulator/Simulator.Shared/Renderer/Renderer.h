@@ -17,6 +17,7 @@ namespace Renderer
 	{
 		virtual void Render() = 0;
 		virtual void CreateWindowSizeDependentResources() = 0;
+		virtual void SetRasterizerState(Platform::String^ state) = 0;
 	};
 
 	class Renderer : public IRenderer
@@ -27,6 +28,8 @@ namespace Renderer
 		virtual void CreateWindowSizeDependentResources();
 		virtual void Update();
 		virtual bool UnInitialize();
+
+		virtual void SetRasterizerState(Platform::String^ state);
 
 		virtual void Render();
 

@@ -146,6 +146,19 @@ namespace Engine
 			Input::ValueTypes::FLOAT,
 			0.06251f
 			);
+
+		mInput->AddInput(
+			"wireframeRS",
+			Windows::System::VirtualKey::R,
+			Input::ValueTypes::FLOAT,
+			1.0f
+			);
+		mInput->AddInput(
+			"defaultRS",
+			Windows::System::VirtualKey::T,
+			Input::ValueTypes::FLOAT,
+			1.0f
+			);
 		
 		mPhysics = std::unique_ptr<Physics::Physics>(new Physics::Physics());
 		mPhysics->Initialize();
@@ -241,6 +254,11 @@ namespace Engine
 
 		gameObjects.back().mesh->indices = myroam.GetIndices();
 		mRenderer->SetObjectsInScene(&gameObjects);
+
+		if (mInput->GetInput("defaultRS").bval)
+			mRenderer->SetRasterizerState("default");
+		if (mInput->GetInput("wireframeRS").bval)
+			mRenderer->SetRasterizerState("wireframe");
 
 		//gameObjects[0].position = XMVectorSet((float)cos(SimulationTime) * 3.0f,(float)sin(SimulationTime) * 3.0f,0,0);
 

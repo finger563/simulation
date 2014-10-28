@@ -112,6 +112,19 @@ namespace Renderer
 			);
 	}
 
+	void Renderer::SetRasterizerState(Platform::String^ state)
+	{
+		auto context = deviceResources->GetD3DDeviceContext();		
+		if (Platform::String::CompareOrdinal(state, "default"))
+		{
+			context->RSSetState(defaultrasterizerstate.Get());
+		}
+		else if (Platform::String::CompareOrdinal(state, "wireframe"))
+		{
+			context->RSSetState(wireframerasterizerstate.Get());
+		}
+	}
+
 	bool Renderer::UnInitialize()
 	{
 		return true;
@@ -173,12 +186,7 @@ namespace Renderer
 
 		// set the new values for the constant buffer
 		context->UpdateSubresource(shader->constantbuffer.Get(), 0, 0, &cbuffer, 0, 0);
-
-		// Set the rasterizer state here if we want to
-		//context->RSSetState(wireframerasterizerstate.Get());
-		// or
-		context->RSSetState(defaultrasterizerstate.Get());
-
+		
 		context->DrawIndexed(numIndices, 0, 0);
 		return;
 	}
