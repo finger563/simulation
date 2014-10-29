@@ -5,15 +5,29 @@ Engine Design:
 * GPU Pro 3 : Section V : Chapter 4 : Designing a Data Driven Renderer
 * GPU Pro 5 : Section V : Chapter 1 : Quaternions Revisited
 * GPU Pro 5 : Section V : Chapter 3 : Managing Transformations in Hierarchy
+* Direct3D Rendering Cookbook : Chapter 9 : Rendering on Multiple Threads and Deferred Contexts
+* Game Programming Gems 8 : Section 4 : Domain-Specific Languages in Game Engines
+* Game Programming Gems 8 : Section 4 : Efficient and Scalable Multi-Core Programming
+
+Depth Buffer:
+-------------
+* 3D Engine Design for Virtual Globes : Chapter 6 : Depth Buffer Precision
 
 Bounding Volume Hierarchy:
 --------------------------
 * GPU Pro : Section III : Chapter 1 : Quadtree Displacement Mapping with Height Blending
 * GPU Pro 4 : Section VI : Chapter 1 : Bit-Trail Traversal for Stackless LBVH on DirectCompute
 * GPU Pro 5 : Section VI : Chapter 3 : Quadtrees on the GPU
+* 3D Game Programming with DX11 : Chapter 15 : Instancing and Frustum Culling
+* Real Time Rendering : Chapter 14 : Acceleration Algorithms
+* Advanced 3D Game Programming with DX9 : Chapter 11 : Scene Management
+* Real-Time Collision Detection : Chapter 6 : Bounding Volume Hierarchies
+* Real-Time Collision Detection : Chapter 7 : Spatial Partitioning
+* Real-Time Collision Detection : Chapter 8 : BSP Tree Hierarchies
 
 Chunked LoD:
 ------------
+* 3D Engine Design for Virtual Globes : Chapter 14 : Chunked LOD
 
 Procedural Object Creation:
 ---------------------------
@@ -23,6 +37,10 @@ Terrain:
 * GPU Pro 2 : Section II : Chapter 3 : Large Scale Terrain Rendering for Outdoor Games
 * GPU Pro 3 : Section I : Chapter 2 : RT Deformable Terrain Rendering with DX11
 * GPU Pro 4 : Section I : Chapter 1 : GPU Terrain Subdivision and Tessellation
+* 3D Engine Design for Virtual Globes : Chapter 12 : Massive-Terrain Rendering
+* 3D Engine Design for Virtual Globes : Chapter 13 : Geometry Clipmapping
+* Advanced 3D Game Programming with DX9 : Chapter 9 : Advanced 3D Programming
+* GPU Gems 3 : Section I : Chapter 1 : Generating Complex Procedural Terrains using the GPU
 
 Atmospheric Scattering:
 -----------------------
@@ -35,6 +53,7 @@ Clouds:
 Trees:
 ------
 * GPU Pro 2 : Section I : Chapter 3 : Procedural Content Generation on the GPU
+* GPU Gems 3 : Section I : Chapter 4 : SpeedTree Rendering
 
 Grass:
 ------
@@ -49,14 +68,22 @@ Water:
 
 Physics:
 --------
+* Direct3D Rendering Cookbook : Chapter 8 : Incorporating Physics and Simulations
+* Game Programming Gems 8 : Section 2 : Physics and Animation
+
 * Physics API:
 ** PHYSX:
+*** Game Programming Gems 8 : Section 7 : PhysX GPU Rigid Bodies in Batman Arkham Asylum
+*** Game Programming Gems 8 : Section 7 : Fast GPU Fluid Simulation in PhysX
+*** Learning Physics Modeling with PhysX
 
 ** JSBSIM:
+*** JSBSim Reference Manual
 
 ** HAVOK:
 
 * Fluids:
+* GPU Gems 3 : Section V : Chapter 30 : RT Simulation and Rendering of 3D Fluids
 
 * Explosions:
 
@@ -64,3 +91,7 @@ Physics:
 ** GPU Pro : Section X : Chapter 4 : Spatial Binning on the GPU
 ** GPU Pro : Section X : Chapter 5 : RT Interaction between Particles and the Dynamic Mesh on the GPU
 ** GPU Pro 5 : Section VI : Two-Level Constraint Solver and Pipelined Local Batching for Rigid Body Simulation on GPUs
+** Real Time Rendering : Chapter 17 : Collision Detection
+** Game Engine Architecture : Chapter 12 : Collision and Rigid Body Dynamics
+** Real-Time Collision Detection : Chapter 10 : GPU Assisted Collision Detection
+*** GPU Gems 3 : Section V : Chapter 29 : RT Rigid Body Simulation on GPUs
