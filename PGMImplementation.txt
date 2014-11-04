@@ -2,15 +2,26 @@ This document covers the implementation details and challenges/questions for the
 
 Goals:
 ------
+* proper texturing of closed surfaces : resolve problem at poles and at IDL (normals)
 * multiple frustum rendering
 * proper LOD for planetary rendering
 * multiple dataset inclusion (high-res & low-res; polar & equirectangular)
 
 Extensions:
 -----------
+* Proper dataset determination : checking the right datasets
+* Streaming only the relevant chunks of the datasets (for very large datasets)
+* Extension to allow planetary ocean rendering based on PGM
+* Allow height determination for collision detectino
+* rendering atmosphere & clouds this way?
 
 Algorithm Functional Blocks:
 ----------------------------
+
+Questions:
+----------
+* How well does this work at long range?
+* Can it automatically scale the number of grid points based on distance?
 
 Unresolved Issues:
 ------------------
