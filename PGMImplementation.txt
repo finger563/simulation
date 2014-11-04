@@ -1,0 +1,16 @@
+This document covers the implementation details and challenges/questions for the transition from planetary mesh-based approach to a PGM-based approach. The implementation for this transition will be mainly derived from "Projective Grid Mapping for Planetary Terrain" by Joseph Mahsman.
+
+Goals:
+------
+* multiple frustum rendering
+* proper LOD for planetary rendering
+* multiple dataset inclusion (high-res & low-res; polar & equirectangular)
+
+Extensions:
+-----------
+
+Algorithm Functional Blocks:
+----------------------------
+
+Unresolved Issues:
+------------------
