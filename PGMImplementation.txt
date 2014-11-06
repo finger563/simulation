@@ -54,6 +54,14 @@ Algorithm Functional Blocks:
     * need to find 3 basis vectors which define sampling camera orientation & matrix
     * need to find frustum attributes to get projection matrix 
       * inverse of projection matrix is used by PGM to convert grid point to eye ray
+    * calculate the corner rays of the view frustum and the visible sphere frustum
+      * view frustum : easy, just use near, left, right, top, bottom
+      * visible sphere frustum : 
+        * calculate orientation difference from view frustum
+          * backward vector : b = -n (nadir)
+          * right vector : r = ||n x f|| (f = camera forward vector)
+          * up vector : u = ||r x n||
+        * central axis of frustum is nadir
 * Height Composition
   * produces accumulated heights based on all height datasets for each projected grid point
   * uses sphere normals to sample datasets
