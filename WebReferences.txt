@@ -47,6 +47,7 @@ Grass:
 
 Water:
 ------
+* http://habib.wikidot.com/projected-grid-ocean-shader-full-html-version
 * http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/realistic-natural-effect-rendering-water-i-r2138
 * http://vterrain.org/Water/
 * http://www.fxguide.com/featured/assassins-creed-iii-the-tech-behind-or-beneath-the-action/
