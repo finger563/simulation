@@ -62,6 +62,17 @@ Algorithm Functional Blocks:
           * right vector : r = ||n x f|| (f = camera forward vector)
           * up vector : u = ||r x n||
         * central axis of frustum is nadir
+        * intersection of each frustum plane and sphere gives tangent vector; tangent vector intersection with near plane gives half-side-length of near plane
+          * h = near * atan(tau), tau = tangent vector angle
+        * then the four corner rays are:
+          * (-h,-h,n)
+          * (h,-h,n)
+          * (h,h,n)
+          * (-h,h,n)
+      * intersection between view frustum and visible sphere frustum:
+        * transform corner rays for both frusta into same coordinate system
+        * use rotated eye-space : rotate viewing camera so that yz-plane includes the center of the planet
+          * ensures top edge of sampling camera frustum is parallel to horizon
 * Height Composition
   * produces accumulated heights based on all height datasets for each projected grid point
   * uses sphere normals to sample datasets
