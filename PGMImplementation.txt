@@ -17,6 +17,41 @@ Extensions:
 
 Algorithm Functional Blocks:
 ----------------------------
+* PGM
+  * Requires: (view-dependent)
+    * reference sphere(s) : primary and secondary reference spheres
+    * sampling camera
+  * Produces:
+    * sphere normals 
+    * positions
+  * Create gridpoints which span the viewport
+  * Computes ray-sphere intersection point & sphere intersection normal
+    * gamma1 = asin((d/r) sin w) - w : first intersection angle from nadir
+    * gamma2 = -asin((d/r) sin w)- w + pi : second intersection angle from nadir
+  * pertinent area
+    * occluded area (beyond horizon and determined by maximum height)
+    * non-sampled intersecting area (below the frustum but should displace into the frustum)
+  * Reference Spheres
+  	* Primary and secondary (used for occluded area) only differ by radius
+  	* Calculation of radii occurs on GPU before PGM
+  	* Primary Reference Sphere:
+  	  * radius calculated as minimum visible radius from previous frame?
+  	    * using a mimimum mipmap operation on the gpu
+  	    * final minimum read back to CPU and saved for next frame
+  	* Secondary Reference Sphere:
+  	  * tangent ray angle to primary sphere : tau
+  	  * extent of occluded area is defined by maximum possible normal angle on maximum sphere
+  	  	* gamma0 = -asin((d/rmax) sin tau) - tau + pi
+  	  * secondary sphere radius : rs = d * cos(gamma0)
+  	  * can replace the planet with an impostor when returned radius for secondary sphere is negative
+* Height Composition
+  * produces accumulated heights based on all height datasets for each projected grid point
+  * uses sphere normals to sample datasets
+* Rasterization
+  * uses accumulated heights to displace mesh and render
+* Color Composition
+  * accumulates colors and surface normals
+* Atmosphere, lighting, etc.
 
 Questions:
 ----------
