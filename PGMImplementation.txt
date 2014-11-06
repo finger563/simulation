@@ -44,6 +44,16 @@ Algorithm Functional Blocks:
   	  	* gamma0 = -asin((d/rmax) sin tau) - tau + pi
   	  * secondary sphere radius : rs = d * cos(gamma0)
   	  * can replace the planet with an impostor when returned radius for secondary sphere is negative
+  * Sampling Camera:
+    * eye space : relative to camera; view matrix transforms from world-space to eye-space
+    * projection matrix transforms points from eye-space into canonical view volume:
+      * frustum (field of view, aspect ratio, near plane, far plane) becomes cube
+      * all visible objects exist in the cube defined by (-1,-1,-1) and (1,1,1)
+    * sampling camera has same position as view camera, but different orientation and frustum
+    * sampling frustum contains parts of sphere that should be sampled
+    * need to find 3 basis vectors which define sampling camera orientation & matrix
+    * need to find frustum attributes to get projection matrix 
+      * inverse of projection matrix is used by PGM to convert grid point to eye ray
 * Height Composition
   * produces accumulated heights based on all height datasets for each projected grid point
   * uses sphere normals to sample datasets
