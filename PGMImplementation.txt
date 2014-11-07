@@ -73,6 +73,24 @@ Algorithm Functional Blocks:
         * transform corner rays for both frusta into same coordinate system
         * use rotated eye-space : rotate viewing camera so that yz-plane includes the center of the planet
           * ensures top edge of sampling camera frustum is parallel to horizon
+        * calculate normals of frustum planes in frusta A and B
+          * corner vector cross products: e.g. n2 = ||n3 x n2||, n1 = ||n2 x n1||
+        * intersect the planes of A with the planes of B
+          * cross product between plane normals
+          * rays are then checked against the opposite planes, 2 from A and 2 from B
+        * find the rays of A that exist in B
+          * test against planes of B & add to intersection list
+        * find the rays of B that exist in A
+          * test against planes of A & add to intersection list
+      * Sampling camera matrix : S = O X R X V, V = view matrix, R = rotated eye matrix, O = rotated eye-space to sampling camera space
+        * O is generated from the set of intersection rays; forward vector orients near plane
+          * forward vector is calculated as the average of the intersection rays
+          * sampling camera must be oriented with horizon : yz-plane must include center of planet
+            * => y,z components of forward vector are averaged from y,z of intersection rays; x is set to 0
+          * basis vectors for sampling cameera orientation:
+            * b = -f
+            * r = ||b X n||
+            * u = ||b X r||
 * Height Composition
   * produces accumulated heights based on all height datasets for each projected grid point
   * uses sphere normals to sample datasets
