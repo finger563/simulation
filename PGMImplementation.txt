@@ -91,6 +91,34 @@ Algorithm Functional Blocks:
             * b = -f
             * r = ||b X n||
             * u = ||b X r||
+          * ray intersection with near plane : t = n/ray_z; Point = t*ray
+  * PGM on GPU:
+    * conceptually:
+      * for every grid point, eye ray is generated
+      * calculate local coord system to generate sphere normals from normal angle
+      * angle of eye to nadir is calculated
+      * angle is used to calculate the normal angle at the ray-circle intersection point
+        * need 3 basis vectors which describe points and vectors relative to the plane of the cross section
+      * calculate the sphere normal in eye space using eye-space basis vectors
+      * normal angle is used to calculate the position of the ray-circle intersection
+    * actually:
+      * bind two target buffers : sphere normals and sphere positions in sampling camera space
+        * 32-bit BP RGB textures
+      * sampling camera matrix (SCM) and its inverse (SCMI) are uploaded
+      * In the fragment shader:
+        * find eye ray associated with current fragment : fragment coord is transformed to clip space coord ([-1 to 1] on all axes; represents everything in frustum) using linear transformations
+        * SCMI transforms clip space to sampling camera coord
+        * perspective divide
+        * position of grid point in sampling coords is the vector from eye to grid point (so it is then normalized)
+        * calc right vector from cross product of eye vector and nadir, transformed using SCM
+        * need 3 normalized basis vectors : i,j,k
+        * i is nadir
+        * j is cross product of i and the right vector
+        * k is the cross product of j and i
+        * calculate the ray angle (w.r.t. n) w = asin(dot(r,k))
+        * precompute c = dist/radius, let u = dot(r,k)
+        * gamma1 = asin(c*u) - asin(u)
+        * calc blending factor to mix two reference spheres' intersection results : zeta = [0,1]
 * Height Composition
   * produces accumulated heights based on all height datasets for each projected grid point
   * uses sphere normals to sample datasets
