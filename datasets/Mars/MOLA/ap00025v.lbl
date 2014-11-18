@@ -1,0 +1,388 @@
+PDS_VERSION_ID                   = PDS3
+RECORD_TYPE                      = FIXED_LENGTH
+RECORD_BYTES                     = 236
+FILE_RECORDS                     = 13362
+^TABLE                           = "AP00025V.TAB"
+INSTRUMENT_HOST_NAME             = "MARS GLOBAL SURVEYOR"
+TARGET_NAME                      = "MARS"
+INSTRUMENT_NAME                  = "MARS ORBITER LASER ALTIMETER"
+DATA_SET_ID                      = "MGS-M-MOLA-5-PEDR-SAMPLER-V1.0"
+PRODUCT_ID                       = "AP00025V.TAB"
+MISSION_PHASE_NAME               = "ORBIT INSERTION"
+ORBIT_NUMBER                     = 25
+START_TIME                       = 1997-294T22:14:00.000
+STOP_TIME                        = 1997-294T22:40:00.000
+PRODUCT_RELEASE_DATE             = 1998-03-01
+DESCRIPTION                      = "This file contains the
+calibrated MOLA ranges, energies, and topography for 18 
+contingency passes, Fall 1997. The tables have 29 columns,
+delimited by spaces. The tables contain radii, topography, areoid
+heights, spacecraft location, and instrument data.  The information
+in these files is virtually identical to the binary PEDR.  The
+binary tables contain additional engineering data.
+The products are produced at the Goddard Space Flight Center under
+the direction of David E. Smith."
+
+PRODUCER_FULL_NAME               = "DAVID E. SMITH"
+PRODUCER_INSTITUTION_NAME        = "NASA/GODDARD SPACE FLIGHT CENTER"
+PRODUCT_VERSION_TYPE             = "FINAL"
+PRODUCER_ID                      = "MGS MOLA TEAM"
+SOFTWARE_NAME                    = "PRECISION ORBIT PROFILE PROCESSOR"
+
+OBJECT                    = TABLE
+ROWS                             = 13362
+COLUMNS                          = 29
+ROW_BYTES                        = 233
+ROW_SUFFIX_BYTES                 = 3
+INTERCHANGE_FORMAT               = ASCII
+DESCRIPTION                      = "The table includes
+descriptive information about the PEDR.  The (space delimited)
+data require 233 ASCII characters; these are followed by a pad
+of 1 unspecified ASCII character, an ASCII carriage-return, and
+an ASCII line-feed."
+
+  OBJECT                   = COLUMN
+    NAME                         = "LONGITUDE"
+    DATA_TYPE                    = ASCII_REAL
+    POSITIVE_LONGITUDE_DIRECTION = "EAST"
+    START_BYTE                   = 1
+    BYTES                        = 10
+    FORMAT                       = "F10.5"
+    UNIT                         = "DEGREE"
+    DESCRIPTION                  = "Areocentric longitude of the
+    intersection of the laser shot and the Martian surface, from
+    precision orbit data."
+  END_OBJECT               = COLUMN
+  
+    OBJECT                 = COLUMN
+    NAME                         = "LATITUDE"
+    DATA_TYPE                    = ASCII_REAL
+    START_BYTE                   = 11
+    BYTES                        = 10
+    FORMAT                       = "F10.5"
+    UNIT                         = "DEGREE"
+    DESCRIPTION                  = "Areocentric latitude of the
+    intersection of the laser shot and the Martian surface, from
+    precision orbit data."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "AREOPOTENTIAL TOPOGRAPHY"
+    DATA_TYPE                    = ASCII_REAL
+    START_BYTE                   = 21
+    BYTES                        = 11
+    FORMAT                       = "F11.2"
+    UNIT                         = "METER"
+    DESCRIPTION                  = "The topography relative
+    to a reference potential surface."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "MOLA RANGE"
+    DATA_TYPE                    = ASCII_REAL
+    START_BYTE                   = 32
+    BYTES                        = 10
+    FORMAT                       = "F10.2"
+    UNIT                         = "METER"
+    DESCRIPTION                  = "The corrected range from
+    the MOLA instrument to the planet, as indicated by the time 
+    from the centroid of the laser pulse to the centroid of the 
+    received pulse, times the speed of light divided by 2. The 
+    raw range from the Timing Interval Unit is added to the range 
+    walk and instrument response corrections (range_correction) 
+    to produce the corrected range."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "PLANETARY RADIUS"
+    DATA_TYPE                    = ASCII_REAL
+    START_BYTE                   = 42
+    BYTES                        = 12
+    FORMAT                       = "F12.2"
+    UNIT                         = "METER"
+    DESCRIPTION                  = "The planetary radius
+    relative to the center-of-mass of Mars."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "SPACECRAFT RADIUS"
+    DATA_TYPE                    = ASCII_REAL
+    START_BYTE                   = 54
+    BYTES                        = 12
+    FORMAT                       = "F12.2"
+    UNIT                         = "METER"
+    DESCRIPTION                  = "The spacecraft radial
+    distance relative to the center-of-mass of Mars."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "EMISSION ANGLE"
+    DATA_TYPE                    = ASCII_REAL
+    START_BYTE                   = 66
+    BYTES                        = 7
+    FORMAT                       = "F7.3"
+    UNIT                         = "DEGREE"
+    DESCRIPTION                  = "The angle between the actual
+    shot direction and areocentric direction (i.e., emission angle)."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "EPHEMERIS TIME"
+    DATA_TYPE                    = ASCII_REAL
+    START_BYTE                   = 73
+    BYTES                        = 16
+    FORMAT                       = "F16.5"
+    UNIT                         = "SECOND"
+    DESCRIPTION                  = "The ephemeris time from
+    J2000 at pulse receipt time."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "AREOGRAPHIC LATITUDE"
+    DATA_TYPE                    = ASCII_REAL
+    START_BYTE                   = 89
+    BYTES                        = 10
+    FORMAT                       = "F10.5"
+    UNIT                         = "DEGREE"
+    DESCRIPTION                  = "The areographic latitude using
+    a flattening of 1/192."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "AREOID RADIUS"
+    DATA_TYPE                    = ASCII_REAL
+    START_BYTE                   = 99
+    BYTES                        = 11
+    FORMAT                       = "F11.2"
+    UNIT                         = "METER"
+    DESCRIPTION                  = "The radius of the reference
+    areoid with a 3396 km mean equatorial radius."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "CHANNEL"
+    DATA_TYPE                    = ASCII_INTEGER
+    START_BYTE                   = 110
+    BYTES                        = 3
+    FORMAT                       = "I3"
+    UNIT                         = "N/A"
+    DESCRIPTION                  = "The MOLA laser trigger
+    channel."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "R_CORR"
+    DATA_TYPE                    = ASCII_REAL
+    START_BYTE                   = 113
+    BYTES                        = 8
+    FORMAT                       = "F8.2"
+    UNIT                         = "METER"
+    DESCRIPTION                  = "The range walk and
+    instrument correction.  It is added to the raw range to
+    produce the corrected range"
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "PULSE WIDTH (WY)"
+    DATA_TYPE                    = ASCII_REAL
+    START_BYTE                   = 121
+    BYTES                        = 8
+    FORMAT                       = "F8.2"
+    UNIT                         = "NANOSECOND"
+    DESCRIPTION                  = "The measured pulse width
+    at the detector threshold setting."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "LASER PULSE WIDTH"
+    DATA_TYPE                    = ASCII_REAL
+    START_BYTE                   = 129
+    BYTES                        = 8
+    FORMAT                       = "F8.2"
+    UNIT                         = "NANOSECOND"
+    DESCRIPTION                  = "Start detector leading edge
+    timing bias, including start detector filter response and
+    outgoing laser pulse width."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "SIGR"
+    DATA_TYPE                    = ASCII_REAL
+    START_BYTE                   = 137
+    BYTES                        = 8
+    FORMAT                       = "F8.2"
+    UNIT                         = "NANOSECOND"
+    DESCRIPTION                  = "Received pulse width, one
+    sigma, after matched channel filter, corrected for
+    threshold settings as determined by the receiver model."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "SIGOPT"
+    DATA_TYPE                    = ASCII_REAL
+    START_BYTE                   = 145
+    BYTES                        = 8
+    FORMAT                       = "F8.2"
+    UNIT                         = "NANOSECOND"
+    DESCRIPTION                  = "The received optical pulse
+    width (one sigma), corrected for filter characteristics and
+    threshold settings, as determined by the receiver model,
+    with the minimum limited by the filter response."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "LASER OUTPUT"
+    DATA_TYPE                    = ASCII_REAL
+    START_BYTE                   = 153
+    BYTES                        = 8
+    FORMAT                       = "F8.3"
+    UNIT                         = "MILLIJOULE"
+    DESCRIPTION                  = "The energy of the laser output,
+    calibrated for temperatures of the start detector (SD), and
+    diode array heat sink (AHST)."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "PULSE ENERGY"
+    DATA_TYPE                    = ASCII_REAL
+    START_BYTE                   = 161
+    BYTES                        = 9
+    FORMAT                       = "F9.3"
+    UNIT                         = "ATTOJOULE"
+    DESCRIPTION                  = "The received pulse energy
+    scattered from the surface, as determined by the detector
+    model."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "REF_TRAN"
+    DATA_TYPE                    = ASCII_REAL
+    START_BYTE                   = 170
+    BYTES                        = 8
+    FORMAT                       = "F8.6"
+    UNIT                         = "N/A"
+    DESCRIPTION                  = "The Reflectivity-
+    Atmospheric Transmission product, inferred from link
+    equation using columns 4 (corrected range), 17 (laser
+    output), and 18 (received pulse energy).  The true
+    reflectivity is REF_TRAN * exp(-2*Tau), where Tau is
+    the atmospheric opacity, nominally 0.5."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "PKT"
+    DATA_TYPE                    = ASCII_INTEGER
+    START_BYTE                   = 178
+    BYTES                        = 6
+    FORMAT                       = "I6"
+    UNIT                         = "N/A"
+    DESCRIPTION                  = "The packet number from
+    the Payload Data System."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "BACKGROUND COUNTS"
+    DATA_TYPE                    = ASCII_INTEGER
+    START_BYTE                   = 184
+    BYTES                        = 7
+    FORMAT                       = "I7"
+    UNIT                         = "N/A"
+    DESCRIPTION                  = "The background counts on the
+    trigger channel.  A measure of surface radiation intensity."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "RECEIVER THRESHOLD"
+    DATA_TYPE                    = ASCII_REAL
+    START_BYTE                   = 191
+    BYTES                        = 7
+    FORMAT                       = "F7.1"
+    UNIT                         = "MILLIVOLT"
+    DESCRIPTION                  = "The receiver threshold setting."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "PECT"
+    DATA_TYPE                    = ASCII_INTEGER
+    START_BYTE                   = 198
+    BYTES                        = 5
+    FORMAT                       = "I5"
+    UNIT                         = "N/A"
+    DESCRIPTION                  = "The pulse energy counts
+    (0-255).  A value of 255 is saturated."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "PWCT"
+    DATA_TYPE                    = ASCII_INTEGER
+    START_BYTE                   = 203
+    BYTES                        = 5
+    FORMAT                       = "I5"
+    UNIT                         = "N/A"
+    DESCRIPTION                  = "The pulse width counts
+    (0-63).  A value of 63 is saturated.  Note that the
+    pulse width measurement is unreliable when PECT is saturated."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "TIU_CTS"
+    DATA_TYPE                    = ASCII_INTEGER
+    START_BYTE                   = 208
+    BYTES                        = 8
+    FORMAT                       = "I8"
+    UNIT                         = "N/A"
+    DESCRIPTION                  = "Timing interval unit counts
+    (99,996,280 Hz is nominal)." 
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "START ENCODER"
+    DATA_TYPE                    = ASCII_INTEGER
+    START_BYTE                   = 216
+    BYTES                        = 2
+    FORMAT                       = "I2"
+    UNIT                         = "N/A"
+    DESCRIPTION                  = "The start encoder bits from
+    variable delay lines.  With these bits, the MOLA shot range
+    is interpolated within each clock count."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "STOP ENCODER"
+    DATA_TYPE                    = ASCII_INTEGER
+    START_BYTE                   = 218
+    BYTES                        = 2
+    FORMAT                       = "I2"
+    UNIT                         = "N/A"
+    DESCRIPTION                  = "The stop encoder bits from
+    variable delay lines.  With these bits, the MOLA shot range
+    is interpolated within each clock count."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "RANGE DELAY"
+    DATA_TYPE                    = ASCII_INTEGER
+    START_BYTE                   = 220
+    BYTES                        = 8
+    FORMAT                       = "I8"
+    UNIT                         = "N/A"
+    DESCRIPTION                  = "The range delay, in counts.
+    The one-way range delay distance is this value * 1.499 m,
+    approximately."
+  END_OBJECT               = COLUMN
+
+  OBJECT                   = COLUMN
+    NAME                         = "RANGE WINDOW"
+    DATA_TYPE                    = ASCII_INTEGER
+    START_BYTE                   = 228
+    BYTES                        = 6
+    FORMAT                       = "I6"
+    UNIT                         = "N/A"
+    DESCRIPTION                  = "The range window, in counts.
+    The one-way range window width is this value * 1.499 m,
+    approximately."
+  END_OBJECT               = COLUMN
+
+END_OBJECT                 = TABLE
+
+END

@@ -1,0 +1,50 @@
+PDS_VERSION_ID                  = PDS3
+RECORD_TYPE                     = UNDEFINED
+^IMAGE                          = "ORBMERC.GIF"
+MISSION_NAME                    = {"VIKING","MARS GLOBAL SURVEYOR"}
+SPACECRAFT_NAME                 = {"VIKING ORBITER 1","VIKING ORBITER 2",
+                                    "MARS GLOBAL SURVEYOR"}
+SOURCE_DATA_SET_ID              = "VO1/VO2-M-VIS-5-DIM-V1.0"
+PRODUCT_ID                      = "ORBMERC"
+PRODUCER_FULL_NAME              = "Thomas C. Stein"
+PRODUCER_INSTITUTION_NAME       = "Washington University"
+TARGET_NAME                     = "MARS"
+
+OBJECT                          = IMAGE_MAP_PROJECTION
+   ^DATA_SET_MAP_PROJECTION     = "DSMAP1.CAT"
+   COORDINATE_SYSTEM_TYPE       = "BODY-FIXED ROTATING"
+   COORDINATE_SYSTEM_NAME       = "PLANETOGRAPHIC"
+   MAP_PROJECTION_TYPE          = "MERCATOR"
+   A_AXIS_RADIUS                = 3393.4 <KM>
+   B_AXIS_RADIUS                = 3393.4 <KM>
+   C_AXIS_RADIUS                = 3375.7 <KM>
+   FIRST_STANDARD_PARALLEL      = "N/A"
+   SECOND_STANDARD_PARALLEL     = "N/A"
+   POSITIVE_LONGITUDE_DIRECTION = "WEST"
+   CENTER_LATITUDE              = 0.0
+   CENTER_LONGITUDE             = 0.0
+   REFERENCE_LATITUDE           = "N/A"
+   REFERENCE_LONGITUDE          = "N/A"
+   LINE_FIRST_PIXEL             = 101
+   LINE_LAST_PIXEL              = 785
+   SAMPLE_FIRST_PIXEL           = 51
+   SAMPLE_LAST_PIXEL            = 1489
+   MAP_PROJECTION_ROTATION      = 0
+   MAP_RESOLUTION               = 4 <PIXEL/DEG>
+   MAP_SCALE                    = 7.403 <KM/PIXEL>
+   MAXIMUM_LATITUDE             = 65.0
+   MINIMUM_LATITUDE             = -65.0
+   EASTERNMOST_LONGITUDE        = 180.0
+   WESTERNMOST_LONGITUDE        = 180.0
+   LINE_PROJECTION_OFFSET       = 445
+   SAMPLE_PROJECTION_OFFSET     = 770
+END_OBJECT                      = IMAGE_MAP_PROJECTION
+
+OBJECT                          = IMAGE
+   ENCODING_TYPE                = "GIF89A"
+   LINES                        = 885
+   LINE_SAMPLES                 = 1540
+   SAMPLE_TYPE                  = UNSIGNED_INTEGER
+   SAMPLE_BITS                  = 8
+END_OBJECT                      = IMAGE
+END
