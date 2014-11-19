@@ -6,6 +6,11 @@ Goals:
 * automatically get relevant datasets (mars, moon, earth)
 * handles multiple datasets simultaneously (high-res local, low-res global)
 * handles multiple projections simultaneously (polar, equirectangular, etc.)
+* able to load multiple types of data:
+  * height maps
+  * color maps
+  * false-color (infrared etc.)
+  * atmospheric data (at different levels)
 
 Extensions:
 -----------
