@@ -118,7 +118,14 @@ Algorithm Functional Blocks:
         * calculate the ray angle (w.r.t. n) w = asin(dot(r,k))
         * precompute c = dist/radius, let u = dot(r,k)
         * gamma1 = asin(c*u) - asin(u)
-        * calc blending factor to mix two reference spheres' intersection results : zeta = [0,1]
+        * user defined constant for % of range of positive ray values for interp : zeta = [0,1]
+        * calc blending factor to mix two reference spheres' intersection results : 
+          * f = (w-tau0)/(b-tau0), b = zeta*tau0
+          * use blend factor to calc ray to intersect secondary reference sphere; it mixes between the beginning ray angle and the angle of the ray tangent to the secondary reference sphere
+          * ray vector created is used in dot product with the up vector in local coord sys
+          * calc normal angle with new ray and secondary reference sphere
+          * use blend factor again to mix between normal angle from primary and normal angle from secondary
+        * sphere normal s = a * cos(gamma) + k * sin(gamma), a = antinadir, k = up vector, gamma = blended normal angle; s will be vector in eye space
 * Height Composition
   * produces accumulated heights based on all height datasets for each projected grid point
   * uses sphere normals to sample datasets
