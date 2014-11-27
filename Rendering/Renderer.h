@@ -9,7 +9,7 @@
 #include "RenderStates.h"
 #include "Controller.h"
 
-#define USE_QUADTREE 1
+#define USE_QUADTREE 0
 
 #if USE_QUADTREE
 #include "Ellipsoid.h"
