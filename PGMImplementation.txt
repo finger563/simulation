@@ -14,6 +14,16 @@ Extensions:
 * Extension to allow planetary ocean rendering based on PGM
 * Allow height determination for collision detectino
 * rendering atmosphere & clouds this way?
+* Generate grid points from impostors using tesselator stage
+  * all objects rendered with PGM start as billboards & tesselator generates grid points based on distance to object
+* Use impostors for everything
+  * can we break complex objects down into connected simple objects replaced with impostors and rendered with pgm?
+* How will the following work with PGM:
+  * Animation
+  * Non-simple bodies
+  * texture warping
+  * Non-convex hulls? (i.e. caves, overhangs, etc)
+    * possibly use 3d textures with extents instead of absolutes?
 
 Algorithm Functional Blocks:
 ----------------------------
