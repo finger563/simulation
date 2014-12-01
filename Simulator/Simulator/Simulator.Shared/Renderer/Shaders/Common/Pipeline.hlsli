@@ -8,5 +8,6 @@ struct VertexIn
 struct VertexOut
 {
 	float4 position : SV_POSITION;
+	float4 normal : NORMAL;
 	float4 color : COLOR;
 };

@@ -8,6 +8,7 @@ VertexOut main( VertexIn vin )
 	vout.position = mul(matWVP, vin.pos);
 
 	float4 norm = normalize(mul(rotation, vin.normal));
+	vout.normal = norm;
 	float diffusebrightness = saturate(dot(norm, lightvec));
 
 	vout.color = ambientcol;
