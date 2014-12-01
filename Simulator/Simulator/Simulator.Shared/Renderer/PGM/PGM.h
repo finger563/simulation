@@ -29,13 +29,21 @@ namespace Renderer
 	private:
 		Camera ViewCamera;
 		Camera SamplingCamera;	// same position as view camera, but different orientation and frustum
+				
+		// Grid Point related data
+		int numGridPointsX;
+		int numGridPointsY;
 
-		// need something here for setting up the shaders properly (i.e. to do the raytracing etc.)
-		// need number of grid points to make
-		// need primary reference sphere
-		// need secondary reference sphere
-		// need min sphere
-		// need max sphere
+		// Sphere related data
+		Vector sphereWorldPos;		// world space position of all spheres
+		double primaryRadius;		// radius of primary sphere
+		double secondaryRadius;		// radius of secondary referece sphere
+		double minRadius;			// minimum radius (based on dataset)
+		double maxRadius;			// maximum radius (based on dataset)
+
+		// Shader related data: shaders perform PGM on GPU
+		std::unique_ptr<Shader> pgmShader;					// raytraces grid points, produces sphere normals and positions
+		std::unique_ptr<Shader> deferredTexturingShader;	// rasterizes based on datasets, sphere normals, and positions
 		
 		std::shared_ptr<DeviceResources> deviceResources;
 	};
