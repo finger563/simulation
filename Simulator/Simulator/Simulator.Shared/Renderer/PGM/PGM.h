@@ -27,10 +27,15 @@ namespace Renderer
 		virtual void OnResuming();
 
 	private:
-		Camera SamplingCamera;
 		Camera ViewCamera;
+		Camera SamplingCamera;	// same position as view camera, but different orientation and frustum
 
 		// need something here for setting up the shaders properly (i.e. to do the raytracing etc.)
+		// need number of grid points to make
+		// need primary reference sphere
+		// need secondary reference sphere
+		// need min sphere
+		// need max sphere
 		
 		std::shared_ptr<DeviceResources> deviceResources;
 	};
