@@ -10,6 +10,7 @@
 #include "Device Resources\DeviceResources.h"
 #include "Text\TextRenderer.h"
 #include "Objects\ROAM.h"
+#include "PGM\PGM.h"
 
 namespace Renderer
 {
@@ -68,6 +69,8 @@ namespace Renderer
 
 	private:
 		void InitStates();								// For initializing the rasterizer etc. states.
+
+		PGM pgm;
 
 		Camera camera;									// Camera used to render the scene
 		std::vector<Base::Objects::GameObject>* objects;	// pointer to objects created and maintained by Engine

@@ -75,6 +75,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Objects\ROAM.h">
       <Filter>Renderer\Objects</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\PGM\PGM.h">
+      <Filter>Renderer\PGM</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />
@@ -120,6 +123,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)Base\Mesh\Mesh.cpp">
       <Filter>Base\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Renderer\PGM\PGM.cpp">
+      <Filter>Renderer\PGM</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -182,6 +188,9 @@
     </Filter>
     <Filter Include="Renderer\Text">
       <UniqueIdentifier>{88099d4e-ae06-4c00-95f1-33812027ce5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\PGM">
+      <UniqueIdentifier>{58d528ae-3f2f-40db-b812-3fc1b18de455}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

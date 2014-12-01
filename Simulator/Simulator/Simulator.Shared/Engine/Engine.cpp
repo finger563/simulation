@@ -267,8 +267,8 @@ namespace Engine
 		mRenderer->Render();
 		Platform::String^ renderString = L"Change Rasterizer state: r,t\nSplit: 1-4\nMerge: 5-8\nMovement: w,a,s,d\nLook: up,down,left,right";
 		POINT mypoint = POINT();
-		mypoint.x = 0 + (long)cos(SimulationTime) * 100;
-		mypoint.y = 100 + (long)sin(SimulationTime) * 100;
+		mypoint.x = (long)(cos(SimulationTime) * 100.0);
+		mypoint.y = 100 + (long)(sin(SimulationTime) * 100.0);
 		mTextRenderer->Render(renderString, mypoint);
 
 		deviceResources->Present();

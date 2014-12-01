@@ -15,7 +15,8 @@ using namespace Platform;
 namespace Renderer
 {
 	Renderer::Renderer(const std::shared_ptr<DeviceResources>& devResources) :
-		deviceResources(devResources)
+		deviceResources(devResources),
+		pgm(devResources)
 	{
 	}
 
