@@ -78,6 +78,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\PGM\PGM.h">
       <Filter>Renderer\PGM</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Shaders\InputElementDescriptors.h">
+      <Filter>Renderer\Shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />

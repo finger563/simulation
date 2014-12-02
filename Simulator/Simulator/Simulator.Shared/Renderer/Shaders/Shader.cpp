@@ -25,6 +25,11 @@ dsFileName("")
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	});
 #endif
+	vertexshader = nullptr;
+	pixelshader = nullptr;
+	geometryshader = nullptr;
+	hullshader = nullptr;
+	domainshader = nullptr;
 }
 
 Shader::Shader(const std::shared_ptr<DeviceResources>& devResources,
@@ -36,6 +41,11 @@ gsFileName(gsFile),
 hsFileName(hsFile),
 dsFileName(dsFile)
 {
+	vertexshader = nullptr;
+	pixelshader = nullptr;
+	geometryshader = nullptr;
+	hullshader = nullptr;
+	domainshader = nullptr;
 }
 
 void Shader::SetInputDescriptor(std::initializer_list<D3D11_INPUT_ELEMENT_DESC> l)
@@ -122,11 +132,27 @@ void Shader::Apply()
 	// set the input layout as the active input layout
 	deviceResources->GetD3DDeviceContext()->IASetInputLayout(inputlayout.Get());
 	// set the shader objects as the active shaders
-	deviceResources->GetD3DDeviceContext()->VSSetShader(vertexshader.Get(), nullptr, 0);
-	deviceResources->GetD3DDeviceContext()->PSSetShader(pixelshader.Get(), nullptr, 0);
-	// set the constant buffer for the vertex and pixel shaders
-	deviceResources->GetD3DDeviceContext()->VSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());
-	deviceResources->GetD3DDeviceContext()->PSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());
+	if (vertexshader != nullptr)
+		deviceResources->GetD3DDeviceContext()->VSSetShader(vertexshader.Get(), nullptr, 0);
+	if (pixelshader != nullptr)
+		deviceResources->GetD3DDeviceContext()->PSSetShader(pixelshader.Get(), nullptr, 0);
+	if (geometryshader != nullptr)
+		deviceResources->GetD3DDeviceContext()->GSSetShader(geometryshader.Get(), nullptr, 0);
+	if (hullshader != nullptr)
+		deviceResources->GetD3DDeviceContext()->HSSetShader(hullshader.Get(), nullptr, 0);
+	if (domainshader != nullptr)
+		deviceResources->GetD3DDeviceContext()->DSSetShader(domainshader.Get(), nullptr, 0);
+	// set the constant buffer for the active shaders
+	if (vertexshader != nullptr)
+		deviceResources->GetD3DDeviceContext()->VSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());
+	if (pixelshader != nullptr)
+		deviceResources->GetD3DDeviceContext()->PSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());
+	if (geometryshader != nullptr)
+		deviceResources->GetD3DDeviceContext()->GSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());
+	if (hullshader != nullptr)
+		deviceResources->GetD3DDeviceContext()->HSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());
+	if (domainshader != nullptr)
+		deviceResources->GetD3DDeviceContext()->DSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());
 }
 
 void Shader::Reset()

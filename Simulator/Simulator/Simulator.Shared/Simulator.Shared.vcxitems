@@ -58,6 +58,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Shaders\ConstantBuffers.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Shaders\InputElementDescriptors.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Shader.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Text\TextRenderer.h" />
   </ItemGroup>
