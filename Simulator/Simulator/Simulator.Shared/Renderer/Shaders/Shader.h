@@ -15,16 +15,29 @@ namespace Renderer
 	// this function loads a file into an Array^
 	Platform::Array<byte>^ LoadShaderFile(std::string File);
 
+	// Default Input Element Descriptor 
+	D3D11_INPUT_ELEMENT_DESC defaultIED[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		//{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
 	class Shader
 	{
 	private:
 		std::shared_ptr<DeviceResources> deviceResources;
+		std::string vsFileName;
+		std::string psFileName;
+		std::string gsFileName;
+		std::string hsFileName;
+		std::string dsFileName;
 
-		// Everything below here is now contained within device resources
-		//ComPtr<ID3D11Device2> dev;						// pointer to renderer's device handle
-		//ComPtr<ID3D11DeviceContext2> devcon;			// pointer to renderer's device context handle
 	public:
 		Shader(const std::shared_ptr<DeviceResources>& deviceResources);
+		Shader(const std::shared_ptr<DeviceResources>& deviceResources,
+			std::string vsFile, std::string psFile,
+			std::string gsFile = "", std::string hsFile = "", std::string dsFile = "");
 		void Initialize();
 		void UnInitialize();
 		void Apply();

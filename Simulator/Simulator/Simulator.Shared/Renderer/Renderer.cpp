@@ -176,7 +176,7 @@ namespace Renderer
 		camera.UpdateMatrices();
 		XMMATRIX matFinal = matWorld * camera.ViewMatrix * camera.ProjMatrix * camera.OrientMatrix;
 
-		CBuffer cbuffer;
+		DefaultCBuffer cbuffer;
 		cbuffer.matWVP = matFinal;
 
 		// Lighting related

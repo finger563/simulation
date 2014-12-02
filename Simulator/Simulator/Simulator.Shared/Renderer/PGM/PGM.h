@@ -20,8 +20,9 @@ namespace Renderer
 		virtual bool UnInitialize();
 
 		// need interface here to get the grid points for rendering
+		//   -- should probably try to get this done in tessellator stage if possible
 		// need interface here to get/apply shaders
-		// should this class handle the deferred texturing? or what?
+		// should this class handle the deferred rendering
 
 		virtual void OnSuspending();
 		virtual void OnResuming();

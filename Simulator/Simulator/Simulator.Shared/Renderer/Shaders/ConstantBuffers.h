@@ -8,7 +8,7 @@ using namespace DirectX;
 
 namespace Renderer
 {
-	struct CBuffer
+	struct DefaultCBuffer
 	{
 		XMMATRIX matWVP;
 		XMMATRIX matRotation;

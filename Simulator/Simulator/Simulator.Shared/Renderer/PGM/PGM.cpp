@@ -4,7 +4,9 @@
 namespace Renderer
 {
 	PGM::PGM(const std::shared_ptr<DeviceResources>& devResources) :
-		deviceResources(devResources)
+		deviceResources(devResources),
+		numGridPointsX(16),
+		numGridPointsY(16)
 	{
 	}
 

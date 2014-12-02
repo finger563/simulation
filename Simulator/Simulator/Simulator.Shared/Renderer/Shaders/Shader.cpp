@@ -9,21 +9,61 @@ using namespace Windows::UI::Core;
 using namespace DirectX;
 
 Shader::Shader(const std::shared_ptr<DeviceResources>& devResources) :
-deviceResources(devResources)
+deviceResources(devResources),
+vsFileName("VertexShader.cso"),
+psFileName("PixelShader.cso"),
+gsFileName(""),
+hsFileName(""),
+dsFileName("")
 {
+}
 
+Shader::Shader(const std::shared_ptr<DeviceResources>& devResources,
+	std::string vsFile, std::string psFile, std::string gsFile, std::string hsFile, std::string dsFile) :
+deviceResources(devResources),
+vsFileName(vsFile),
+psFileName(psFile),
+gsFileName(gsFile),
+hsFileName(hsFile),
+dsFileName(dsFile)
+{
 }
 
 void Shader::Initialize()
 {
 	// load the shader files
-	Platform::Array<byte>^ VSFile = LoadShaderFile("VertexShader.cso");
-	Platform::Array<byte>^ PSFile = LoadShaderFile("PixelShader.cso");
+	Platform::Array<byte>^ VSFile;
+	Platform::Array<byte>^ PSFile;
+	Platform::Array<byte>^ GSFile;
+	Platform::Array<byte>^ DSFile;
+	Platform::Array<byte>^ HSFile;
 
 	// create the shader objects
-	deviceResources->GetD3DDevice()->CreateVertexShader(VSFile->Data, VSFile->Length, nullptr, &vertexshader);
-	deviceResources->GetD3DDevice()->CreatePixelShader(PSFile->Data, PSFile->Length, nullptr, &pixelshader);
-
+	if (vsFileName.compare(""))
+	{
+		VSFile = LoadShaderFile(vsFileName);
+		deviceResources->GetD3DDevice()->CreateVertexShader(VSFile->Data, VSFile->Length, nullptr, &vertexshader);
+	}
+	if (psFileName.compare(""))
+	{
+		PSFile = LoadShaderFile(psFileName);
+		deviceResources->GetD3DDevice()->CreatePixelShader(PSFile->Data, PSFile->Length, nullptr, &pixelshader);
+	}
+	if (gsFileName.compare(""))
+	{
+		GSFile = LoadShaderFile(gsFileName);
+		deviceResources->GetD3DDevice()->CreateGeometryShader(GSFile->Data, GSFile->Length, nullptr, &geometryshader);
+	}
+	if (hsFileName.compare(""))
+	{
+		HSFile = LoadShaderFile(hsFileName);
+		deviceResources->GetD3DDevice()->CreateHullShader(HSFile->Data, HSFile->Length, nullptr, &hullshader);
+	}
+	if (dsFileName.compare(""))
+	{
+		DSFile = LoadShaderFile(dsFileName);
+		deviceResources->GetD3DDevice()->CreateDomainShader(DSFile->Data, DSFile->Length, nullptr, &domainshader);
+	}
 
 	// initialize input layout
 	D3D11_INPUT_ELEMENT_DESC ied[] =
@@ -32,7 +72,7 @@ void Shader::Initialize()
 		//{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-
+	
 	// create the input layout
 	deviceResources->GetD3DDevice()->CreateInputLayout(ied, ARRAYSIZE(ied), VSFile->Data, VSFile->Length, &inputlayout);
 
@@ -40,7 +80,7 @@ void Shader::Initialize()
 	D3D11_BUFFER_DESC bd = { 0 };
 
 	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(CBuffer);		// must always be a multiple of 16 bytes
+	bd.ByteWidth = sizeof(DefaultCBuffer);		// must always be a multiple of 16 bytes
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
 	// create the constant buffer
