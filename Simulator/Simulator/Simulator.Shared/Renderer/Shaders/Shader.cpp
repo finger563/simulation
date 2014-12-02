@@ -16,6 +16,15 @@ gsFileName(""),
 hsFileName(""),
 dsFileName("")
 {
+#if 1
+	SetInputDescriptor(defaultIED, 2);
+#else
+	SetInputDescriptor(
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	});
+#endif
 }
 
 Shader::Shader(const std::shared_ptr<DeviceResources>& devResources,
@@ -27,6 +36,30 @@ gsFileName(gsFile),
 hsFileName(hsFile),
 dsFileName(dsFile)
 {
+}
+
+void Shader::SetInputDescriptor(std::initializer_list<D3D11_INPUT_ELEMENT_DESC> l)
+{
+	if (l.size() > 0)
+	{
+		pIED = new D3D11_INPUT_ELEMENT_DESC[l.size()];
+		int n = 0;
+		for (const D3D11_INPUT_ELEMENT_DESC* it = begin(l); it != end(l); ++it, ++n)
+		{
+			pIED[n] = *it;
+		}
+		numDescriptors = l.size();
+	}
+}
+
+void Shader::SetInputDescriptor(D3D11_INPUT_ELEMENT_DESC pElemDesc[], int numDesc)
+{
+	numDescriptors = numDesc;
+	pIED = new D3D11_INPUT_ELEMENT_DESC[numDescriptors];
+	for (int i = 0; i < numDescriptors; i++)
+	{
+		pIED[i] = pElemDesc[i];
+	}
 }
 
 void Shader::Initialize()
@@ -64,17 +97,9 @@ void Shader::Initialize()
 		DSFile = LoadShaderFile(dsFileName);
 		deviceResources->GetD3DDevice()->CreateDomainShader(DSFile->Data, DSFile->Length, nullptr, &domainshader);
 	}
-
-	// initialize input layout
-	D3D11_INPUT_ELEMENT_DESC ied[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		//{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
 	
 	// create the input layout
-	deviceResources->GetD3DDevice()->CreateInputLayout(ied, ARRAYSIZE(ied), VSFile->Data, VSFile->Length, &inputlayout);
+	deviceResources->GetD3DDevice()->CreateInputLayout(pIED, numDescriptors, VSFile->Data, VSFile->Length, &inputlayout);
 
 	// initialize the constant buffer
 	D3D11_BUFFER_DESC bd = { 0 };
