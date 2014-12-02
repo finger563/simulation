@@ -14,7 +14,8 @@ vsFileName("VertexShader.cso"),
 psFileName("PixelShader.cso"),
 gsFileName(""),
 hsFileName(""),
-dsFileName("")
+dsFileName(""),
+numDescriptors(0)
 {
 #if 1
 	SetInputDescriptor(defaultIED, 2);
@@ -39,7 +40,8 @@ vsFileName(vsFile),
 psFileName(psFile),
 gsFileName(gsFile),
 hsFileName(hsFile),
-dsFileName(dsFile)
+dsFileName(dsFile),
+numDescriptors(0)
 {
 	vertexshader = nullptr;
 	pixelshader = nullptr;
