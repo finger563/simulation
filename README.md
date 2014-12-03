@@ -3,7 +3,7 @@ simulation
 
 This project has the goal of developing a modular, fast, and realistic multi-domain system simulation and renderer.  It is the culmination of graphics, rendering, and physics research that I've done over the past 6-7 years as either hobby or class projects.
 
-We are developing a GPU-accelerated muti-domain physics simulation and realistic rendering system.  It will support the simulation of multiple physical domains simultaneously, e.g. fluid dynamics, gravity, elastic and inelastic collision.  Additionally, it will support realistic rendering of the simulation as feedback and interaction with the user.  We are integrating support for procedural data generation as well as the data stored by NASA in its Planetary Data System.  By working with existing high-fidelity physics simulation engines and integrating the latest in GPU acceleration and rendering techniques, we will provide real-time simulation and feedback to the user.
+We are developing a GPU-accelerated muti-domain physics simulation and realistic rendering system.  It will support the simulation of multiple physical domains simultaneously, e.g. fluid dynamics, gravity, elastic and inelastic collision.  Additionally, it will support realistic rendering of the simulation as feedback and interaction with the user.  We are integrating support for procedural data generation as well as the data stored by NASA in its [Planetary Data System](http://pds.jpl.nasa.gov/).  By working with existing high-fidelity physics simulation engines and integrating the latest in GPU acceleration and rendering techniques, we will provide real-time simulation and feedback to the user.
 
 Research:
 ---------
