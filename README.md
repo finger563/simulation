@@ -7,7 +7,7 @@ We are developing a GPU-accelerated muti-domain physics simulation and realistic
 
 Research:
 ---------
-Much of the research for this engine has not been documented (sadly), as it has been ongoing since around 2008.  Some of that resarch culminated in a class project which was a networked first person shooter built on top of a custom software rendering engine (also on github).  However, Since this project has started, all resarch has been (as much as possible) catalogued by topic as [book references](BookReferences.md), [web references](WebReferences.md), or the relevant research papers have been committed into the repository under the Docs folder.  Additionally, any ongoing or past implementation notes are committed as their own files, listed under Relevant Documentation in this file.
+Much of the research for this engine has not been documented (sadly), as it has been ongoing since around 2008.  Some of that resarch culminated in a class project which was a [networked first person shooter built on top of a custom software rendering engine](https://github.com/finger563/CS283Project).  However, Since this project has started, all resarch has been (as much as possible) catalogued by topic as [book references](BookReferences.md), [web references](WebReferences.md), or the relevant research papers have been committed into the repository under the Docs folder.  Additionally, any ongoing or past implementation notes are committed as their own files, listed under [Relevant Documentation](#relevant-documentation) in this file.
 
 Design:
 -------
