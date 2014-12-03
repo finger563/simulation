@@ -7,7 +7,7 @@ We are developing a GPU-accelerated muti-domain physics simulation and realistic
 
 Research:
 ---------
-Much of the research for this engine has not been documented (sadly), as it has been ongoing since around 2008.  Some of that resarch culminated in a class project which was a [networked first person shooter built on top of a custom software rendering engine](https://github.com/finger563/CS283Project).  However, Since this project has started, all resarch has been (as much as possible) catalogued by topic as [book references](BookReferences.md), [web references](WebReferences.md), or the relevant research papers have been committed into the repository under the Docs folder.  Additionally, any ongoing or past implementation notes are committed as their own files, listed under [Relevant Documentation](#relevant-documentation) in this file.
+Much of the research for this engine has not been documented (sadly), as it has been ongoing since around 2008.  Some of that resarch culminated in a class project which was a [networked first person shooter built on top of a custom software rendering engine](https://github.com/finger563/CS283Project).  However, Since this project has started, all resarch has been (as much as possible) catalogued by topic as [book references](BookReferences.md), [web references](WebReferences.md), or the relevant research papers have been committed into the repository under the [Docs](Docs) folder.  Additionally, any ongoing or past implementation notes are committed as their own files, listed under [Relevant Documentation](#relevant-documentation) in this file.
 
 Design:
 -------
@@ -42,8 +42,8 @@ Each of these subsystems may extend the base subsystem interface to add relevant
 Implementation:
 ---------------
 Currently there are two versions of the simulator implemented:
-* [The Renderer Project](Rendering/Renderer.sln) in the Rendering folder is the outdated code which utilizes hardware tesselation and programmable shaders to render the NASA Earth SRTM dataset with a cloud layer and atmosphere.
-* [The Simulator Project](Simulator/Simulator.sln) in the Simulator folder contains the main implementation.  It is currently being transitioned from a ROAM-based rendering implementation to a PGM-based implementation.  The user input subsystem is functional, as are the Renderer and the Engine subsystems, but the Physics subsystem has no integration with 3rd party physics simulators and contains no physics simulation code itself.  
+* [The Renderer Project](Rendering/Renderer.sln) in the [Rendering](Rendering) folder is the outdated code which utilizes hardware tesselation and programmable shaders to render the NASA Earth SRTM dataset with a cloud layer and atmosphere.
+* [The Simulator Project](Simulator/Simulator.sln) in the [Simulator](Simulator) folder contains the main implementation.  It is currently being transitioned from a ROAM-based rendering implementation to a PGM-based implementation.  The user input subsystem is functional, as are the Renderer and the Engine subsystems, but the Physics subsystem has no integration with 3rd party physics simulators and contains no physics simulation code itself.  
 
 Relevant Documentation:
 -----------------------
