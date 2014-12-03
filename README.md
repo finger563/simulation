@@ -42,8 +42,8 @@ Each of these subsystems may extend the base subsystem interface to add relevant
 Implementation:
 ---------------
 Currently there are two versions of the simulator implemented:
-* (The Renderer Project)[Renderer.sln] in the Rendering folder is the outdated code which utilizes hardware tesselation and programmable shaders to render the NASA Earth SRTM dataset with a cloud layer and atmosphere.
-* (The Simulator Project)[Simulator.sln] in the Simulator folder contains the main implementation.  It is currently being transitioned from a ROAM-based rendering implementation to a PGM-based implementation.  The user input subsystem is functional, as are the Renderer and the Engine subsystems, but the Physics subsystem has no integration with 3rd party physics simulators and contains no physics simulation code itself.  
+* [The Renderer Project](Rendering/Renderer.sln) in the Rendering folder is the outdated code which utilizes hardware tesselation and programmable shaders to render the NASA Earth SRTM dataset with a cloud layer and atmosphere.
+* [The Simulator Project](Simulator/Simulator.sln) in the Simulator folder contains the main implementation.  It is currently being transitioned from a ROAM-based rendering implementation to a PGM-based implementation.  The user input subsystem is functional, as are the Renderer and the Engine subsystems, but the Physics subsystem has no integration with 3rd party physics simulators and contains no physics simulation code itself.  
 
 Relevant Documentation:
 -----------------------
