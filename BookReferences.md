@@ -99,15 +99,15 @@ Physics:
 * Shader X7 : Section IX : Chapter 1 : Memory and Computation Efficient Data Structure ofr Particle Based Simulation on the GPU
 
 * Physics API:
-** PHYSX:
-*** Game Programming Gems 8 : Section 7 : PhysX GPU Rigid Bodies in Batman Arkham Asylum
-*** Game Programming Gems 8 : Section 7 : Fast GPU Fluid Simulation in PhysX
-*** Learning Physics Modeling with PhysX
+  * PHYSX:
+    * Game Programming Gems 8 : Section 7 : PhysX GPU Rigid Bodies in Batman Arkham Asylum
+    * Game Programming Gems 8 : Section 7 : Fast GPU Fluid Simulation in PhysX
+    * Learning Physics Modeling with PhysX
 
-** JSBSIM:
-*** JSBSim Reference Manual
+  * JSBSIM:
+    * JSBSim Reference Manual
 
-** HAVOK:
+  * HAVOK:
 
 * Fluids:
 * GPU Gems 3 : Section V : Chapter 30 : RT Simulation and Rendering of 3D Fluids
@@ -115,10 +115,10 @@ Physics:
 * Explosions:
 
 * Collision Detection:
-** GPU Pro : Section X : Chapter 4 : Spatial Binning on the GPU
-** GPU Pro : Section X : Chapter 5 : RT Interaction between Particles and the Dynamic Mesh on the GPU
-** GPU Pro 5 : Section VI : Chapter 4 : Two-Level Constraint Solver and Pipelined Local Batching for Rigid Body Simulation on GPUs
-** Real Time Rendering : Chapter 17 : Collision Detection
-** Game Engine Architecture : Chapter 12 : Collision and Rigid Body Dynamics
-** Real-Time Collision Detection : Chapter 10 : GPU Assisted Collision Detection
-*** GPU Gems 3 : Section V : Chapter 29 : RT Rigid Body Simulation on GPUs
+  * GPU Pro : Section X : Chapter 4 : Spatial Binning on the GPU
+  * GPU Pro : Section X : Chapter 5 : RT Interaction between Particles and the Dynamic Mesh on the GPU
+  * GPU Pro 5 : Section VI : Chapter 4 : Two-Level Constraint Solver and Pipelined Local Batching for Rigid Body Simulation on GPUs
+  * Real Time Rendering : Chapter 17 : Collision Detection
+  * Game Engine Architecture : Chapter 12 : Collision and Rigid Body Dynamics
+  * Real-Time Collision Detection : Chapter 10 : GPU Assisted Collision Detection
+    * GPU Gems 3 : Section V : Chapter 29 : RT Rigid Body Simulation on GPUs
