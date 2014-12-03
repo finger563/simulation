@@ -11,9 +11,39 @@ Much of the research for this engine has not been documented (sadly), as it has 
 
 Design:
 -------
+A full design can be found in our [Design Document](Design.md); this section is a shorter version of it.  
+
+The simulator is composed as a collection of subsystems which each export at least this basic interface:
+
+	interface ISubsystem
+	{
+		virtual bool Initialize() = 0;
+		virtual void Update() = 0;
+		virtual bool UnInitialize() = 0;
+
+		virtual void OnSuspending() = 0;
+		virtual void OnResuming() = 0;
+	};
+
+The main subsystems of the simulator are
+* Base
+  * Contains the basic data structures, math, memory, time, and interface used across subsystems
+* Engine
+  * Controls the main execution of the simulator and its subsystems
+* Input
+  * Controls the user input to the simulator
+* Physics
+  * Manages the physical simulation for all entities being simulated
+* Renderer
+  * Manages the rendering of all entities for feedback to the user
+
+Each of these subsystems may extend the base subsystem interface to add relevant methods required for their purpose.  
 
 Implementation:
 ---------------
+Currently there are two versions of the simulator implemented:
+* (The Renderer Project)[Renderer.sln] in the Rendering folder is the outdated code which utilizes hardware tesselation and programmable shaders to render the NASA Earth SRTM dataset with a cloud layer and atmosphere.
+* (The Simulator Project)[Simulator.sln] in the Simulator folder contains the main implementation.  It is currently being transitioned from a ROAM-based rendering implementation to a PGM-based implementation.  The user input subsystem is functional, as are the Renderer and the Engine subsystems, but the Physics subsystem has no integration with 3rd party physics simulators and contains no physics simulation code itself.  
 
 Relevant Documentation:
 -----------------------
