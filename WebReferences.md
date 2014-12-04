@@ -17,6 +17,7 @@ Procedural Object Creation:
 
 Terrain:
 --------
+* http://experilous.com/1/blog/post/procedural-planet-generation
 * http://organicvectory.com/index.php?view=article&id=48
 * http://www.gamasutra.com/view/feature/131451/a_realtime_procedural_universe_.php
 * http://vterrain.org/
