@@ -14,17 +14,17 @@ Design:
 A full design can be found in our [Design Document](Design.md); this section is a shorter version of it.  
 
 The simulator is composed as a collection of subsystems which each export at least this basic interface:
+``` cpp
+interface ISubsystem
+{
+	virtual bool Initialize() = 0;
+	virtual void Update() = 0;
+	virtual bool UnInitialize() = 0;
 
-	interface ISubsystem
-	{
-		virtual bool Initialize() = 0;
-		virtual void Update() = 0;
-		virtual bool UnInitialize() = 0;
-
-		virtual void OnSuspending() = 0;
-		virtual void OnResuming() = 0;
-	};
-
+	virtual void OnSuspending() = 0;
+	virtual void OnResuming() = 0;
+};
+```
 The main subsystems of the simulator are
 * Base
   * Contains the basic data structures, math, memory, time, and interface used across subsystems
