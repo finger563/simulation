@@ -33,6 +33,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)App.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Base.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Data Structures\QuadTree.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\GDAL\DataCacher.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\GDAL\DataExtractor.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Math\Quaternion.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Mesh\Mesh.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Base\Subsystem.h" />

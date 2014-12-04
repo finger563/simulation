@@ -81,6 +81,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Renderer\Shaders\InputElementDescriptors.h">
       <Filter>Renderer\Shaders</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\GDAL\DataExtractor.h">
+      <Filter>Base\GDAL</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Base\GDAL\DataCacher.h">
+      <Filter>Base\GDAL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />
@@ -194,6 +200,9 @@
     </Filter>
     <Filter Include="Renderer\PGM">
       <UniqueIdentifier>{58d528ae-3f2f-40db-b812-3fc1b18de455}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\GDAL">
+      <UniqueIdentifier>{cc523de2-f4f2-4069-8d2a-640f49d7ab36}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
