@@ -74,6 +74,12 @@
     <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Basic\VertexShader.hlsl">
       <ShaderType>Vertex</ShaderType>
     </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Planetary\PGMPixelShader.hlsl">
+      <ShaderType>Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Planetary\PGMVertexShader.hlsl">
+      <ShaderType>Vertex</ShaderType>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Common\ConstantBuffers.hlsli" />

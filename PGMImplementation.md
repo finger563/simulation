@@ -49,9 +49,10 @@ Algorithm Functional Blocks:
   	    * using a mimimum mipmap operation on the gpu
   	    * final minimum read back to CPU and saved for next frame
   	* Secondary Reference Sphere:
-  	  * tangent ray angle to primary sphere : tau
+  	  * tangent ray angle to primary sphere : tau = asin(r/d)
   	  * extent of occluded area is defined by maximum possible normal angle on maximum sphere
   	  	* gamma0 = -asin((d/rmax) sin tau) - tau + pi
+                 = -asin((d/rmax) sin (asin(r/d))) - asin(r/d) + pi
   	  * secondary sphere radius : rs = d * cos(gamma0)
   	  * can replace the planet with an impostor when returned radius for secondary sphere is negative
   * Sampling Camera:
@@ -113,7 +114,7 @@ Algorithm Functional Blocks:
       * normal angle is used to calculate the position of the ray-circle intersection
     * actually:
       * bind two target buffers : sphere normals and sphere positions in sampling camera space
-        * 32-bit BP RGB textures
+        * 32-bit FP RGB textures
       * sampling camera matrix (SCM) and its inverse (SCMI) are uploaded
       * In the fragment shader:
         * find eye ray associated with current fragment : fragment coord is transformed to clip space coord ([-1 to 1] on all axes; represents everything in frustum) using linear transformations
