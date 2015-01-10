@@ -36,6 +36,8 @@ namespace Renderer
 
 	bool Renderer::Initialize()
 	{
+		pgm.Initialize();
+
 		directionalLights.push_back(
 			DirectionalLight( 
 				XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f),	// position
