@@ -31,6 +31,7 @@ Algorithm Functional Blocks:
   * Requires: (view-dependent)
     * reference sphere(s) : primary and secondary reference spheres
     * sampling camera
+    * deferred texturing
   * Produces:
     * sphere normals 
     * positions

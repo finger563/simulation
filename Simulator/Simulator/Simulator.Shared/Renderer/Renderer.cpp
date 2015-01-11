@@ -59,7 +59,6 @@ namespace Renderer
 		shader = std::make_unique<Shader>(deviceResources);
 
 		shader->Initialize();
-		shader->Apply();
 
 		return true;
 	}
@@ -140,6 +139,11 @@ namespace Renderer
 
 	void Renderer::Render()
 	{
+
+		pgm.Update();
+
+		shader->Apply();
+
 		auto context = deviceResources->GetD3DDeviceContext();
 
 		// set our new render target object as the active render target

@@ -31,7 +31,19 @@ namespace Renderer
 		// Obtain a pointer to the window
 		CoreWindow^ Window = CoreWindow::GetForCurrentThread();
 
+		// Need to init the view camera
 		ViewCamera.Set(
+			Base::Math::VectorInit({ 0.0, 0.0, -5.0, 0.0 }),			// position
+			Base::Math::VectorInit({ 0.0, 0.0, 1.0, 0.0 }),				// view
+			Base::Math::VectorInit({ 0.0, 1.0, 0.0, 0.0 }),				// up
+			45.0f,														// FOVY
+			(float)(Window->Bounds.Width / Window->Bounds.Height),	// aspect ratio
+			1.0f,														// near plane
+			1000.0f														// far plane
+			);
+
+		// Need to init the sampling camera
+		SamplingCamera.Set(
 			Base::Math::VectorInit({ 0.0, 0.0, -5.0, 0.0 }),			// position
 			Base::Math::VectorInit({ 0.0, 0.0, 1.0, 0.0 }),				// view
 			Base::Math::VectorInit({ 0.0, 1.0, 0.0, 0.0 }),				// up
@@ -74,6 +86,8 @@ namespace Renderer
 
 	void PGM::Update()
 	{
+		pgmShader->Apply();
+
 		// update view camera
 		ViewCamera.UpdateMatrices();
 		// update grid points (per the new viewport)
@@ -82,6 +96,7 @@ namespace Renderer
 		//		* gamma1 = asin((d / r) sin w) - w : first intersection angle from nadir
 		//		* gamma2 = -asin((d / r) sin w) - w + pi : second intersection angle from nadir
 		// update sampling camera
+		SamplingCamera.UpdateMatrices();
 
 	}
 
