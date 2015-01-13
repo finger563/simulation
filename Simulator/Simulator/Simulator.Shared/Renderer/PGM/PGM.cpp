@@ -86,17 +86,24 @@ namespace Renderer
 
 	void PGM::Update()
 	{
+		// set up render target buffers:
+		//	* positions
+		//	* normals
 		pgmShader->Apply();
 
 		// update view camera
 		ViewCamera.UpdateMatrices();
-		// update grid points (per the new viewport)
+		// update sampling camera
+		SamplingCamera.UpdateMatrices();
+		// update grid points (per the new sampling viewport)
+		//	* calc new extents to edges of sphere for frusta
+		//	* calc new distance to planet
 		// compute ray-sphere intersection point & sphere intersection normal
 		//   gamma1 & gamma 2
 		//		* gamma1 = asin((d / r) sin w) - w : first intersection angle from nadir
 		//		* gamma2 = -asin((d / r) sin w) - w + pi : second intersection angle from nadir
-		// update sampling camera
-		SamplingCamera.UpdateMatrices();
+
+		// set up constant buffers for sending grid points and planet data to GPU for processing in shaders
 
 	}
 
