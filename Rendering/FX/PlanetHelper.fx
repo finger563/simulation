@@ -43,6 +43,16 @@ cbuffer cbPerObject
 	Material gMaterial;
 }; 
 
+float2 normalToTex(float3 normal)
+{
+	float lon = atan2(normal.y, normal.x);
+	float lat = asin(normal.z);
+	float2 tex;
+	tex.x = lon / (2.0 * 3.14159265358) + 0.5;
+	tex.y = 1.0 - (lat / (3.14159265358) + 0.5);
+	return tex;
+}
+
 // The scale equation calculated by Vernier's Graphical Analysis
 float scale(float fCos)
 {

@@ -4,7 +4,7 @@
 
 #include "LightHelper.fx"
 #include "PlanetHelper.fx"
- 
+
 cbuffer cbPerDispMapFrame
 {
 	float  gFogStart;
@@ -40,7 +40,8 @@ struct VertexIn
 struct VertexOut
 {
     float3 PosW       : POSITION;
-    float3 NormalW    : NORMAL;
+	float3 NormalW    : NORMAL0;
+	float3 NormalL	  : NORMAL1;
 	float3 TangentW   : TANGENT;
 	float2 Tex        : TEXCOORD;
 	float  TessFactor : TESS;
@@ -55,6 +56,7 @@ VertexOut VS_PlanetFromSpace(VertexIn vin)
 	
 	// Transform to world space space.
 	vout.PosW     = mul(float4(vin.PosL, 1.0f), gWorld).xyz;
+	vout.NormalL = vin.NormalL;
 	vout.NormalW  = mul(vin.NormalL, (float3x3)gWorldInvTranspose);
 	vout.TangentW = mul(vin.TangentL, (float3x3)gWorld);
 
@@ -127,6 +129,7 @@ VertexOut VS_PlanetFromAtmo(VertexIn vin)
 	// Transform to world space space.
 	vout.PosW     = mul(float4(vin.PosL, 1.0f), gWorld).xyz;
 	vout.NormalW  = mul(vin.NormalL, (float3x3)gWorldInvTranspose);
+	vout.NormalL = vin.NormalL;
 	vout.TangentW = mul(vin.TangentL, (float3x3)gWorld);
 
 	// Output vertex attributes for interpolation across triangle.
@@ -217,7 +220,8 @@ PatchTess PatchHS(InputPatch<VertexOut,3> patch,
 struct HullOut
 {
 	float3 PosW     : POSITION;
-    float3 NormalW  : NORMAL;
+    float3 NormalW  : NORMAL0;
+	float3 NormalL  : NORMAL1;
 	float3 TangentW : TANGENT;
 	float2 Tex      : TEXCOORD;
 	
@@ -239,6 +243,7 @@ HullOut HS(InputPatch<VertexOut,3> p,
 	// Pass through shader.
 	hout.PosW     = p[i].PosW;
 	hout.NormalW  = p[i].NormalW;
+	hout.NormalL = p[i].NormalL;
 	hout.TangentW = p[i].TangentW;
 	hout.Tex      = p[i].Tex;
 
@@ -251,7 +256,8 @@ struct DomainOut
 {
 	float4 PosH     : SV_POSITION;
     float3 PosW     : POSITION;
-    float3 NormalW  : NORMAL;
+	float3 NormalW  : NORMAL0;
+	float3 NormalL  : NORMAL1;
 	float3 TangentW : TANGENT;
 	float2 Tex      : TEXCOORD;
 	
@@ -270,7 +276,8 @@ DomainOut DS(PatchTess patchTess,
 	
 	// Interpolate patch attributes to generated vertices.
 	dout.PosW     = bary.x*tri[0].PosW     + bary.y*tri[1].PosW     + bary.z*tri[2].PosW;
-	dout.NormalW  = bary.x*tri[0].NormalW  + bary.y*tri[1].NormalW  + bary.z*tri[2].NormalW;
+	dout.NormalW = bary.x*tri[0].NormalW + bary.y*tri[1].NormalW + bary.z*tri[2].NormalW;
+	dout.NormalL = bary.x*tri[0].NormalL + bary.y*tri[1].NormalL + bary.z*tri[2].NormalL;
 	dout.TangentW = bary.x*tri[0].TangentW + bary.y*tri[1].TangentW + bary.z*tri[2].TangentW;
 	dout.Tex      = bary.x*tri[0].Tex      + bary.y*tri[1].Tex      + bary.z*tri[2].Tex;
 	
@@ -278,11 +285,14 @@ DomainOut DS(PatchTess patchTess,
 	dout.c1      = bary.x*tri[0].c1      + bary.y*tri[1].c1      + bary.z*tri[2].c1;
 	
 	// Interpolating normal can unnormalize it, so normalize it.
+	dout.NormalL = normalize(dout.NormalL);
 	dout.NormalW = normalize(dout.NormalW);
 	
 	//
 	// Displacement mapping.
 	//
+
+	dout.Tex = normalToTex(dout.NormalL);
 	
 	// Choose the mipmap level based on distance to the eye; specifically, choose
 	// the next miplevel every MipInterval units, and clamp the miplevel in [0,6].
@@ -320,6 +330,9 @@ float4 PS(DomainOut pin,
 
 	// Normalize.
 	toEye /= distToEye;
+
+	pin.NormalL = normalize(pin.NormalL);
+	pin.Tex = normalToTex(pin.NormalL);
 	
     // Default to multiplicative identity.
     float4 texColor = float4(1, 1, 1, 1);
