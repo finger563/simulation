@@ -1,7 +1,7 @@
 
 // The number of sample points taken along the ray
-const int nSamples = 5;
-const float fSamples = 5.0;
+const int nSamples = 10;
+const float fSamples = 10.0;
 
 // The scale depth (the altitude at which the average atmospheric density is found)
 const float fScaleDepth = 0.25;
@@ -45,11 +45,11 @@ cbuffer cbPerObject
 
 float2 normalToTex(float3 normal)
 {
-	float lon = atan2(normal.y, normal.x);
-	float lat = asin(normal.z);
+	float lon = atan2(normal.z,normal.x);
+	float lat = asin(normal.y);
 	float2 tex;
 	tex.x = lon / (2.0 * 3.14159265358) + 0.5;
-	tex.y = 1.0 - (lat / (3.14159265358) + 0.5);
+	tex.y = -lat / (3.14159265358) + 0.5;
 	return tex;
 }
 
