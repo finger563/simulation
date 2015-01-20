@@ -147,7 +147,9 @@ namespace Renderer
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		// update the constant buffers with relevant info for PGM
-		DefaultCBuffer cbuffer;
+		PGMCBuffer cbuffer;
+		cbuffer.CameraPosition = SamplingCamera.Position;
+		cbuffer.ViewVector = SamplingCamera.View;
 		context->UpdateSubresource(pgmShader->constantbuffer.Get(), 0, 0, &cbuffer, 0, 0);
 
 		// invoke the shader code

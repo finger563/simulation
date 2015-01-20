@@ -232,5 +232,11 @@
     <None Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Common\Pipeline.hlsli">
       <Filter>Renderer\Shaders\Common</Filter>
     </None>
+    <None Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Planetary\Pipeline.hlsli">
+      <Filter>Renderer\Shaders\Planetary</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Planetary\ConstantBuffers.hlsli">
+      <Filter>Renderer\Shaders\Planetary</Filter>
+    </None>
   </ItemGroup>
 </Project>
