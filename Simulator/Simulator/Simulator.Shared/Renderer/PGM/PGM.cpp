@@ -82,6 +82,10 @@ namespace Renderer
 		XMFLOAT4X4 orientation = deviceResources->GetOrientationTransform3D();
 
 		ViewCamera.OrientMatrix = XMLoadFloat4x4(&orientation);
+
+		SamplingCamera.OrientMatrix = XMLoadFloat4x4(&orientation);
+
+		MakeGridPoints();
 	}
 
 	void PGM::Update()
@@ -105,6 +109,63 @@ namespace Renderer
 
 		// set up constant buffers for sending grid points and planet data to GPU for processing in shaders
 
+		// set our new render target object as the active render target
+		auto context = deviceResources->GetD3DDeviceContext();
+		ID3D11RenderTargetView *const targets[] = { deviceResources->GetBackBufferRenderTargetView() };
+		context->OMSetRenderTargets(1, targets, deviceResources->GetDepthStencilView());
+
+		// Reset the viewport to target the whole screen.
+		auto viewport = deviceResources->GetScreenViewport();
+		context->RSSetViewports(1, &viewport);
+		// clear the back buffer to a deep blue
+		context->ClearRenderTargetView(deviceResources->GetBackBufferRenderTargetView(), DirectX::Colors::CornflowerBlue);
+
+		// clear the depth buffer
+		context->ClearDepthStencilView(deviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+		// send grid points:
+		// set the vertex buffer
+		UINT stride = sizeof(Base::Vertex);
+		UINT offset = 0;
+		context->IASetVertexBuffers(0, 1, gridvertexbuffer.GetAddressOf(), &stride, &offset);
+		// set the index buffer
+		context->IASetIndexBuffer(gridindexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		// set the primitive topology
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	}
+
+	void PGM::MakeGridPoints()
+	{
+		numIndices = numGridPointsX * numGridPointsY;
+		std::vector<Base::Vertex> OurVertices;
+		std::vector<UINT> OurIndices;
+		// need to set up verts & inds based on grid
+		
+		// create the vertex buffer
+		D3D11_BUFFER_DESC vertexBD = { 0 };
+		vertexBD.ByteWidth = sizeof(Base::Vertex) * (int)OurVertices.size();
+		vertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+		D3D11_SUBRESOURCE_DATA vertexSRD = { OurVertices.data(), 0, 0 };
+
+		ThrowIfFailed(
+			deviceResources->GetD3DDevice()->CreateBuffer(&vertexBD, &vertexSRD, &gridvertexbuffer)
+			);
+
+		// create the index buffer
+		// buffer description
+		D3D11_BUFFER_DESC indexBD = { 0 };
+		indexBD.ByteWidth = sizeof(UINT) * (int)OurIndices.size();    // indices are stored in short values
+		indexBD.BindFlags = D3D11_BIND_INDEX_BUFFER;
+
+		// subresource data
+		D3D11_SUBRESOURCE_DATA indexSRD = { OurIndices.data(), 0, 0 };
+
+		ThrowIfFailed(
+			deviceResources->GetD3DDevice()->CreateBuffer(&indexBD, &indexSRD, &gridindexbuffer)
+			);
 	}
 
 	bool PGM::UnInitialize()

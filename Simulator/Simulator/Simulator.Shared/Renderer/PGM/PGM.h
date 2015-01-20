@@ -21,6 +21,7 @@ namespace Renderer
 
 		// need interface here to get the grid points for rendering
 		//   -- should probably try to get this done in tessellator stage if possible
+		virtual void MakeGridPoints();
 		// need interface here to get/apply shaders
 		// should this class handle the deferred rendering
 
@@ -34,6 +35,9 @@ namespace Renderer
 		// Grid Point related data
 		int numGridPointsX;
 		int numGridPointsY;
+		ComPtr<ID3D11Buffer> gridvertexbuffer;				// Dx11.2 GPU vertex buffer interface
+		ComPtr<ID3D11Buffer> gridindexbuffer;				// Dx11.2 GPU index buffer interface
+		int numIndices;									// number of indices to draw
 
 		// Sphere related data
 		Vector sphereWorldPos;		// world space position of all spheres
