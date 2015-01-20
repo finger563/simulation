@@ -4,15 +4,37 @@ PGM (which itself was adapted from water displacement projective mapping) is an 
 
 The book **3D Game Programming with DirectX 11** has a chapter, _Chapter 21_, which covers projective texturing and shadow mapping.  The concepts in that chapter (core ideas, transformations, code) are all relevant to PGM.
 
-Goals:
-------
+# Things Left to Do:
+--------------------
+* Sampling/Auxiliary camera calculation:
+  * Determine which rays should intersect the terrain; based on point underneath viewer, and extent of terrain in view camera
+  * use position of view camera
+  * set up frustum based on calculated rays for the four corners to define the frustum
+* Grid point calculation:
+  * use sampling camera frustum corner rays and generate vertices inside the sampling camera frustum (build into vertex and index lists)
+* Shader ray-tracing:
+  * vertex shader : 
+    * pass through?
+  * fragment shader : 
+    * ray trace grid point from eye to surface (plane or sphere) to get position of point
+    * determine normal at new point
+    * determine lookup at new point (for texturing and height offset)
+* Persistent Grid Mapping:
+  * Use plane of y=0 as base terrain and extrude up along normal from there, similarly to how it is done for water simulation
+* Sphere integration:
+  * Project grid points onto sphere instead of plane
+* Deferred Rendering:
+  * Use multiple render targets in first pass to render fragment positions and normals, then use those as read targets in second pass for lighting and texturing
+
+# Goals:
+--------
 * proper texturing of closed surfaces : resolve problem at poles and at IDL (normals)
 * multiple frustum rendering
 * proper LOD for planetary rendering
 * multiple dataset inclusion (high-res & low-res; polar & equirectangular)
 
-Extensions:
------------
+# Extensions:
+-------------
 * Proper dataset determination : checking the right datasets
 * Streaming only the relevant chunks of the datasets (for very large datasets)
 * Extension to allow planetary ocean rendering based on PGM
@@ -29,8 +51,8 @@ Extensions:
   * Non-convex hulls? (i.e. caves, overhangs, etc)
     * possibly use 3d textures with extents instead of absolutes?
 
-Algorithm Functional Blocks:
-----------------------------
+# Algorithm Functional Blocks:
+------------------------------
 * PGM
   * Requires: (view-dependent)
     * reference sphere(s) : primary and secondary reference spheres
@@ -151,10 +173,10 @@ Algorithm Functional Blocks:
   * accumulates colors and surface normals
 * Atmosphere, lighting, etc.
 
-Questions:
-----------
+# Questions:
+------------
 * How well does this work at long range?
 * Can it automatically scale the number of grid points based on distance?
 
-Unresolved Issues:
-------------------
+# Unresolved Issues:
+--------------------

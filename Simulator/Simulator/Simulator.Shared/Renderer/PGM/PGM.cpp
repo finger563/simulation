@@ -90,25 +90,6 @@ namespace Renderer
 
 	void PGM::Update()
 	{
-		// set up render target buffers:
-		//	* positions
-		//	* normals
-		pgmShader->Apply();
-
-		// update view camera
-		ViewCamera.UpdateMatrices();
-		// update sampling camera
-		SamplingCamera.UpdateMatrices();
-		// update grid points (per the new sampling viewport)
-		//	* calc new extents to edges of sphere for frusta
-		//	* calc new distance to planet
-		// compute ray-sphere intersection point & sphere intersection normal
-		//   gamma1 & gamma 2
-		//		* gamma1 = asin((d / r) sin w) - w : first intersection angle from nadir
-		//		* gamma2 = -asin((d / r) sin w) - w + pi : second intersection angle from nadir
-
-		// set up constant buffers for sending grid points and planet data to GPU for processing in shaders
-
 		// set our new render target object as the active render target
 		auto context = deviceResources->GetD3DDeviceContext();
 		ID3D11RenderTargetView *const targets[] = { deviceResources->GetBackBufferRenderTargetView() };
@@ -117,12 +98,43 @@ namespace Renderer
 		// Reset the viewport to target the whole screen.
 		auto viewport = deviceResources->GetScreenViewport();
 		context->RSSetViewports(1, &viewport);
-		// clear the back buffer to a deep blue
-		context->ClearRenderTargetView(deviceResources->GetBackBufferRenderTargetView(), DirectX::Colors::CornflowerBlue);
 
 		// clear the depth buffer
 		context->ClearDepthStencilView(deviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
+		// set up render target buffers for Deferred Rendering:
+		//  * Pass 1:
+		//		input:
+		//		* vertex/index buffers
+		//		output:
+		//		* positions
+		//		* normals
+		//	* Pass 2:
+		//		input:
+		//		* position buffer
+		//		* normal buffer
+		//		* texture atlas
+		//		* height atlas
+		//		output:
+		//		* rendered scene
+
+		pgmShader->Apply();
+
+		// update view camera
+		ViewCamera.UpdateMatrices();
+		// update sampling camera
+		SamplingCamera.UpdateMatrices();
+		// compute ray-sphere intersection point & sphere intersection normal
+		//   gamma1 & gamma 2
+		//		* gamma1 = asin((d / r) sin w) - w : first intersection angle from nadir
+		//		* gamma2 = -asin((d / r) sin w) - w + pi : second intersection angle from nadir
+
+		// set up constant buffers for planet data to GPU for processing in shaders
+
+		// update grid points (per the new sampling viewport)
+		//	* calc new extents to edges of sphere for frusta
+		//	* calc new distance to planet
+		// build grid points into vertex buffer and index buffer
 		// send grid points:
 		// set the vertex buffer
 		UINT stride = sizeof(Base::Vertex);
@@ -133,6 +145,13 @@ namespace Renderer
 
 		// set the primitive topology
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		// update the constant buffers with relevant info for PGM
+		DefaultCBuffer cbuffer;
+		context->UpdateSubresource(pgmShader->constantbuffer.Get(), 0, 0, &cbuffer, 0, 0);
+
+		// invoke the shader code
+		context->DrawIndexed(numIndices, 0, 0);
 
 	}
 
