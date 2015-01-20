@@ -14,6 +14,7 @@ namespace Renderer
 		XMVECTOR Up;
 		XMVECTOR Right;
 		XMVECTOR Orientation;
+		XMVECTOR TopLeft, TopRight, BottomLeft, BottomRight; // corner vectors for frustum
 		float FoVY;
 		float Aspect;
 		float NearPlane;
@@ -32,6 +33,7 @@ namespace Renderer
 			float nearPlane,
 			float farPlane);
 
+		void UpdateCorners();
 		void UpdateMatrices();			// called in Renderer::Render() before sending matrices to GPU
 
 		void Strafe(float Dist);		// + = right, - = left

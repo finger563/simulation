@@ -21,6 +21,21 @@ void Camera::Set(
 	NearPlane = nearPlane;
 	FarPlane = farPlane;
 	OrientMatrix = XMMatrixIdentity();
+	UpdateCorners();
+}
+
+void Camera::UpdateCorners()
+{
+	float FoVX = FoVY * Aspect;  // aspect = x/y
+	float width = NearPlane * tan(FoVX);
+	float height = NearPlane * tan(FoVY);
+	XMVECTOR r = Right * width;
+	XMVECTOR u = Up * height;
+	XMVECTOR v = View * NearPlane;
+	TopLeft = XMVector3Normalize(v + u - r);
+	TopRight = XMVector3Normalize(v + u + r);
+	BottomLeft = XMVector3Normalize(v - u - r);
+	BottomRight = XMVector3Normalize(v - u + r);
 }
 
 void Camera::Strafe(float Dist)
@@ -57,6 +72,7 @@ void Camera::UpdateMatrices()
 		NearPlane,
 		FarPlane
 		);
+	UpdateCorners();
 }
 
 void Camera::RotateAroundPoint(XMVECTOR& Point, XMVECTOR& Axis, float Angle)
