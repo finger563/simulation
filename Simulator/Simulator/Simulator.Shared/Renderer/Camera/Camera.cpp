@@ -24,6 +24,40 @@ void Camera::Set(
 	UpdateCorners();
 }
 
+void Camera::Set(
+	XMVECTOR& position,
+	XMVECTOR& topLeft,
+	XMVECTOR& topRight,
+	XMVECTOR& bottomLeft,
+	XMVECTOR& bottomRight
+	)
+{
+	TopLeft = topLeft;
+	TopRight = topRight;
+	BottomLeft = bottomLeft;
+	BottomRight = bottomRight;
+	Position = position;
+	XMVECTOR v = (topLeft + bottomRight) / 2;
+	XMVECTOR top = (topLeft + topRight) / 2;
+	XMVECTOR w = XMVector4Length(topRight - topLeft);
+	float width;
+	XMVectorGetByIndexPtr(&width, w, 0);
+	width = width / 2;
+	XMVECTOR h = XMVector4Length(topRight - bottomRight);
+	float height;
+	XMVectorGetByIndexPtr(&height, h, 0);
+	height = height / 2;
+	XMVECTOR u = top - v;
+	Up = XMVector3Normalize(u);
+	View = XMVector3Normalize(v);
+	Right = XMVector3Cross(-View, Up);
+	Aspect = width / height;
+	XMVECTOR a = XMVector3AngleBetweenVectors(bottomRight, topRight);
+	float angle;
+	XMVectorGetByIndexPtr(&angle, a, 0);
+	FoVY = XMConvertToDegrees(angle / 2);
+}
+
 void Camera::UpdateCorners()
 {
 	float FoVX = FoVY * Aspect;  // aspect = x/y
