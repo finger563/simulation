@@ -98,6 +98,9 @@ namespace Renderer
 		// Reset the viewport to target the whole screen.
 		auto viewport = deviceResources->GetScreenViewport();
 		context->RSSetViewports(1, &viewport);
+		
+		// clear the back buffer
+		context->ClearRenderTargetView(deviceResources->GetBackBufferRenderTargetView(), DirectX::Colors::CornflowerBlue);
 
 		// clear the depth buffer
 		context->ClearDepthStencilView(deviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
