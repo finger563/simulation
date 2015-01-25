@@ -52,3 +52,5 @@ Relevant Documentation:
 * [A list of websites relevant to each subject](WebReferences.md)
 * [A development document full of notes for implementing and extending PGM](PGMImplementation.md)
 * [A development document with notes for the possible integration of GDAL](GDALIntegration.md)
+* [A development document with notes for the possible integration of FLEX](FLEXIntegration.md)
+* [A development document with notes for the possible integration of Assimp](AssimpIntegration.md)

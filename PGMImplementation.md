@@ -1,8 +1,10 @@
 This document covers the implementation details and challenges/questions for the transition from planetary mesh-based approach to a PGM-based approach. The implementation for this transition will be mainly derived from "Projective Grid Mapping for Planetary Terrain" by Joseph Mahsman.
 
-PGM (which itself was adapted from water displacement projective mapping) is an extension of the ideas behind shadow mapping and projective texturing which project from a camera/eye point into the scene to perform depth queries, texturing, occlusion testing, etc.
+PGM (which itself was adapted from [water displacement projective mapping](http://habib.wikidot.com/projected-grid-ocean-shader-full-html-version)) is an extension of the ideas behind shadow mapping and projective texturing which project from a camera/eye point into the scene to perform depth queries, texturing, occlusion testing, etc.
 
 The book **3D Game Programming with DirectX 11** has a chapter, _Chapter 21_, which covers projective texturing and shadow mapping.  The concepts in that chapter (core ideas, transformations, code) are all relevant to PGM.
+
+The book **3D Game Programming with DirectX 11** has a chapter, _Chapter 20_, which covers how to utilize the geometry shader stream-out capabilities.  This feature allows us to disable the rasterization parts of the rendering pipeline and generate only a vertex buffer from an effect pass.  The use of this technique means we can run PGM to generate a vertex buffer which can be rendered like any other mesh, only needing the matrix transformation from Sampling Camera Space to View Camera Space.
 
 # Things Left to Do:
 --------------------
@@ -35,6 +37,7 @@ The book **3D Game Programming with DirectX 11** has a chapter, _Chapter 21_, wh
 
 # Extensions:
 -------------
+* PGM with geometry shader stream-out : generate vertex buffers instead of a texture each for positions and normals
 * Proper dataset determination : checking the right datasets
 * Streaming only the relevant chunks of the datasets (for very large datasets)
 * Extension to allow planetary ocean rendering based on PGM
