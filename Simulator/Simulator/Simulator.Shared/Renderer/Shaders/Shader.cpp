@@ -17,15 +17,7 @@ hsFileName(""),
 dsFileName(""),
 numDescriptors(0)
 {
-#if 1
 	SetInputDescriptor(defaultIED, 2);
-#else
-	SetInputDescriptor(
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	});
-#endif
 	vertexshader = nullptr;
 	pixelshader = nullptr;
 	geometryshader = nullptr;
@@ -138,6 +130,8 @@ void Shader::Apply()
 		deviceResources->GetD3DDeviceContext()->VSSetShader(vertexshader.Get(), nullptr, 0);
 	if (pixelshader != nullptr)
 		deviceResources->GetD3DDeviceContext()->PSSetShader(pixelshader.Get(), nullptr, 0);
+	else
+		deviceResources->GetD3DDeviceContext()->PSSetShader(nullptr, nullptr, 0);
 	if (geometryshader != nullptr)
 		deviceResources->GetD3DDeviceContext()->GSSetShader(geometryshader.Get(), nullptr, 0);
 	if (hullshader != nullptr)

@@ -12,6 +12,10 @@ namespace Renderer
 	{
 	public:
 
+		struct Vertex {
+			float position[3];
+		};
+
 		PGM(const std::shared_ptr<DeviceResources>& deviceResources);
 
 		virtual bool Initialize();	// need initialization data (number of grid points etc)
@@ -37,6 +41,7 @@ namespace Renderer
 		int numGridPointsY;
 		ComPtr<ID3D11Buffer> gridvertexbuffer;				// Dx11.2 GPU vertex buffer interface
 		ComPtr<ID3D11Buffer> gridindexbuffer;				// Dx11.2 GPU index buffer interface
+		ComPtr<ID3D11Buffer> streamOutVertexBuffer;			// Dx11.2 GPU Stream-Out vertex buffer interface
 		int numIndices;									// number of indices to draw
 
 		// Sphere related data
@@ -48,6 +53,7 @@ namespace Renderer
 
 		// Shader related data: shaders perform PGM on GPU
 		std::unique_ptr<Shader> pgmShader;					// raytraces grid points, produces sphere normals and positions
+		std::unique_ptr<Shader> rasterizationShader;		// rasterizes everything else
 		std::unique_ptr<Shader> deferredTexturingShader;	// rasterizes based on datasets, sphere normals, and positions
 		
 		std::shared_ptr<DeviceResources> deviceResources;

@@ -53,9 +53,22 @@ namespace Renderer
 			1000.0f														// far plane
 			);
 
-		pgmShader = std::make_unique<Shader>(deviceResources, "PGMVertexShader.cso","PGMPixelShader.cso");
+		pgmShader = std::make_unique<Shader>(deviceResources, "PGMVertexShader.cso","", "PGMGeometryShader.cso");
+		pgmShader->SetInputDescriptor(pgmIED,1);
 		pgmShader->Initialize();
 		// END JUST FOR TESTING
+		
+		// create the vertex buffer for stream out between PGM projection and rasterization stages
+		D3D11_BUFFER_DESC vertexBD = { 0 };
+		vertexBD.Usage = D3D11_USAGE_DEFAULT;
+		vertexBD.ByteWidth = numGridPointsX * numGridPointsY;
+		vertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_STREAM_OUTPUT;
+		vertexBD.CPUAccessFlags = 0;
+		vertexBD.MiscFlags = 0;
+		
+		ThrowIfFailed(
+			deviceResources->GetD3DDevice()->CreateBuffer(&vertexBD, nullptr, &streamOutVertexBuffer)
+			);
 
 		return true;
 	}
@@ -140,22 +153,58 @@ namespace Renderer
 		// build grid points into vertex buffer and index buffer
 		// send grid points:
 		// set the vertex buffer
-		UINT stride = sizeof(Base::Vertex);
+
+		// PGM Stage:
+		//	* send PGM info (camera info, shape info) in constant buffer
+		//	* set grid points vertex buffer / index buffer created for sampling camera to IA stage
+		//	* set the stream out vertex buffer to stream out stage
+
+		UINT stride = sizeof(PGM::Vertex);
 		UINT offset = 0;
+		// set the vertex buffer (grid points)
 		context->IASetVertexBuffers(0, 1, gridvertexbuffer.GetAddressOf(), &stride, &offset);
-		// set the index buffer
+		// set the index buffer (grid points)
 		context->IASetIndexBuffer(gridindexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		// set the stream-out buffer for output from Geometry Shader
+		context->SOSetTargets(1,streamOutVertexBuffer.GetAddressOf(),&offset);
 
 		// set the primitive topology
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		// update the constant buffers with relevant info for PGM
-		PGMCBuffer cbuffer;
-		cbuffer.CameraPosition = SamplingCamera.Position;
-		cbuffer.ViewVector = SamplingCamera.View;
-		context->UpdateSubresource(pgmShader->constantbuffer.Get(), 0, 0, &cbuffer, 0, 0);
+		// update the constant buffers with relevant info for PGM (camera & surface info)
+		PGM_Pass0_CBuffer pgmCbuffer;
+		pgmCbuffer.CameraPosition = SamplingCamera.Position;
+		pgmCbuffer.ViewVector = SamplingCamera.View;
+		context->UpdateSubresource(pgmShader->constantbuffer.Get(), 0, 0, &pgmCbuffer, 0, 0);
 
-		// invoke the shader code
+		// invoke the shader code for raycasting PGM
+		context->DrawIndexed(numIndices, 0, 0);
+
+		// Rasterization Stage:
+		//	* set stream-out stage target to null
+		//	* send main camera info & transform from sampling to main camera
+		//	* set stream out vertex buffer (from PGM stage) to IA stage
+
+		// clear stream out stage target from previous stage
+		ComPtr<ID3D11Buffer> bufferArray = { 0 };
+		context->SOSetTargets(1, bufferArray.GetAddressOf(), &offset);
+
+		stride = sizeof(Base::Vertex);
+		offset = 0;
+		// set the vertex buffer (grid points)
+		context->IASetVertexBuffers(0, 1, gridvertexbuffer.GetAddressOf(), &stride, &offset);
+
+		// set the primitive topology
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		// update the constant buffers with relevant info for PGM (camera & surface info)
+		PGM_Pass1_CBuffer rasterizationCbuffer;
+		rasterizationCbuffer.CameraPosition = SamplingCamera.Position;
+		rasterizationCbuffer.ViewVector = SamplingCamera.View;
+		context->UpdateSubresource(pgmShader->constantbuffer.Get(), 0, 0, &rasterizationCbuffer, 0, 0);
+
+		// invoke the shader code for raycasting PGM
 		context->DrawIndexed(numIndices, 0, 0);
 
 	}
@@ -163,13 +212,13 @@ namespace Renderer
 	void PGM::MakeGridPoints()
 	{
 		numIndices = numGridPointsX * numGridPointsY;
-		std::vector<Base::Vertex> OurVertices;
+		std::vector<PGM::Vertex> OurVertices;
 		std::vector<UINT> OurIndices;
 		// need to set up verts & inds based on grid
 		
 		// create the vertex buffer
 		D3D11_BUFFER_DESC vertexBD = { 0 };
-		vertexBD.ByteWidth = sizeof(Base::Vertex) * (int)OurVertices.size();
+		vertexBD.ByteWidth = sizeof(PGM::Vertex) * numIndices;
 		vertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
 		D3D11_SUBRESOURCE_DATA vertexSRD = { OurVertices.data(), 0, 0 };

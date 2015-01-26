@@ -74,6 +74,10 @@
     <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Basic\VertexShader.hlsl">
       <ShaderType>Vertex</ShaderType>
     </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Planetary\PGMGeometryShader.hlsl">
+      <ShaderType>Geometry</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Planetary\PGMPixelShader.hlsl">
       <ShaderType>Pixel</ShaderType>
       <ShaderModel>5.0</ShaderModel>

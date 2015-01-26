@@ -17,7 +17,19 @@ namespace Renderer
 		XMVECTOR AmbientColor;
 	};
 
-	struct PGMCBuffer
+	struct PGM_Pass0_CBuffer
+	{
+		XMMATRIX matWVP;
+		XMMATRIX matRotation;
+		XMVECTOR DiffuseVector;
+		XMVECTOR DiffuseColor;
+		XMVECTOR AmbientColor;
+		XMVECTOR CameraPosition;
+		XMVECTOR ViewVector;
+		XMMATRIX TexTransform;
+	};
+
+	struct PGM_Pass1_CBuffer
 	{
 		XMMATRIX matWVP;
 		XMMATRIX matRotation;
