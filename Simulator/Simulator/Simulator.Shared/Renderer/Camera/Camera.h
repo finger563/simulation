@@ -33,6 +33,8 @@ namespace Renderer
 			float nearPlane,
 			float farPlane);
 
+		void Set(const Camera& c);
+
 		void UpdateCorners();
 		void Set(
 			XMVECTOR& position,

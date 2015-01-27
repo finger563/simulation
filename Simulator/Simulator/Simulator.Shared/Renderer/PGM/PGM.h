@@ -23,6 +23,8 @@ namespace Renderer
 		virtual void Update();		// update camera data here
 		virtual bool UnInitialize();
 
+		// need interface here to update the camera
+		virtual void SetCamera(const Renderer::Camera& c);
 		// need interface here to get the grid points for rendering
 		//   -- should probably try to get this done in tessellator stage if possible
 		virtual void MakeGridPoints();

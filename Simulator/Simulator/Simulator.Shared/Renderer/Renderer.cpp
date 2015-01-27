@@ -134,6 +134,7 @@ namespace Renderer
 
 	void Renderer::Update()
 	{
+		pgm.SetCamera(camera);
 		pgm.Update();
 	}
 

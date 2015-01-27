@@ -27,36 +27,15 @@ namespace Renderer
 		numGridPointsX = 16;
 		numGridPointsY = 16;
 
-		// We need to configure the window-dependent resources and members:
-		// Obtain a pointer to the window
-		CoreWindow^ Window = CoreWindow::GetForCurrentThread();
-
-		// Need to init the view camera
-		ViewCamera.Set(
-			Base::Math::VectorInit({ 0.0, 0.0, -5.0, 0.0 }),			// position
-			Base::Math::VectorInit({ 0.0, 0.0, 1.0, 0.0 }),				// view
-			Base::Math::VectorInit({ 0.0, 1.0, 0.0, 0.0 }),				// up
-			45.0f,														// FOVY
-			(float)(Window->Bounds.Width / Window->Bounds.Height),	// aspect ratio
-			1.0f,														// near plane
-			1000.0f														// far plane
-			);
-
-		// Need to init the sampling camera
-		SamplingCamera.Set(
-			Base::Math::VectorInit({ 0.0, 0.0, -5.0, 0.0 }),			// position
-			Base::Math::VectorInit({ 0.0, 0.0, 1.0, 0.0 }),				// view
-			Base::Math::VectorInit({ 0.0, 1.0, 0.0, 0.0 }),				// up
-			45.0f,														// FOVY
-			(float)(Window->Bounds.Width / Window->Bounds.Height),	// aspect ratio
-			1.0f,														// near plane
-			1000.0f														// far plane
-			);
-
-		pgmShader = std::make_unique<Shader>(deviceResources, "PGMVertexShader.cso","", "PGMGeometryShader.cso");
-		pgmShader->SetInputDescriptor(pgmIED,1);
-		pgmShader->Initialize();
+		MakeGridPoints();
 		// END JUST FOR TESTING
+		
+		pgmShader = std::make_unique<Shader>(deviceResources, "PGMVertexShader.cso", "", "PGMGeometryShader.cso");
+		pgmShader->SetInputDescriptor(pgmIED, 1);
+		pgmShader->Initialize();
+
+		rasterizationShader = std::make_unique<Shader>(deviceResources);
+		rasterizationShader->Initialize();
 		
 		// create the vertex buffer for stream out between PGM projection and rasterization stages
 		D3D11_BUFFER_DESC vertexBD = { 0 };
@@ -71,6 +50,12 @@ namespace Renderer
 			);
 
 		return true;
+	}
+
+	void PGM::SetCamera(const Renderer::Camera& c)
+	{
+		ViewCamera.Set(c);
+		SamplingCamera.Set(ViewCamera);
 	}
 
 	void PGM::CreateWindowSizeDependentResources()
@@ -164,13 +149,13 @@ namespace Renderer
 		// set the vertex buffer (grid points)
 		context->IASetVertexBuffers(0, 1, gridvertexbuffer.GetAddressOf(), &stride, &offset);
 		// set the index buffer (grid points)
-		context->IASetIndexBuffer(gridindexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		//context->IASetIndexBuffer(gridindexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// set the stream-out buffer for output from Geometry Shader
 		context->SOSetTargets(1,streamOutVertexBuffer.GetAddressOf(),&offset);
 
 		// set the primitive topology
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
 		// update the constant buffers with relevant info for PGM (camera & surface info)
 		PGM_Pass0_CBuffer pgmCbuffer;
@@ -180,6 +165,10 @@ namespace Renderer
 
 		// invoke the shader code for raycasting PGM
 		context->DrawIndexed(numIndices, 0, 0);
+
+		pgmShader->Disable();
+
+		rasterizationShader->Apply();
 
 		// Rasterization Stage:
 		//	* set stream-out stage target to null
@@ -193,21 +182,32 @@ namespace Renderer
 		stride = sizeof(Base::Vertex);
 		offset = 0;
 		// set the vertex buffer (grid points)
-		context->IASetVertexBuffers(0, 1, gridvertexbuffer.GetAddressOf(), &stride, &offset);
+		context->IASetVertexBuffers(0, 1, streamOutVertexBuffer.GetAddressOf(), &stride, &offset);
 
 		// set the primitive topology
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
 		// update the constant buffers with relevant info for PGM (camera & surface info)
 		PGM_Pass1_CBuffer rasterizationCbuffer;
 		rasterizationCbuffer.CameraPosition = ViewCamera.Position;
 		rasterizationCbuffer.ViewVector = ViewCamera.View;
-		context->UpdateSubresource(pgmShader->constantbuffer.Get(), 0, 0, &rasterizationCbuffer, 0, 0);
+				
+		XMMATRIX matFinal = ViewCamera.ViewMatrix * ViewCamera.ProjMatrix * ViewCamera.OrientMatrix;
+
+		rasterizationCbuffer.matWVP = matFinal;
+
+		// Lighting related
+		rasterizationCbuffer.matRotation = XMMatrixIdentity();
+		rasterizationCbuffer.DiffuseVector = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
+		rasterizationCbuffer.DiffuseColor = XMVectorSet(0.5f, 0.5f, 0.5f, 1.0f);
+		rasterizationCbuffer.AmbientColor = XMVectorSet(0.2f, 0.2f, 0.2f, 1.0f);
+
+		context->UpdateSubresource(rasterizationShader->constantbuffer.Get(), 0, 0, &rasterizationCbuffer, 0, 0);
 
 		// Draw the vertices created from the stream-out stage
 		context->DrawAuto();
 
-		pgmShader->Disable();
+		rasterizationShader->Disable();
 	}
 
 	void PGM::MakeGridPoints()
@@ -215,7 +215,24 @@ namespace Renderer
 		numIndices = numGridPointsX * numGridPointsY;
 		std::vector<PGM::Vertex> OurVertices;
 		std::vector<UINT> OurIndices;
+		int index = 0;
 		// need to set up verts & inds based on grid
+		for (int i = 0; i < numGridPointsX; i++)
+		{
+			for (int j = 0; j < numGridPointsY; j++)
+			{
+				float x, y, z;
+				x = (float)(i) / (float)(numGridPointsX);
+				y = (float)(j) / (float)(numGridPointsY);
+				z = 1.5;
+				PGM::Vertex v;
+				v.position[0] = x;
+				v.position[1] = y;
+				v.position[2] = z;
+				OurVertices.push_back(v);
+				OurIndices.push_back(index++);
+			}
+		}
 		
 		// create the vertex buffer
 		D3D11_BUFFER_DESC vertexBD = { 0 };

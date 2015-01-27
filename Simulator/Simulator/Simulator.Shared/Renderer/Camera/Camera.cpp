@@ -58,6 +58,20 @@ void Camera::Set(
 	FoVY = XMConvertToDegrees(angle / 2);
 }
 
+void Camera::Set(const Renderer::Camera& c)
+{
+	Position = c.Position;
+	View = c.View;
+	Up = c.Up;
+	Right = XMVector3Cross(-View, Up);
+	FoVY = c.FoVY;
+	Aspect = c.Aspect;
+	NearPlane = c.NearPlane;
+	FarPlane = c.FarPlane;
+	OrientMatrix = XMMatrixIdentity();
+	UpdateCorners();
+}
+
 void Camera::UpdateCorners()
 {
 	float FoVX = FoVY * Aspect;  // aspect = x/y
