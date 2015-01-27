@@ -1,10 +1,10 @@
 
 struct VertexIn
 {
-	float4 pos : POSITION;
+	float3 pos : POSITION;
 };
 
 struct VertexOut
 {
-	float4 position : SV_POSITION;
+	float4 position : POSITION;
 };

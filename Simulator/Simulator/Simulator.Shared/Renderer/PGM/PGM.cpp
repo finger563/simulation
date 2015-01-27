@@ -200,13 +200,14 @@ namespace Renderer
 
 		// update the constant buffers with relevant info for PGM (camera & surface info)
 		PGM_Pass1_CBuffer rasterizationCbuffer;
-		rasterizationCbuffer.CameraPosition = SamplingCamera.Position;
-		rasterizationCbuffer.ViewVector = SamplingCamera.View;
+		rasterizationCbuffer.CameraPosition = ViewCamera.Position;
+		rasterizationCbuffer.ViewVector = ViewCamera.View;
 		context->UpdateSubresource(pgmShader->constantbuffer.Get(), 0, 0, &rasterizationCbuffer, 0, 0);
 
-		// invoke the shader code for raycasting PGM
-		context->DrawIndexed(numIndices, 0, 0);
+		// Draw the vertices created from the stream-out stage
+		context->DrawAuto();
 
+		pgmShader->Disable();
 	}
 
 	void PGM::MakeGridPoints()

@@ -151,6 +151,18 @@ void Shader::Apply()
 		deviceResources->GetD3DDeviceContext()->DSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());
 }
 
+void Shader::Disable()
+{
+	// set the input layout as the active input layout
+	deviceResources->GetD3DDeviceContext()->IASetInputLayout(nullptr);
+	// set the shader objects as the active shaders
+	deviceResources->GetD3DDeviceContext()->VSSetShader(nullptr, nullptr, 0);
+	deviceResources->GetD3DDeviceContext()->PSSetShader(nullptr, nullptr, 0);
+	deviceResources->GetD3DDeviceContext()->GSSetShader(nullptr, nullptr, 0);
+	deviceResources->GetD3DDeviceContext()->HSSetShader(nullptr, nullptr, 0);
+	deviceResources->GetD3DDeviceContext()->DSSetShader(nullptr, nullptr, 0);
+}
+
 void Shader::Reset()
 {
 	inputlayout.Reset();

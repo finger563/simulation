@@ -9,10 +9,6 @@ VertexOut main( VertexIn vin )
 
 	float4 norm = normalize(mul(rotation, vin.normal));
 	vout.normal = norm;
-	float diffusebrightness = saturate(dot(norm, lightvec));
-
-	vout.color = ambientcol;
-	vout.color += lightcol * diffusebrightness;    // find the diffuse color and add
 
 	return vout;
 }

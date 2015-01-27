@@ -134,14 +134,11 @@ namespace Renderer
 
 	void Renderer::Update()
 	{
-
+		pgm.Update();
 	}
 
 	void Renderer::Render()
 	{
-
-		pgm.Update();
-
 		shader->Apply();
 
 		auto context = deviceResources->GetD3DDeviceContext();
@@ -195,6 +192,8 @@ namespace Renderer
 		context->UpdateSubresource(shader->constantbuffer.Get(), 0, 0, &cbuffer, 0, 0);
 		
 		context->DrawIndexed(numIndices, 0, 0);
+
+		shader->Disable();
 		return;
 	}
 
