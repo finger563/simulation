@@ -11,8 +11,12 @@ namespace Renderer
 	class PGM : public Base::ISubsystem
 	{
 	public:
-		struct Vertex {
+		struct GridVertex {
 			float x, y, z;
+		};
+		struct SOVertex {
+			float x, y, z, w;
+			float nx, ny, nyz, nw;
 		};
 
 		PGM(const std::shared_ptr<DeviceResources>& deviceResources);

@@ -38,7 +38,8 @@ namespace Renderer
 		testShader->SetInputDescriptor(pgmIED, 1);
 		testShader->Initialize();
 
-		rasterizationShader = std::make_unique<Shader>(deviceResources);
+		rasterizationShader = std::make_unique<Shader>(deviceResources, "PGMVertexShader.cso", "PGMPixelShader.cso");
+		testShader->SetInputDescriptor(pgmSOIED, 2);
 		rasterizationShader->Initialize();
 		
 		// create the vertex buffer for stream out between PGM projection and rasterization stages
@@ -92,34 +93,28 @@ namespace Renderer
 
 	void PGM::Update()
 	{
+
+		// update view camera
+		ViewCamera.UpdateMatrices();
+		// update sampling camera
+		SamplingCamera.UpdateMatrices();
+		// compute ray-sphere intersection point & sphere intersection normal
+		//   gamma1 & gamma 2
+		//		* gamma1 = asin((d / r) sin w) - w : first intersection angle from nadir
+		//		* gamma2 = -asin((d / r) sin w) - w + pi : second intersection angle from nadir
+
 		// set our new render target object as the active render target
 		auto context = deviceResources->GetD3DDeviceContext();
 
-#if 1
+#if 0
 		testShader->Apply();
-		/*
-		PGM::Vertex OurVertices[] =
-		{
-			{ 0.0f, 0.5f, 0.0f },
-			{ 0.45f, -0.5f, 0.0f },
-			{ -0.45f, -0.5f, 0.0f },
-		};
-
-		D3D11_BUFFER_DESC bd = {0};
-		bd.ByteWidth = sizeof(PGM::Vertex) * ARRAYSIZE(OurVertices);
-		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-
-		D3D11_SUBRESOURCE_DATA srd = {OurVertices, 0, 0};
-
-		deviceResources->GetD3DDevice()->CreateBuffer(&bd, &srd, &gridvertexbuffer);
-		*/
 		// set the vertex buffer
-		UINT stride = sizeof(PGM::Vertex);
+		UINT stride = sizeof(PGM::GridVertex);
 		UINT offset = 0;
 		context->IASetVertexBuffers(0, 1, gridvertexbuffer.GetAddressOf(), &stride, &offset);
 
 		// set the primitive topology
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
 		// draw 3 vertices, starting from vertex 0
 		context->Draw(numIndices, 0);
@@ -144,18 +139,7 @@ namespace Renderer
 		//		* rendered scene
 
 		pgmShader->Apply();
-
-		// update view camera
-		ViewCamera.UpdateMatrices();
-		// update sampling camera
-		SamplingCamera.UpdateMatrices();
-		// compute ray-sphere intersection point & sphere intersection normal
-		//   gamma1 & gamma 2
-		//		* gamma1 = asin((d / r) sin w) - w : first intersection angle from nadir
-		//		* gamma2 = -asin((d / r) sin w) - w + pi : second intersection angle from nadir
-
-		// set up constant buffers for planet data to GPU for processing in shaders
-
+		
 		// update grid points (per the new sampling viewport)
 		//	* calc new extents to edges of sphere for frusta
 		//	* calc new distance to planet
@@ -168,12 +152,10 @@ namespace Renderer
 		//	* set grid points vertex buffer / index buffer created for sampling camera to IA stage
 		//	* set the stream out vertex buffer to stream out stage
 
-		UINT stride = sizeof(PGM::Vertex);
+		UINT stride = sizeof(PGM::GridVertex);
 		UINT offset = 0;
 		// set the vertex buffer (grid points)
 		context->IASetVertexBuffers(0, 1, gridvertexbuffer.GetAddressOf(), &stride, &offset);
-		// set the index buffer (grid points)
-		//context->IASetIndexBuffer(gridindexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// set the stream-out buffer for output from Geometry Shader
 		context->SOSetTargets(1,streamOutVertexBuffer.GetAddressOf(),&offset);
@@ -203,13 +185,13 @@ namespace Renderer
 		ComPtr<ID3D11Buffer> bufferArray = { 0 };
 		context->SOSetTargets(1, bufferArray.GetAddressOf(), &offset);
 
-		stride = sizeof(Base::Vertex);
+		stride = sizeof(PGM::SOVertex);
 		offset = 0;
-		// set the vertex buffer (grid points)
+		// set the vertex buffer to the stream out buffer from the previous stage
 		context->IASetVertexBuffers(0, 1, streamOutVertexBuffer.GetAddressOf(), &stride, &offset);
 
 		// set the primitive topology
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
 		// update the constant buffers with relevant info for PGM (camera & surface info)
 		PGM_Pass1_CBuffer rasterizationCbuffer;
@@ -238,7 +220,7 @@ namespace Renderer
 	void PGM::MakeGridPoints()
 	{
 		numIndices = numGridPointsX * numGridPointsY;
-		std::vector<PGM::Vertex> OurVertices;
+		std::vector<PGM::GridVertex> OurVertices;
 		std::vector<UINT> OurIndices;
 		int index = 0;
 		// need to set up verts & inds based on grid
@@ -247,10 +229,10 @@ namespace Renderer
 			for (int j = 0; j < numGridPointsY; j++)
 			{
 				float x, y, z;
-				x = (float)(i) / (float)(numGridPointsX) * 2.0f - 1.0f;
-				y = (float)(j) / (float)(numGridPointsY)* 2.0f - 1.0f;
+				x = (float)(i) / (float)(numGridPointsX - 1)*2.0f - 1.0f;
+				y = (float)(j) / (float)(numGridPointsY - 1)*2.0f - 1.0f;
 				z = 0.0f;
-				PGM::Vertex v = { x, y, z };
+				PGM::GridVertex v = { x, y, z };
 				OurVertices.push_back(v);
 				OurIndices.push_back(index++);
 			}
@@ -258,7 +240,7 @@ namespace Renderer
 		
 		// create the vertex buffer
 		D3D11_BUFFER_DESC vertexBD = { 0 };
-		vertexBD.ByteWidth = sizeof(PGM::Vertex) * numIndices;
+		vertexBD.ByteWidth = sizeof(PGM::GridVertex) * numIndices;
 		vertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
 		D3D11_SUBRESOURCE_DATA vertexSRD = { OurVertices.data(), 0, 0 };
