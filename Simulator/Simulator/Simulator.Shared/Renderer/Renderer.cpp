@@ -134,14 +134,6 @@ namespace Renderer
 
 	void Renderer::Update()
 	{
-		pgm.SetCamera(camera);
-		pgm.Update();
-	}
-
-	void Renderer::Render()
-	{
-		shader->Apply();
-
 		auto context = deviceResources->GetD3DDeviceContext();
 
 		// set our new render target object as the active render target
@@ -153,10 +145,21 @@ namespace Renderer
 		context->RSSetViewports(1, &viewport);
 
 		// clear the back buffer to a deep blue
-		//context->ClearRenderTargetView(deviceResources->GetBackBufferRenderTargetView(), DirectX::Colors::CornflowerBlue);
-		
+		context->ClearRenderTargetView(deviceResources->GetBackBufferRenderTargetView(), DirectX::Colors::Black);
+
 		// clear the depth buffer
-		//context->ClearDepthStencilView(deviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		context->ClearDepthStencilView(deviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+		pgm.SetCamera(camera);
+		pgm.Update();
+	}
+
+	void Renderer::Render()
+	{
+#if 1
+		shader->Apply();
+
+		auto context = deviceResources->GetD3DDeviceContext();
 
 		// set the vertex buffer
 		UINT stride = sizeof(Base::Vertex);
@@ -195,6 +198,7 @@ namespace Renderer
 		context->DrawIndexed(numIndices, 0, 0);
 
 		shader->Disable();
+#endif
 		return;
 	}
 

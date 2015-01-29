@@ -34,6 +34,10 @@ namespace Renderer
 		pgmShader->SetInputDescriptor(pgmIED, 1);
 		pgmShader->Initialize();
 
+		testShader = std::make_unique<Shader>(deviceResources, "PGMVertexShader.cso", "PGMPixelShader.cso");
+		testShader->SetInputDescriptor(pgmIED, 1);
+		testShader->Initialize();
+
 		rasterizationShader = std::make_unique<Shader>(deviceResources);
 		rasterizationShader->Initialize();
 		
@@ -90,18 +94,38 @@ namespace Renderer
 	{
 		// set our new render target object as the active render target
 		auto context = deviceResources->GetD3DDeviceContext();
-		ID3D11RenderTargetView *const targets[] = { deviceResources->GetBackBufferRenderTargetView() };
-		context->OMSetRenderTargets(1, targets, deviceResources->GetDepthStencilView());
 
-		// Reset the viewport to target the whole screen.
-		auto viewport = deviceResources->GetScreenViewport();
-		context->RSSetViewports(1, &viewport);
-		
-		// clear the back buffer
-		context->ClearRenderTargetView(deviceResources->GetBackBufferRenderTargetView(), DirectX::Colors::CornflowerBlue);
+#if 1
+		testShader->Apply();
+		/*
+		PGM::Vertex OurVertices[] =
+		{
+			{ 0.0f, 0.5f, 0.0f },
+			{ 0.45f, -0.5f, 0.0f },
+			{ -0.45f, -0.5f, 0.0f },
+		};
 
-		// clear the depth buffer
-		context->ClearDepthStencilView(deviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		D3D11_BUFFER_DESC bd = {0};
+		bd.ByteWidth = sizeof(PGM::Vertex) * ARRAYSIZE(OurVertices);
+		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+		D3D11_SUBRESOURCE_DATA srd = {OurVertices, 0, 0};
+
+		deviceResources->GetD3DDevice()->CreateBuffer(&bd, &srd, &gridvertexbuffer);
+		*/
+		// set the vertex buffer
+		UINT stride = sizeof(PGM::Vertex);
+		UINT offset = 0;
+		context->IASetVertexBuffers(0, 1, gridvertexbuffer.GetAddressOf(), &stride, &offset);
+
+		// set the primitive topology
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+
+		// draw 3 vertices, starting from vertex 0
+		context->Draw(numIndices, 0);
+
+		testShader->Disable();
+#else
 
 		// set up render target buffers for Deferred Rendering:
 		//  * Pass 1:
@@ -208,6 +232,7 @@ namespace Renderer
 		context->DrawAuto();
 
 		rasterizationShader->Disable();
+#endif
 	}
 
 	void PGM::MakeGridPoints()
@@ -222,13 +247,10 @@ namespace Renderer
 			for (int j = 0; j < numGridPointsY; j++)
 			{
 				float x, y, z;
-				x = (float)(i) / (float)(numGridPointsX);
-				y = (float)(j) / (float)(numGridPointsY);
-				z = 1.5;
-				PGM::Vertex v;
-				v.position[0] = x;
-				v.position[1] = y;
-				v.position[2] = z;
+				x = (float)(i) / (float)(numGridPointsX) * 2.0f - 1.0f;
+				y = (float)(j) / (float)(numGridPointsY)* 2.0f - 1.0f;
+				z = 0.0f;
+				PGM::Vertex v = { x, y, z };
 				OurVertices.push_back(v);
 				OurIndices.push_back(index++);
 			}

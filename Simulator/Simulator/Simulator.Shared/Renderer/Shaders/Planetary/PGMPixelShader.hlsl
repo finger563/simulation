@@ -3,9 +3,10 @@
 
 float4 main(VertexOut pin) : SV_TARGET
 {
+	/*
 	// use camera position and surface/position (plane or sphere) to project
 	// pin.position to actual position
-	float4 pos = cameraPos + cameraPos.z / (cameraPos.z - pin.position.z) * (pin.position - cameraPos); // implements P_ij = V + (v_z)/(v_z - g_z)*(G_ij - V)
+	float4 pos = cameraPos + cameraPos.z / (cameraPos.z - pin.pos.z) * (pin.pos - cameraPos); // implements P_ij = V + (v_z)/(v_z - g_z)*(G_ij - V)
 	// then calculate height/texture lookup based on pin.position
 	float4 texCoord = float4(pos.xy, 0, 0);
 	texCoord = mul(texCoord,texTransform);
@@ -21,5 +22,7 @@ float4 main(VertexOut pin) : SV_TARGET
 
 	float4 color = ambientcol;
 	color += lightcol * diffusebrightness;    // find the diffuse color and add
+	*/
+	float4 color = float4(1.0f, 1.0f, 1.0f, 1.0f);
 	return color;
 }

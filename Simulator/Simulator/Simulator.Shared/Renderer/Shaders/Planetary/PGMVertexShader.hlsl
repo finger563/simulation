@@ -4,6 +4,6 @@
 VertexOut main(VertexIn vin)
 {
 	VertexOut vout;
-	vout.position = float4(vin.pos,0);
+	vout.pos = vin.pos;
 	return vout;
 }
