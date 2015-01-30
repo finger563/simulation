@@ -4,6 +4,6 @@
 VertexOut main(VertexIn vin)
 {
 	VertexOut vout;
-	vout.pos = vin.pos;
+	vout.pos = mul(matWVP,vin.pos);
 	return vout;
 }

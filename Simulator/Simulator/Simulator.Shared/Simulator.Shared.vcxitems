@@ -77,6 +77,7 @@
     <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Planetary\PGMGeometryShader.hlsl">
       <ShaderType>Geometry</ShaderType>
       <ShaderModel>5.0</ShaderModel>
+      <EnableDebuggingInformation>true</EnableDebuggingInformation>
     </FxCompile>
     <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Planetary\PGMPixelShader.hlsl">
       <ShaderType>Pixel</ShaderType>

@@ -7,21 +7,17 @@ struct GSOutput
 	float4 normal : NORMAL;
 };
 
-[maxvertexcount(3)]
+[maxvertexcount(1)]
 void main(
-	point float4 input[1] : SV_POSITION, 
+	point VertexOut input[1], 
 	inout PointStream< GSOutput > output
 )
 {
 	GSOutput element;
 	// raycast here from grid to surface
-	element.pos = cameraPos + cameraPos.z / (cameraPos.z - input[0].z) * (input[0] - cameraPos); // implements P_ij = V + (v_z)/(v_z - g_z)*(G_ij - V)
+	//element.pos = cameraPos + cameraPos.y / (cameraPos.y - input[0].pos.y) * (input[0].pos - cameraPos); // implements P_ij = V + (v_z)/(v_z - g_z)*(G_ij - V)
+	element.pos = input[0].pos;
 	// calculate normal to surface here
 	element.normal = float4(0, 1, 0, 0);
 	output.Append(element);
 }
-
-GeometryShader gsStreamOut = ConstructGSWithSO(
-	CompileShader(gs_5_0, main()),
-	"SV_POSITION.xyzw; NORMAL.xyzw"
-	);

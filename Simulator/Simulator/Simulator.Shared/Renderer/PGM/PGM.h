@@ -57,7 +57,6 @@ namespace Renderer
 		double maxRadius;			// maximum radius (based on dataset)
 
 		// Shader related data: shaders perform PGM on GPU
-		std::unique_ptr<Shader> testShader;
 		std::unique_ptr<Shader> pgmShader;					// raytraces grid points, produces sphere normals and positions
 		std::unique_ptr<Shader> rasterizationShader;		// rasterizes everything else
 		std::unique_ptr<Shader> deferredTexturingShader;	// rasterizes based on datasets, sphere normals, and positions

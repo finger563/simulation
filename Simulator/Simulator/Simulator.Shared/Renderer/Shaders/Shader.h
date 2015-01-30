@@ -18,11 +18,6 @@ namespace Renderer
 	{
 	private:
 		std::shared_ptr<DeviceResources> deviceResources;
-		std::string vsFileName;
-		std::string psFileName;
-		std::string gsFileName;
-		std::string hsFileName;
-		std::string dsFileName;
 
 	public:
 		Shader(const std::shared_ptr<DeviceResources>& deviceResources);
@@ -48,6 +43,12 @@ namespace Renderer
 		ComPtr<ID3D11GeometryShader> geometryshader;
 		ComPtr<ID3D11HullShader> hullshader;
 		ComPtr<ID3D11DomainShader> domainshader;
+
+		std::string vsFileName;
+		std::string psFileName;
+		std::string gsFileName;
+		std::string hsFileName;
+		std::string dsFileName;
 
 		D3D11_INPUT_ELEMENT_DESC *pIED;
 		int numDescriptors;

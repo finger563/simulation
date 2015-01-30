@@ -31,24 +31,47 @@ namespace Renderer
 		// END JUST FOR TESTING
 		
 		pgmShader = std::make_unique<Shader>(deviceResources, "PGMVertexShader.cso", "", "PGMGeometryShader.cso");
-		pgmShader->SetInputDescriptor(pgmIED, 1);
+		pgmShader->SetInputDescriptor(gridPointIED, 1);
 		pgmShader->Initialize();
-
-		testShader = std::make_unique<Shader>(deviceResources, "PGMVertexShader.cso", "PGMPixelShader.cso");
-		testShader->SetInputDescriptor(pgmIED, 1);
-		testShader->Initialize();
-
+		
 		rasterizationShader = std::make_unique<Shader>(deviceResources, "PGMVertexShader.cso", "PGMPixelShader.cso");
-		testShader->SetInputDescriptor(pgmSOIED, 2);
+		rasterizationShader->SetInputDescriptor(pgmRasterizationIED, 2);
 		rasterizationShader->Initialize();
+
+
+		// create the SO buffer to get data between PGM and rasterization stages
+		auto context = deviceResources->GetD3DDeviceContext();
+
+		Platform::Array<byte>^ GSFile;
+		GSFile = LoadShaderFile(pgmShader->gsFileName);
+
+		deviceResources->GetD3DDevice()->CreateGeometryShaderWithStreamOutput(
+			GSFile->Data, 
+			GSFile->Length,
+			gridPointSOIED,
+			2,
+			NULL,
+			0,
+			0,
+			NULL,
+			pgmShader->geometryshader.GetAddressOf()
+			);
 		
 		// create the vertex buffer for stream out between PGM projection and rasterization stages
-		D3D11_BUFFER_DESC vertexBD = { 0 };
-		vertexBD.Usage = D3D11_USAGE_DEFAULT;
-		vertexBD.ByteWidth = numGridPointsX * numGridPointsY;
-		vertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_STREAM_OUTPUT;
-		vertexBD.CPUAccessFlags = 0;
-		vertexBD.MiscFlags = 0;
+		D3D11_BUFFER_DESC vertexBD =
+		{
+			numGridPointsX * numGridPointsY * 4 * 3,
+			D3D11_USAGE_DEFAULT,
+			D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_STREAM_OUTPUT,
+			0,
+			0,
+			0
+		};
+		//vertexBD.Usage = D3D11_USAGE_DEFAULT;
+		//vertexBD.ByteWidth = numGridPointsX * numGridPointsY;
+		//vertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_STREAM_OUTPUT;
+		//vertexBD.CPUAccessFlags = 0;
+		//vertexBD.MiscFlags = 0;
 		
 		ThrowIfFailed(
 			deviceResources->GetD3DDevice()->CreateBuffer(&vertexBD, nullptr, &streamOutVertexBuffer)
@@ -107,19 +130,19 @@ namespace Renderer
 		auto context = deviceResources->GetD3DDeviceContext();
 
 #if 0
-		testShader->Apply();
+		rasterizationShader->Apply();
 		// set the vertex buffer
 		UINT stride = sizeof(PGM::GridVertex);
 		UINT offset = 0;
 		context->IASetVertexBuffers(0, 1, gridvertexbuffer.GetAddressOf(), &stride, &offset);
 
 		// set the primitive topology
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
 		// draw 3 vertices, starting from vertex 0
 		context->Draw(numIndices, 0);
 
-		testShader->Disable();
+		rasterizationShader->Disable();
 #else
 
 		// set up render target buffers for Deferred Rendering:
@@ -137,6 +160,13 @@ namespace Renderer
 		//		* height atlas
 		//		output:
 		//		* rendered scene
+
+		D3D11_DEPTH_STENCIL_DESC dsd;
+		dsd.DepthEnable = FALSE;
+		dsd.StencilEnable = FALSE;
+		ComPtr<ID3D11DepthStencilState> dss;
+		deviceResources->GetD3DDevice()->CreateDepthStencilState(&dsd, dss.GetAddressOf());
+		context->OMSetDepthStencilState(dss.Get(), 0);
 
 		pgmShader->Apply();
 		
@@ -167,12 +197,18 @@ namespace Renderer
 		PGM_Pass0_CBuffer pgmCbuffer;
 		pgmCbuffer.CameraPosition = SamplingCamera.Position;
 		pgmCbuffer.ViewVector = SamplingCamera.View;
+		pgmCbuffer.matWVP = XMMatrixIdentity();
 		context->UpdateSubresource(pgmShader->constantbuffer.Get(), 0, 0, &pgmCbuffer, 0, 0);
 
 		// invoke the shader code for raycasting PGM
-		context->DrawIndexed(numIndices, 0, 0);
+		context->Draw(numIndices, 0);
 
 		pgmShader->Disable();
+
+		D3D11_DEPTH_STENCIL_DESC dsd2;
+		ComPtr<ID3D11DepthStencilState> dss2;
+		deviceResources->GetD3DDevice()->CreateDepthStencilState(&dsd2,dss2.GetAddressOf());
+		context->OMSetDepthStencilState(dss2.Get(),0);
 
 		rasterizationShader->Apply();
 
@@ -214,6 +250,7 @@ namespace Renderer
 		context->DrawAuto();
 
 		rasterizationShader->Disable();
+
 #endif
 	}
 
