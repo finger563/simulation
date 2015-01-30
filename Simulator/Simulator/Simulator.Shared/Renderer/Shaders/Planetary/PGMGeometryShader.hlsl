@@ -1,12 +1,6 @@
 #include "./Pipeline.hlsli"
 #include "./ConstantBuffers.hlsli"
 
-struct GSOutput
-{
-	float4 pos : SV_POSITION;
-	float4 normal : NORMAL;
-};
-
 [maxvertexcount(1)]
 void main(
 	point VertexOut input[1], 

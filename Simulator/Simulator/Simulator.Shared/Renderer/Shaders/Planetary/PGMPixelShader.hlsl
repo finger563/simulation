@@ -1,7 +1,7 @@
 #include "./Pipeline.hlsli"
 #include "./ConstantBuffers.hlsli"
 
-float4 main(VertexOut pin) : SV_TARGET
+float4 main(GSOutput pin) : SV_TARGET
 {
 	// use camera position and surface/position (plane or sphere) to project
 	// pin.position to actual position

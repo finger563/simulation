@@ -193,6 +193,9 @@ namespace Renderer
 		// set the primitive topology
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
+
+		XMMATRIX matFinal = ViewCamera.ViewMatrix * ViewCamera.ProjMatrix;
+
 		// update the constant buffers with relevant info for PGM (camera & surface info)
 		PGM_Pass0_CBuffer pgmCbuffer;
 		pgmCbuffer.CameraPosition = SamplingCamera.Position;
@@ -233,8 +236,6 @@ namespace Renderer
 		PGM_Pass1_CBuffer rasterizationCbuffer;
 		rasterizationCbuffer.CameraPosition = ViewCamera.Position;
 		rasterizationCbuffer.ViewVector = ViewCamera.View;
-				
-		XMMATRIX matFinal = ViewCamera.ViewMatrix * ViewCamera.ProjMatrix * ViewCamera.OrientMatrix;
 
 		rasterizationCbuffer.matWVP = matFinal;
 
