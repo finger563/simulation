@@ -79,6 +79,9 @@
       <ShaderModel>5.0</ShaderModel>
       <EnableDebuggingInformation>true</EnableDebuggingInformation>
     </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Planetary\PGMPassThroughVertexShader.hlsl">
+      <ShaderType>Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Planetary\PGMPixelShader.hlsl">
       <ShaderType>Pixel</ShaderType>
       <ShaderModel>5.0</ShaderModel>

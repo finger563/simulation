@@ -30,7 +30,7 @@ namespace Renderer
 		MakeGridPoints();
 		// END JUST FOR TESTING
 		
-		pgmShader = std::make_unique<Shader>(deviceResources, "PGMVertexShader.cso", "", "PGMGeometryShader.cso");
+		pgmShader = std::make_unique<Shader>(deviceResources, "PGMPassThroughVertexShader.cso", "PGMPixelShader.cso", "PGMGeometryShader.cso");
 		pgmShader->SetInputDescriptor(gridPointIED, 1);
 		pgmShader->Initialize();
 		
@@ -194,13 +194,17 @@ namespace Renderer
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
 
-		XMMATRIX matFinal = ViewCamera.ViewMatrix * ViewCamera.ProjMatrix;
+		XMMATRIX matFinal = SamplingCamera.ViewMatrix * SamplingCamera.ProjMatrix;
 
 		// update the constant buffers with relevant info for PGM (camera & surface info)
 		PGM_Pass0_CBuffer pgmCbuffer;
 		pgmCbuffer.CameraPosition = SamplingCamera.Position;
 		pgmCbuffer.ViewVector = SamplingCamera.View;
 		pgmCbuffer.matWVP = XMMatrixIdentity();
+		pgmCbuffer.matRotation = XMMatrixIdentity();
+		pgmCbuffer.DiffuseVector = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
+		pgmCbuffer.DiffuseColor = XMVectorSet(0.5f, 0.5f, 0.5f, 1.0f);
+		pgmCbuffer.AmbientColor = XMVectorSet(0.2f, 0.2f, 0.2f, 1.0f);
 		context->UpdateSubresource(pgmShader->constantbuffer.Get(), 0, 0, &pgmCbuffer, 0, 0);
 
 		// invoke the shader code for raycasting PGM
