@@ -60,7 +60,7 @@ namespace Renderer
 		// create the vertex buffer for stream out between PGM projection and rasterization stages
 		D3D11_BUFFER_DESC vertexBD =
 		{
-			numGridPointsX * numGridPointsY * 4 * 3,
+			numGridPointsX * numGridPointsY * 4 * 4,  // 4 bytes per channel, 4 channels per vertex
 			D3D11_USAGE_DEFAULT,
 			D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_STREAM_OUTPUT,
 			0,
@@ -197,14 +197,9 @@ namespace Renderer
 		XMMATRIX matFinal = SamplingCamera.ViewMatrix * SamplingCamera.ProjMatrix;
 
 		// update the constant buffers with relevant info for PGM (camera & surface info)
-		PGM_Pass0_CBuffer pgmCbuffer;
+		DefaultCBuffer pgmCbuffer;
 		pgmCbuffer.CameraPosition = SamplingCamera.Position;
-		pgmCbuffer.ViewVector = SamplingCamera.View;
-		pgmCbuffer.matWVP = XMMatrixIdentity();
-		pgmCbuffer.matRotation = XMMatrixIdentity();
-		pgmCbuffer.DiffuseVector = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
-		pgmCbuffer.DiffuseColor = XMVectorSet(0.5f, 0.5f, 0.5f, 1.0f);
-		pgmCbuffer.AmbientColor = XMVectorSet(0.2f, 0.2f, 0.2f, 1.0f);
+		pgmCbuffer.ViewVector = SamplingCamera.View; 
 		context->UpdateSubresource(pgmShader->constantbuffer.Get(), 0, 0, &pgmCbuffer, 0, 0);
 
 		// invoke the shader code for raycasting PGM
@@ -237,7 +232,7 @@ namespace Renderer
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
 		// update the constant buffers with relevant info for PGM (camera & surface info)
-		PGM_Pass1_CBuffer rasterizationCbuffer;
+		DefaultCBuffer rasterizationCbuffer;
 		rasterizationCbuffer.CameraPosition = ViewCamera.Position;
 		rasterizationCbuffer.ViewVector = ViewCamera.View;
 

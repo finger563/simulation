@@ -1,5 +1,5 @@
-#include "./Pipeline.hlsli"
-#include "./ConstantBuffers.hlsli"
+#include "../Planetary/Pipeline.hlsli"
+#include "../Common/ConstantBuffers.hlsli"
 
 VertexOut main(VertexIn vin)
 {

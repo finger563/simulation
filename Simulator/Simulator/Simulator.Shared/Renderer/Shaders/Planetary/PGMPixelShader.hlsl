@@ -1,8 +1,9 @@
-#include "./Pipeline.hlsli"
-#include "./ConstantBuffers.hlsli"
+#include "../Planetary/Pipeline.hlsli"
+#include "../Common/ConstantBuffers.hlsli"
 
 float4 main(GSOutput pin) : SV_TARGET
 {
+	/*
 	// use camera position and surface/position (plane or sphere) to project
 	// pin.position to actual position
 	//float4 pos = cameraPos + cameraPos.z / (cameraPos.z - pin.pos.z) * (pin.pos - cameraPos); // implements P_ij = V + (v_z)/(v_z - g_z)*(G_ij - V)
@@ -28,4 +29,6 @@ float4 main(GSOutput pin) : SV_TARGET
 	color += lightcol * diffusebrightness;    // find the diffuse color and add
 	color = float4(1.0f, 1.0f, 1.0f, 1.0f);
 	return color;
+	*/
+	return float4(1.0f, 1.0f, 1.0f, 1.0f);
 }

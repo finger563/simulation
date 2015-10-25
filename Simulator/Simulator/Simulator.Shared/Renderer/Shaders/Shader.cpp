@@ -109,6 +109,7 @@ void Shader::Initialize()
 	D3D11_BUFFER_DESC bd = { 0 };
 
 	bd.Usage = D3D11_USAGE_DEFAULT;
+	// THIS NEEDS TO BE CHANGED PER SHADER, SINCE SHADERS MAY HAVE DIFFERENT CBUFFERS
 	bd.ByteWidth = sizeof(DefaultCBuffer);		// must always be a multiple of 16 bytes
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 

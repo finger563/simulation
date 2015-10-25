@@ -96,7 +96,6 @@
     <None Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Common\Light.hlsli" />
     <None Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Common\Material.hlsli" />
     <None Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Common\Pipeline.hlsli" />
-    <None Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Planetary\ConstantBuffers.hlsli" />
     <None Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Planetary\Pipeline.hlsli" />
   </ItemGroup>
 </Project>

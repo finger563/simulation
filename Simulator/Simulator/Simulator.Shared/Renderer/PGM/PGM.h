@@ -16,7 +16,7 @@ namespace Renderer
 		};
 		struct SOVertex {
 			float x, y, z, w;
-			float nx, ny, nyz, nw;
+			//float nx, ny, nyz, nw;
 		};
 
 		PGM(const std::shared_ptr<DeviceResources>& deviceResources);
