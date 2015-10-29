@@ -52,7 +52,7 @@ namespace Renderer
 			1,
 			NULL,
 			0,
-			D3D11_SO_NO_RASTERIZED_STREAM,
+			0, // D3D11_SO_NO_RASTERIZED_STREAM to not pass SO to pixelshader
 			NULL,
 			pgmShader->geometryshader.GetAddressOf()
 			);
