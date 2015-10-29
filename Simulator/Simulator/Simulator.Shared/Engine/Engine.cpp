@@ -356,7 +356,13 @@ namespace Engine
 		mPhysics->Update();
 		mRenderer->Update();
 		mRenderer->Render();
-		Platform::String^ renderString = L"Change Rasterizer state: r,t\nSplit: 1-4\nMerge: 5-8\nMovement: w,a,s,d\nLook: up,down,left,right";
+		Platform::String^ renderString = L"Change Rasterizer state: r,t\n";
+		renderString += "Split: 1-4\n";
+		renderString += "Merge: 5-8\n";
+		renderString += "Movement: w,a,s,d\n";
+		renderString += "Look: up, down, left, right\n";
+		renderString += "Update Grid points (X/Y): j,l,i,k\n";
+		renderString += "enable/disable PGM update: u,o";
 		POINT mypoint = POINT();
 		mypoint.x = (long)(cos(SimulationTime) * 100.0);
 		mypoint.y = 100 + (long)(sin(SimulationTime) * 100.0);
