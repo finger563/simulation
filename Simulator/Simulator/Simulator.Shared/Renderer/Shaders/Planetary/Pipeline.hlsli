@@ -1,7 +1,7 @@
 
 struct VertexIn
 {
-	float4 pos : SV_POSITION;
+	float4 pos : POSITION;
 };
 
 struct VertexOut
@@ -11,5 +11,5 @@ struct VertexOut
 
 struct GSOutput
 {
-	float4 pos : SV_POSITION;
+	float4 pos : POSITION;
 };

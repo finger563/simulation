@@ -16,7 +16,6 @@ namespace Renderer
 		};
 		struct SOVertex {
 			float x, y, z, w;
-			//float nx, ny, nyz, nw;
 		};
 
 		PGM(const std::shared_ptr<DeviceResources>& deviceResources);
@@ -24,6 +23,7 @@ namespace Renderer
 		virtual bool Initialize();	// need initialization data (number of grid points etc)
 		virtual void CreateWindowSizeDependentResources();
 		virtual void Update();		// update camera data here
+		void Render();
 		virtual bool UnInitialize();
 
 		// need interface here to update the camera

@@ -12,6 +12,9 @@ using namespace Windows::Foundation;
 using namespace Windows::Graphics::Display;
 using namespace Platform;
 
+#define CONFIG_DEPTH_STENCIL 1
+#define CONFIG_RASTERIZATION_STAGE 1
+
 namespace Renderer
 {
 	PGM::PGM(const std::shared_ptr<DeviceResources>& devResources) :
@@ -52,7 +55,7 @@ namespace Renderer
 			1,
 			NULL,
 			0,
-			0, // D3D11_SO_NO_RASTERIZED_STREAM to not pass SO to pixelshader
+			D3D11_SO_NO_RASTERIZED_STREAM, // to not pass SO to pixelshader
 			NULL,
 			pgmShader->geometryshader.GetAddressOf()
 			);
@@ -113,6 +116,7 @@ namespace Renderer
 		ViewCamera.UpdateMatrices();
 		// update sampling camera
 		SamplingCamera.UpdateMatrices();
+
 		// compute ray-sphere intersection point & sphere intersection normal
 		//   gamma1 & gamma 2
 		//		* gamma1 = asin((d / r) sin w) - w : first intersection angle from nadir
@@ -120,23 +124,7 @@ namespace Renderer
 
 		// set our new render target object as the active render target
 		auto context = deviceResources->GetD3DDeviceContext();
-
-#if 0
-		rasterizationShader->Apply();
-		// set the vertex buffer
-		UINT stride = sizeof(PGM::GridVertex);
-		UINT offset = 0;
-		context->IASetVertexBuffers(0, 1, gridvertexbuffer.GetAddressOf(), &stride, &offset);
-
-		// set the primitive topology
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-
-		// draw 3 vertices, starting from vertex 0
-		context->Draw(numIndices, 0);
-
-		rasterizationShader->Disable();
-#else
-
+		
 		// set up render target buffers for Deferred Rendering:
 		//  * Pass 1:
 		//		input:
@@ -153,12 +141,14 @@ namespace Renderer
 		//		output:
 		//		* rendered scene
 
+#if CONFIG_DEPTH_STENCIL
 		D3D11_DEPTH_STENCIL_DESC dsd;
 		dsd.DepthEnable = FALSE;
 		dsd.StencilEnable = FALSE;
 		ComPtr<ID3D11DepthStencilState> dss;
 		deviceResources->GetD3DDevice()->CreateDepthStencilState(&dsd, dss.GetAddressOf());
 		context->OMSetDepthStencilState(dss.Get(), 0);
+#endif
 
 		pgmShader->Apply();
 		
@@ -185,14 +175,14 @@ namespace Renderer
 		// set the primitive topology
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
-
-		XMMATRIX matFinal = SamplingCamera.ViewMatrix * SamplingCamera.ProjMatrix;
-
 		// update the constant buffers with relevant info for PGM (camera & surface info)
 		DefaultCBuffer pgmCbuffer;
 		pgmCbuffer.CameraPosition = SamplingCamera.Position;
 		pgmCbuffer.ViewVector = SamplingCamera.View;
+
+		XMMATRIX matFinal = ViewCamera.ViewMatrix;
 		pgmCbuffer.matWVP = matFinal;
+
 		context->UpdateSubresource(pgmShader->constantbuffer.Get(), 0, 0, &pgmCbuffer, 0, 0);
 
 		// invoke the shader code for raycasting PGM
@@ -200,10 +190,22 @@ namespace Renderer
 
 		pgmShader->Disable();
 
+#if CONFIG_DEPTH_STENCIL
 		D3D11_DEPTH_STENCIL_DESC dsd2;
 		ComPtr<ID3D11DepthStencilState> dss2;
 		deviceResources->GetD3DDevice()->CreateDepthStencilState(&dsd2,dss2.GetAddressOf());
 		context->OMSetDepthStencilState(dss2.Get(),0);
+#endif
+
+		// clear stream out stage target from previous stage
+		ComPtr<ID3D11Buffer> bufferArray = { 0 };
+		context->SOSetTargets(1, bufferArray.GetAddressOf(), &offset);
+	}
+
+	void PGM::Render()
+	{
+#if CONFIG_RASTERIZATION_STAGE
+		auto context = deviceResources->GetD3DDeviceContext();
 
 		rasterizationShader->Apply();
 
@@ -212,23 +214,21 @@ namespace Renderer
 		//	* send main camera info & transform from sampling to main camera
 		//	* set stream out vertex buffer (from PGM stage) to IA stage
 
-		// clear stream out stage target from previous stage
-		ComPtr<ID3D11Buffer> bufferArray = { 0 };
-		context->SOSetTargets(1, bufferArray.GetAddressOf(), &offset);
-
-		stride = sizeof(PGM::SOVertex);
-		offset = 0;
+		UINT stride = sizeof(PGM::SOVertex);
+		UINT offset = 0;
 		// set the vertex buffer to the stream out buffer from the previous stage
 		context->IASetVertexBuffers(0, 1, streamOutVertexBuffer.GetAddressOf(), &stride, &offset);
 
 		// set the primitive topology
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
+		//context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
 		// update the constant buffers with relevant info for PGM (camera & surface info)
 		DefaultCBuffer rasterizationCbuffer;
 		rasterizationCbuffer.CameraPosition = ViewCamera.Position;
 		rasterizationCbuffer.ViewVector = ViewCamera.View;
 
+		XMMATRIX matFinal = ViewCamera.ViewMatrix * ViewCamera.ProjMatrix * ViewCamera.OrientMatrix;
 		rasterizationCbuffer.matWVP = matFinal;
 
 		// Lighting related
@@ -243,7 +243,6 @@ namespace Renderer
 		context->DrawAuto();
 
 		rasterizationShader->Disable();
-
 #endif
 	}
 

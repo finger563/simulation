@@ -156,6 +156,7 @@ namespace Renderer
 
 	void Renderer::Render()
 	{
+		pgm.Render();
 #if 1
 		shader->Apply();
 
