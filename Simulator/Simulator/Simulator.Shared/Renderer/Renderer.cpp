@@ -16,7 +16,8 @@ namespace Renderer
 {
 	Renderer::Renderer(const std::shared_ptr<DeviceResources>& devResources) :
 		deviceResources(devResources),
-		pgm(devResources)
+		pgm(devResources),
+		updatePGM(true)
 	{
 	}
 
@@ -114,6 +115,16 @@ namespace Renderer
 			);
 	}
 
+	void Renderer::SetUpdatePGM(Platform::Boolean update)
+	{
+		updatePGM = update;
+	}
+
+	Platform::Boolean Renderer::GetUpdatePGM()
+	{
+		return updatePGM;
+	}
+
 	void Renderer::SetRasterizerState(Platform::String^ state)
 	{
 		auto context = deviceResources->GetD3DDeviceContext();		
@@ -150,8 +161,11 @@ namespace Renderer
 		// clear the depth buffer
 		context->ClearDepthStencilView(deviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		pgm.SetCamera(camera);
-		pgm.Update();
+		if (updatePGM)
+		{
+			pgm.SetCamera(camera);
+			pgm.Update();
+		}
 	}
 
 	void Renderer::Render()

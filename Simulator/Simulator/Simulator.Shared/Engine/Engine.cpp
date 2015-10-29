@@ -42,6 +42,13 @@ namespace Engine
 
 		mInput->Initialize();
 
+		mInput->AddInput(
+			"UpdatePGM",
+			Windows::System::VirtualKey::U,
+			Input::ValueTypes::FLOAT,
+			1.0
+			);
+
 		// Maybe have these in an initialization file?
 		float movementSpeed = 0.1f;
 		float roatationSpeed = 0.025f;
@@ -204,6 +211,13 @@ namespace Engine
 		SimulationTime += 0.05;
 
 		mInput->Update();
+
+		bool updatePGM = mRenderer->GetUpdatePGM();
+		bool changePGM = (bool)(mInput->GetInput("UpdatePGM").fval);
+		if (changePGM)
+		{
+			mRenderer->SetUpdatePGM(!updatePGM);
+		}
 
 		float walk = 0;
 		walk += mInput->GetInput("WalkForward").fval;

@@ -49,6 +49,9 @@ namespace Renderer
 		virtual void OnOrientationChanged(Windows::Graphics::Display::DisplayInformation^ Sender, Platform::Object^ Args);
 #endif
 
+		void SetUpdatePGM(Platform::Boolean update);
+		Platform::Boolean GetUpdatePGM();
+
 		// must overload these for now because
 		// (1) we are creating engine=>renderer using unique_ptr
 		// (2) the XMVECTOR/XMMATRIX must be 16 byte aligned
@@ -71,6 +74,7 @@ namespace Renderer
 		void InitStates();								// For initializing the rasterizer etc. states.
 
 		PGM pgm;
+		bool updatePGM;
 
 		Camera camera;									// Camera used to render the scene
 		std::vector<Base::Objects::GameObject>* objects;	// pointer to objects created and maintained by Engine
