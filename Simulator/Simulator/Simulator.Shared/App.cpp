@@ -92,14 +92,14 @@ void App::App::SetWindow(CoreWindow^ Window)
 
 	// Input Handlers
 
-	Window->PointerPressed += ref new TypedEventHandler
-		<CoreWindow^, PointerEventArgs^>(mEngine->mInput, &Input::Input::PointerPressed);
+	//Window->PointerPressed += ref new TypedEventHandler
+	//	<CoreWindow^, PointerEventArgs^>(mEngine->mInput, &Input::Input::PointerPressed);
+	//Window->PointerWheelChanged += ref new TypedEventHandler
+	//	<CoreWindow^, PointerEventArgs^>(mEngine->mInput, &Input::Input::PointerWheelChanged);
 	Window->KeyDown += ref new TypedEventHandler
 		<CoreWindow^, KeyEventArgs^>(mEngine->mInput, &Input::Input::KeyDown);
 	Window->KeyUp += ref new TypedEventHandler
 		<CoreWindow^, KeyEventArgs^>(mEngine->mInput, &Input::Input::KeyUp);
-	Window->PointerWheelChanged += ref new TypedEventHandler
-		<CoreWindow^, PointerEventArgs^>(mEngine->mInput, &Input::Input::PointerWheelChanged);
 }
 
 void App::App::Load(String^ EntryPoint) 
