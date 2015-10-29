@@ -12,9 +12,6 @@ using namespace Windows::Foundation;
 using namespace Windows::Graphics::Display;
 using namespace Platform;
 
-#define CONFIG_DEPTH_STENCIL 0
-#define CONFIG_RASTERIZATION_STAGE 1
-
 namespace Renderer
 {
 	PGM::PGM(const std::shared_ptr<DeviceResources>& devResources) :
@@ -75,10 +72,20 @@ namespace Renderer
 		return true;
 	}
 
-	void PGM::SetCamera(const Renderer::Camera& c)
+	void PGM::SetViewCamera(const Renderer::Camera& c)
 	{
 		ViewCamera.Set(c);
-		SamplingCamera.Set(ViewCamera);
+
+		// update view camera
+		ViewCamera.UpdateMatrices();
+	}
+
+	void PGM::SetSamplingCamera(const Renderer::Camera& c)
+	{
+		SamplingCamera.Set(c);
+
+		// update sampling camera
+		SamplingCamera.UpdateMatrices();
 	}
 
 	void PGM::CreateWindowSizeDependentResources()
@@ -111,12 +118,6 @@ namespace Renderer
 
 	void PGM::Update()
 	{
-
-		// update view camera
-		ViewCamera.UpdateMatrices();
-		// update sampling camera
-		SamplingCamera.UpdateMatrices();
-
 		// compute ray-sphere intersection point & sphere intersection normal
 		//   gamma1 & gamma 2
 		//		* gamma1 = asin((d / r) sin w) - w : first intersection angle from nadir
@@ -141,14 +142,12 @@ namespace Renderer
 		//		output:
 		//		* rendered scene
 
-#if CONFIG_DEPTH_STENCIL
 		D3D11_DEPTH_STENCIL_DESC dsd;
 		dsd.DepthEnable = FALSE;
 		dsd.StencilEnable = FALSE;
 		ComPtr<ID3D11DepthStencilState> dss;
 		deviceResources->GetD3DDevice()->CreateDepthStencilState(&dsd, dss.GetAddressOf());
 		context->OMSetDepthStencilState(dss.Get(), 0);
-#endif
 
 		pgmShader->Apply();
 		
@@ -180,7 +179,7 @@ namespace Renderer
 		pgmCbuffer.CameraPosition = SamplingCamera.Position;
 		pgmCbuffer.ViewVector = SamplingCamera.View;
 		
-		XMMATRIX matFinal = XMMatrixInverse(NULL, XMMatrixTranspose(ViewCamera.ViewMatrix)); 
+		XMMATRIX matFinal = XMMatrixInverse(NULL, XMMatrixTranspose(SamplingCamera.ViewMatrix));
 
 		pgmCbuffer.matWVP = matFinal;
 
@@ -191,12 +190,10 @@ namespace Renderer
 
 		pgmShader->Disable();
 
-#if CONFIG_DEPTH_STENCIL
 		D3D11_DEPTH_STENCIL_DESC dsd2;
 		ComPtr<ID3D11DepthStencilState> dss2;
 		deviceResources->GetD3DDevice()->CreateDepthStencilState(&dsd2,dss2.GetAddressOf());
 		context->OMSetDepthStencilState(dss2.Get(),0);
-#endif
 
 		// clear stream out stage target from previous stage
 		ComPtr<ID3D11Buffer> bufferArray = { 0 };
@@ -205,7 +202,6 @@ namespace Renderer
 
 	void PGM::Render()
 	{
-#if CONFIG_RASTERIZATION_STAGE
 		auto context = deviceResources->GetD3DDeviceContext();
 
 		rasterizationShader->Apply();
@@ -244,7 +240,6 @@ namespace Renderer
 		context->DrawAuto();
 
 		rasterizationShader->Disable();
-#endif
 	}
 
 	void PGM::MakeGridPoints()
