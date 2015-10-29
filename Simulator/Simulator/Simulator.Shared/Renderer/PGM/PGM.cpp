@@ -179,8 +179,9 @@ namespace Renderer
 		DefaultCBuffer pgmCbuffer;
 		pgmCbuffer.CameraPosition = SamplingCamera.Position;
 		pgmCbuffer.ViewVector = SamplingCamera.View;
+		
+		XMMATRIX matFinal = XMMatrixInverse(NULL, XMMatrixTranspose(ViewCamera.ViewMatrix)); 
 
-		XMMATRIX matFinal = ViewCamera.ViewMatrix;
 		pgmCbuffer.matWVP = matFinal;
 
 		context->UpdateSubresource(pgmShader->constantbuffer.Get(), 0, 0, &pgmCbuffer, 0, 0);
@@ -220,8 +221,8 @@ namespace Renderer
 		context->IASetVertexBuffers(0, 1, streamOutVertexBuffer.GetAddressOf(), &stride, &offset);
 
 		// set the primitive topology
-		//context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
+		//context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
 		// update the constant buffers with relevant info for PGM (camera & surface info)
 		DefaultCBuffer rasterizationCbuffer;
@@ -260,7 +261,7 @@ namespace Renderer
 				float x, y, z;
 				x = (float)(i) / (float)(numGridPointsX - 1)*2.0f - 1.0f;
 				y = (float)(j) / (float)(numGridPointsY - 1)*2.0f - 1.0f;
-				z = 0.0f;
+				z = 2.0f;
 				PGM::GridVertex v = { x, y, z, 1 };
 				OurVertices.push_back(v);
 				OurIndices.push_back(index++);
