@@ -35,7 +35,7 @@ namespace Renderer
 		pgmShader->Initialize();
 		
 		rasterizationShader = std::make_unique<Shader>(deviceResources, "PGMVertexShader.cso", "PGMPixelShader.cso");
-		rasterizationShader->SetInputDescriptor(pgmRasterizationIED, 2);
+		rasterizationShader->SetInputDescriptor(pgmRasterizationIED, 1);
 		rasterizationShader->Initialize();
 
 
@@ -49,29 +49,21 @@ namespace Renderer
 			GSFile->Data, 
 			GSFile->Length,
 			gridPointSOIED,
-			2,
+			1,
 			NULL,
 			0,
-			0,
+			D3D11_SO_NO_RASTERIZED_STREAM,
 			NULL,
 			pgmShader->geometryshader.GetAddressOf()
 			);
 		
 		// create the vertex buffer for stream out between PGM projection and rasterization stages
-		D3D11_BUFFER_DESC vertexBD =
-		{
-			numGridPointsX * numGridPointsY * 4 * 4,  // 4 bytes per channel, 4 channels per vertex
-			D3D11_USAGE_DEFAULT,
-			D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_STREAM_OUTPUT,
-			0,
-			0,
-			0
-		};
-		//vertexBD.Usage = D3D11_USAGE_DEFAULT;
-		//vertexBD.ByteWidth = numGridPointsX * numGridPointsY;
-		//vertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_STREAM_OUTPUT;
-		//vertexBD.CPUAccessFlags = 0;
-		//vertexBD.MiscFlags = 0;
+		D3D11_BUFFER_DESC vertexBD;
+		vertexBD.Usage = D3D11_USAGE_DEFAULT;
+		vertexBD.ByteWidth = numGridPointsX * numGridPointsY * 4 * 4 * 1;
+		vertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_STREAM_OUTPUT;
+		vertexBD.CPUAccessFlags = 0;
+		vertexBD.MiscFlags = 0;
 		
 		ThrowIfFailed(
 			deviceResources->GetD3DDevice()->CreateBuffer(&vertexBD, nullptr, &streamOutVertexBuffer)
@@ -199,7 +191,8 @@ namespace Renderer
 		// update the constant buffers with relevant info for PGM (camera & surface info)
 		DefaultCBuffer pgmCbuffer;
 		pgmCbuffer.CameraPosition = SamplingCamera.Position;
-		pgmCbuffer.ViewVector = SamplingCamera.View; 
+		pgmCbuffer.ViewVector = SamplingCamera.View;
+		pgmCbuffer.matWVP = matFinal;
 		context->UpdateSubresource(pgmShader->constantbuffer.Get(), 0, 0, &pgmCbuffer, 0, 0);
 
 		// invoke the shader code for raycasting PGM
@@ -269,7 +262,7 @@ namespace Renderer
 				x = (float)(i) / (float)(numGridPointsX - 1)*2.0f - 1.0f;
 				y = (float)(j) / (float)(numGridPointsY - 1)*2.0f - 1.0f;
 				z = 0.0f;
-				PGM::GridVertex v = { x, y, z };
+				PGM::GridVertex v = { x, y, z, 1 };
 				OurVertices.push_back(v);
 				OurIndices.push_back(index++);
 			}

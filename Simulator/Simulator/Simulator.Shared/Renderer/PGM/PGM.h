@@ -12,7 +12,7 @@ namespace Renderer
 	{
 	public:
 		struct GridVertex {
-			float x, y, z;
+			float x, y, z, w;
 		};
 		struct SOVertex {
 			float x, y, z, w;
