@@ -43,8 +43,14 @@ namespace Engine
 		mInput->Initialize();
 
 		mInput->AddInput(
-			"UpdatePGM",
+			"setUpdatePGM",
 			Windows::System::VirtualKey::U,
+			Input::ValueTypes::FLOAT,
+			1.0
+			);
+		mInput->AddInput(
+			"unsetUpdatePGM",
+			Windows::System::VirtualKey::O,
 			Input::ValueTypes::FLOAT,
 			1.0
 			);
@@ -248,11 +254,15 @@ namespace Engine
 
 		mInput->Update();
 
-		bool updatePGM = mRenderer->GetUpdatePGM();
-		bool changePGM = (bool)(mInput->GetInput("UpdatePGM").fval);
-		if (changePGM)
+		bool setUpdatePGM = (bool)(mInput->GetInput("setUpdatePGM").fval);
+		if (setUpdatePGM)
 		{
-			mRenderer->SetUpdatePGM(!updatePGM);
+			mRenderer->SetUpdatePGM(true);
+		}
+		bool unsetUpdatePGM = (bool)(mInput->GetInput("unsetUpdatePGM").fval);
+		if (unsetUpdatePGM)
+		{
+			mRenderer->SetUpdatePGM(false);
 		}
 		int pgmx = mRenderer->pgm.GetGridPointXSize();
 		int pgmy = mRenderer->pgm.GetGridPointYSize();
