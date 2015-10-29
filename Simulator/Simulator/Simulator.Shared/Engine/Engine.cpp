@@ -250,7 +250,7 @@ namespace Engine
 
 	void Engine::Update()
 	{
-		SimulationTime += 0.05;
+		//SimulationTime += 0.05;
 
 		mInput->Update();
 
