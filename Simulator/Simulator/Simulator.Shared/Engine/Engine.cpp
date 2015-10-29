@@ -48,6 +48,30 @@ namespace Engine
 			Input::ValueTypes::FLOAT,
 			1.0
 			);
+		mInput->AddInput(
+			"IncreasePGMX",
+			Windows::System::VirtualKey::L,
+			Input::ValueTypes::FLOAT,
+			1.0
+			);
+		mInput->AddInput(
+			"DecreasePGMX",
+			Windows::System::VirtualKey::J,
+			Input::ValueTypes::FLOAT,
+			1.0
+			);
+		mInput->AddInput(
+			"IncreasePGMY",
+			Windows::System::VirtualKey::I,
+			Input::ValueTypes::FLOAT,
+			1.0
+			);
+		mInput->AddInput(
+			"DecreasePGMY",
+			Windows::System::VirtualKey::K,
+			Input::ValueTypes::FLOAT,
+			1.0
+			);
 
 		// Maybe have these in an initialization file?
 		float movementSpeed = 0.1f;
@@ -77,6 +101,18 @@ namespace Engine
 			movementSpeed
 			);
 
+		mInput->AddInput(
+			"RotateLeft",
+			Windows::System::VirtualKey::Q,
+			Input::ValueTypes::FLOAT,
+			roatationSpeed
+			);
+		mInput->AddInput(
+			"RotateRight",
+			Windows::System::VirtualKey::E,
+			Input::ValueTypes::FLOAT,
+			roatationSpeed
+			);
 		mInput->AddInput(
 			"YawRight",
 			Windows::System::VirtualKey::Right,
@@ -218,6 +254,33 @@ namespace Engine
 		{
 			mRenderer->SetUpdatePGM(!updatePGM);
 		}
+		int pgmx = mRenderer->pgm.GetGridPointXSize();
+		int pgmy = mRenderer->pgm.GetGridPointYSize();
+		bool increasePGMX = (bool)(mInput->GetInput("IncreasePGMX").fval);
+		bool decreasePGMX = (bool)(mInput->GetInput("DecreasePGMX").fval);
+		bool increasePGMY = (bool)(mInput->GetInput("IncreasePGMY").fval);
+		bool decreasePGMY = (bool)(mInput->GetInput("DecreasePGMY").fval);
+		if (increasePGMX)
+			pgmx++;
+		if (decreasePGMX)
+			pgmx--;
+		if (increasePGMY)
+			pgmy++;
+		if (decreasePGMY)
+			pgmy--;
+		bool makeNewGridPoints = false;
+		if (pgmx != mRenderer->pgm.GetGridPointXSize())
+		{
+			mRenderer->pgm.SetGridPointXSize(pgmx);
+			makeNewGridPoints = true;
+		}
+		if (pgmy != mRenderer->pgm.GetGridPointYSize())
+		{
+			mRenderer->pgm.SetGridPointYSize(pgmy);
+			makeNewGridPoints = true;
+		}
+		if (makeNewGridPoints)
+			mRenderer->pgm.MakeGridPoints();
 
 		float walk = 0;
 		walk += mInput->GetInput("WalkForward").fval;
@@ -231,11 +294,15 @@ namespace Engine
 		float yaw = 0;
 		yaw += mInput->GetInput("YawRight").fval;
 		yaw -= mInput->GetInput("YawLeft").fval;
+		float rotate = 0;
+		rotate += mInput->GetInput("RotateLeft").fval;
+		rotate -= mInput->GetInput("RotateRight").fval;
 
 		mRenderer->GetCameraPtr()->Pitch(pitch);
 		mRenderer->GetCameraPtr()->Yaw(yaw);
 		mRenderer->GetCameraPtr()->Walk(walk);
 		mRenderer->GetCameraPtr()->Strafe(strafe);
+		mRenderer->GetCameraPtr()->Roll(rotate);
 
 		float s1, s2, s3, s4;
 		s1 = mInput->GetInput("split1").fval;

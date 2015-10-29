@@ -32,6 +32,10 @@ namespace Renderer
 		// need interface here to get the grid points for rendering
 		//   -- should probably try to get this done in tessellator stage if possible
 		virtual void MakeGridPoints();
+		virtual void SetGridPointXSize(int xsize);
+		virtual void SetGridPointYSize(int ysize);
+		virtual int GetGridPointXSize();
+		virtual int GetGridPointYSize();
 		// need interface here to get/apply shaders
 		// should this class handle the deferred rendering
 

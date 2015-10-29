@@ -20,16 +20,7 @@ namespace Renderer
 	}
 
 	bool PGM::Initialize()
-	{
-		// THIS IS JUST FOR TESTING
-		primaryRadius = 1.0f;
-		sphereWorldPos = Base::Math::VectorInit({ 0.0f, 0.0f, 0.0f });
-		numGridPointsX = 16;
-		numGridPointsY = 16;
-
-		MakeGridPoints();
-		// END JUST FOR TESTING
-		
+	{		
 		pgmShader = std::make_unique<Shader>(deviceResources, "PGMPassThroughVertexShader.cso", "PGMPixelShader.cso", "PGMGeometryShader.cso");
 		pgmShader->SetInputDescriptor(gridPointIED, 1);
 		pgmShader->Initialize();
@@ -56,18 +47,15 @@ namespace Renderer
 			NULL,
 			pgmShader->geometryshader.GetAddressOf()
 			);
-		
-		// create the vertex buffer for stream out between PGM projection and rasterization stages
-		D3D11_BUFFER_DESC vertexBD;
-		vertexBD.Usage = D3D11_USAGE_DEFAULT;
-		vertexBD.ByteWidth = numGridPointsX * numGridPointsY * 4 * 4 * 1;
-		vertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_STREAM_OUTPUT;
-		vertexBD.CPUAccessFlags = 0;
-		vertexBD.MiscFlags = 0;
-		
-		ThrowIfFailed(
-			deviceResources->GetD3DDevice()->CreateBuffer(&vertexBD, nullptr, &streamOutVertexBuffer)
-			);
+
+		// THIS IS JUST FOR TESTING
+		primaryRadius = 1.0f;
+		sphereWorldPos = Base::Math::VectorInit({ 0.0f, 0.0f, 0.0f });
+		numGridPointsX = 16;
+		numGridPointsY = 16;
+
+		MakeGridPoints();
+		// END JUST FOR TESTING
 
 		return true;
 	}
@@ -167,6 +155,7 @@ namespace Renderer
 		UINT offset = 0;
 		// set the vertex buffer (grid points)
 		context->IASetVertexBuffers(0, 1, gridvertexbuffer.GetAddressOf(), &stride, &offset);
+		context->IASetIndexBuffer(gridindexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// set the stream-out buffer for output from Geometry Shader
 		context->SOSetTargets(1,streamOutVertexBuffer.GetAddressOf(),&offset);
@@ -242,6 +231,26 @@ namespace Renderer
 		rasterizationShader->Disable();
 	}
 
+	int PGM::GetGridPointXSize()
+	{
+		return numGridPointsX;
+	}
+
+	int PGM::GetGridPointYSize()
+	{
+		return numGridPointsY;
+	}
+
+	void PGM::SetGridPointXSize(int xsize)
+	{
+		numGridPointsX = xsize > 0 ? xsize : 1;
+	}
+
+	void PGM::SetGridPointYSize(int ysize)
+	{
+		numGridPointsY = ysize > 0 ? ysize : 1;
+	}
+
 	void PGM::MakeGridPoints()
 	{
 		numIndices = numGridPointsX * numGridPointsY;
@@ -285,6 +294,19 @@ namespace Renderer
 
 		ThrowIfFailed(
 			deviceResources->GetD3DDevice()->CreateBuffer(&indexBD, &indexSRD, &gridindexbuffer)
+			);
+
+
+		// create the vertex buffer for stream out between PGM projection and rasterization stages
+		D3D11_BUFFER_DESC SOvertexBD;
+		SOvertexBD.Usage = D3D11_USAGE_DEFAULT;
+		SOvertexBD.ByteWidth = numGridPointsX * numGridPointsY * 4 * 4 * 1;
+		SOvertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_STREAM_OUTPUT;
+		SOvertexBD.CPUAccessFlags = 0;
+		SOvertexBD.MiscFlags = 0;
+
+		ThrowIfFailed(
+			deviceResources->GetD3DDevice()->CreateBuffer(&SOvertexBD, nullptr, &streamOutVertexBuffer)
 			);
 	}
 

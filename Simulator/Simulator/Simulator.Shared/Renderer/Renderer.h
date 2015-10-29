@@ -49,6 +49,7 @@ namespace Renderer
 		virtual void OnOrientationChanged(Windows::Graphics::Display::DisplayInformation^ Sender, Platform::Object^ Args);
 #endif
 
+		PGM pgm;
 		void SetUpdatePGM(Platform::Boolean update);
 		Platform::Boolean GetUpdatePGM();
 
@@ -73,7 +74,6 @@ namespace Renderer
 	private:
 		void InitStates();								// For initializing the rasterizer etc. states.
 
-		PGM pgm;
 		bool updatePGM;
 
 		Camera camera;									// Camera used to render the scene
