@@ -161,7 +161,8 @@ namespace Renderer
 		context->SOSetTargets(1,streamOutVertexBuffer.GetAddressOf(),&offset);
 
 		// set the primitive topology
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+		//context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		// update the constant buffers with relevant info for PGM (camera & surface info)
 		DefaultCBuffer pgmCbuffer;
@@ -204,10 +205,11 @@ namespace Renderer
 		UINT offset = 0;
 		// set the vertex buffer to the stream out buffer from the previous stage
 		context->IASetVertexBuffers(0, 1, streamOutVertexBuffer.GetAddressOf(), &stride, &offset);
+		context->IASetIndexBuffer(gridindexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// set the primitive topology
 		//context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 		// update the constant buffers with relevant info for PGM (camera & surface info)
 		DefaultCBuffer rasterizationCbuffer;
@@ -258,9 +260,9 @@ namespace Renderer
 		std::vector<UINT> OurIndices;
 		int index = 0;
 		// need to set up verts & inds based on grid
-		for (int i = 0; i < numGridPointsX; i++)
+		for (int j = 0; j < numGridPointsY; j++)
 		{
-			for (int j = 0; j < numGridPointsY; j++)
+			for (int i = 0; i < numGridPointsX; i++)
 			{
 				float x, y, z;
 				x = (float)(i) / (float)(numGridPointsX - 1)*2.0f - 1.0f;
@@ -268,7 +270,20 @@ namespace Renderer
 				z = 2.0f;
 				PGM::GridVertex v = { x, y, z, 1 };
 				OurVertices.push_back(v);
-				OurIndices.push_back(index++);
+			}
+		}
+
+		for (int j = 0; j < numGridPointsY - 1; j++)
+		{
+			for (int i = 0; i < numGridPointsX - 1; i++)
+			{
+				int startingIndex = i + numGridPointsX*j;
+				OurIndices.push_back(startingIndex);
+				OurIndices.push_back(startingIndex + 1);
+				OurIndices.push_back(startingIndex + numGridPointsX);
+				OurIndices.push_back(startingIndex + numGridPointsX);
+				OurIndices.push_back(startingIndex + 1);
+				OurIndices.push_back(startingIndex + numGridPointsX + 1);
 			}
 		}
 		
