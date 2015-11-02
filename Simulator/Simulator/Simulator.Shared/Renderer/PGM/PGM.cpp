@@ -161,7 +161,6 @@ namespace Renderer
 		context->SOSetTargets(1,streamOutVertexBuffer.GetAddressOf(),&offset);
 
 		// set the primitive topology
-		//context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		// update the constant buffers with relevant info for PGM (camera & surface info)
@@ -201,16 +200,13 @@ namespace Renderer
 		//	* send main camera info & transform from sampling to main camera
 		//	* set stream out vertex buffer (from PGM stage) to IA stage
 
-		//UINT stride = sizeof(PGM::SOVertex);
-		UINT stride = sizeof(PGM::GridVertex);
+		UINT stride = sizeof(PGM::SOVertex);
 		UINT offset = 0;
 		// set the vertex buffer to the stream out buffer from the previous stage
-		//context->IASetVertexBuffers(0, 1, streamOutVertexBuffer.GetAddressOf(), &stride, &offset);
-		context->IASetVertexBuffers(0, 1, gridvertexbuffer.GetAddressOf(), &stride, &offset);
+		context->IASetVertexBuffers(0, 1, streamOutVertexBuffer.GetAddressOf(), &stride, &offset);
 		context->IASetIndexBuffer(gridindexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// set the primitive topology
-		//context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		// update the constant buffers with relevant info for PGM (camera & surface info)

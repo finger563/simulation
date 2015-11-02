@@ -172,7 +172,7 @@ namespace Renderer
 	void Renderer::Render()
 	{
 		pgm.Render();
-#if 1
+
 		shader->Apply();
 
 		auto context = deviceResources->GetD3DDeviceContext();
@@ -214,7 +214,7 @@ namespace Renderer
 		context->DrawIndexed(numIndices, 0, 0);
 
 		shader->Disable();
-#endif
+
 		return;
 	}
 
