@@ -201,15 +201,17 @@ namespace Renderer
 		//	* send main camera info & transform from sampling to main camera
 		//	* set stream out vertex buffer (from PGM stage) to IA stage
 
-		UINT stride = sizeof(PGM::SOVertex);
+		//UINT stride = sizeof(PGM::SOVertex);
+		UINT stride = sizeof(PGM::GridVertex);
 		UINT offset = 0;
 		// set the vertex buffer to the stream out buffer from the previous stage
-		context->IASetVertexBuffers(0, 1, streamOutVertexBuffer.GetAddressOf(), &stride, &offset);
+		//context->IASetVertexBuffers(0, 1, streamOutVertexBuffer.GetAddressOf(), &stride, &offset);
+		context->IASetVertexBuffers(0, 1, gridvertexbuffer.GetAddressOf(), &stride, &offset);
 		context->IASetIndexBuffer(gridindexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// set the primitive topology
 		//context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		// update the constant buffers with relevant info for PGM (camera & surface info)
 		DefaultCBuffer rasterizationCbuffer;
@@ -228,7 +230,8 @@ namespace Renderer
 		context->UpdateSubresource(rasterizationShader->constantbuffer.Get(), 0, 0, &rasterizationCbuffer, 0, 0);
 
 		// Draw the vertices created from the stream-out stage
-		context->DrawAuto();
+		//context->DrawAuto();
+		context->DrawIndexed(numIndices,0,0);
 
 		rasterizationShader->Disable();
 	}
@@ -255,7 +258,6 @@ namespace Renderer
 
 	void PGM::MakeGridPoints()
 	{
-		numIndices = numGridPointsX * numGridPointsY;
 		std::vector<PGM::GridVertex> OurVertices;
 		std::vector<UINT> OurIndices;
 		int index = 0;
@@ -277,19 +279,22 @@ namespace Renderer
 		{
 			for (int i = 0; i < numGridPointsX - 1; i++)
 			{
+				// upper triangle
 				int startingIndex = i + numGridPointsX*j;
 				OurIndices.push_back(startingIndex);
-				OurIndices.push_back(startingIndex + 1);
-				OurIndices.push_back(startingIndex + numGridPointsX);
 				OurIndices.push_back(startingIndex + numGridPointsX);
 				OurIndices.push_back(startingIndex + 1);
+				// lower triangle
+				OurIndices.push_back(startingIndex + 1);
+				OurIndices.push_back(startingIndex + numGridPointsX);
 				OurIndices.push_back(startingIndex + numGridPointsX + 1);
 			}
 		}
+		numIndices = OurIndices.size();
 		
 		// create the vertex buffer
 		D3D11_BUFFER_DESC vertexBD = { 0 };
-		vertexBD.ByteWidth = sizeof(PGM::GridVertex) * numIndices;
+		vertexBD.ByteWidth = sizeof(PGM::GridVertex) * OurVertices.size();
 		vertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
 		D3D11_SUBRESOURCE_DATA vertexSRD = { OurVertices.data(), 0, 0 };
