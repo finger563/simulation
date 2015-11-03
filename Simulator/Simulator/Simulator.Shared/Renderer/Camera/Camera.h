@@ -16,6 +16,7 @@ namespace Renderer
 	public:
 		struct FrustumVertex {
 			float x, y, z, w;
+			float nx, ny, nz, nw;
 		};
 
 		XMVECTOR Position;

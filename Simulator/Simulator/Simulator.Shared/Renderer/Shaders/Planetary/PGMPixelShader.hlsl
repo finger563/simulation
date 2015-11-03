@@ -30,5 +30,6 @@ float4 main(GSOutput pin) : SV_TARGET
 	color = float4(1.0f, 1.0f, 1.0f, 1.0f);
 	return color;
 	*/
+	return pin.normal;
 	return float4(1.0f, 1.0f, 1.0f, 1.0f);
 }

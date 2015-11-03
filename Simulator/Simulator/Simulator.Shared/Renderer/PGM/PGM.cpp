@@ -276,7 +276,7 @@ namespace Renderer
 				float x, y, z;
 				x = (float)(i) / (float)(numGridPointsX - 1)*2.0f - 1.0f;
 				y = (float)(j) / (float)(numGridPointsY - 1)*2.0f - 1.0f;
-				z = 2.0f;
+				z = 1.0f;
 				PGM::GridVertex v = { x, y, z, 1 };
 				OurVertices.push_back(v);
 			}

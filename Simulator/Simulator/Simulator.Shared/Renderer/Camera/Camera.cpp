@@ -183,7 +183,10 @@ namespace Renderer
 		Base::Math::VectorGet(BottomLeft, &y, 1);
 		Base::Math::VectorGet(BottomLeft, &z, 2);
 		float fscale = 10.0;
-		Camera::FrustumVertex blv = { x * fscale + px, y * fscale + py, z * fscale + pz, 1 };
+		Camera::FrustumVertex blv = { 
+			x * fscale + px, y * fscale + py, z * fscale + pz, 1,
+			1, 0, 0, 1
+		};
 		OurVertices.push_back(blv);
 		OurIndices.push_back(index++);
 		for (int i = 0; i < corners.size(); i++)
@@ -192,13 +195,19 @@ namespace Renderer
 			Base::Math::VectorGet(corner, &x, 0);
 			Base::Math::VectorGet(corner, &y, 1);
 			Base::Math::VectorGet(corner, &z, 2);
-			Camera::FrustumVertex v = { x*fscale+px, y*fscale+py, z*fscale+pz, 1 };
+			Camera::FrustumVertex v = { 
+				x*fscale+px, y*fscale+py, z*fscale+pz, 1,
+				1, 0, 0, 1
+			};
 			OurVertices.push_back(v);
 			OurIndices.push_back(index++);
 			OurVertices.push_back(v);
 			OurIndices.push_back(index++);
 
-			Camera::FrustumVertex v2 = { px, py, pz, 1 };
+			Camera::FrustumVertex v2 = { 
+				px, py, pz, 1,
+				1, 0, 0, 1
+			};
 			OurVertices.push_back(v2);
 			OurIndices.push_back(index++);
 			OurVertices.push_back(v);
