@@ -171,27 +171,41 @@ namespace Renderer
 		std::vector<XMVECTOR> corners;
 		corners.push_back(TopLeft);
 		corners.push_back(TopRight);
-		corners.push_back(BottomLeft);
 		corners.push_back(BottomRight);
+		corners.push_back(BottomLeft);
 		float px, py, pz;
 		Base::Math::VectorGet(Position, &px, 0);
 		Base::Math::VectorGet(Position, &py, 1);
 		Base::Math::VectorGet(Position, &pz, 2);
+
+		float x, y, z;
+		Base::Math::VectorGet(BottomLeft, &x, 0);
+		Base::Math::VectorGet(BottomLeft, &y, 1);
+		Base::Math::VectorGet(BottomLeft, &z, 2);
+		float fscale = 10.0;
+		Camera::FrustumVertex blv = { x * fscale + px, y * fscale + py, z * fscale + pz, 1 };
+		OurVertices.push_back(blv);
+		OurIndices.push_back(index++);
 		for (int i = 0; i < corners.size(); i++)
 		{
-			float x, y, z;
 			XMVECTOR corner = corners[i];
 			Base::Math::VectorGet(corner, &x, 0);
 			Base::Math::VectorGet(corner, &y, 1);
 			Base::Math::VectorGet(corner, &z, 2);
-			Camera::FrustumVertex v = { x*100+px, y*100+py, z*100+pz, 1 };
+			Camera::FrustumVertex v = { x*fscale+px, y*fscale+py, z*fscale+pz, 1 };
+			OurVertices.push_back(v);
+			OurIndices.push_back(index++);
 			OurVertices.push_back(v);
 			OurIndices.push_back(index++);
 
 			Camera::FrustumVertex v2 = { px, py, pz, 1 };
 			OurVertices.push_back(v2);
 			OurIndices.push_back(index++);
+			OurVertices.push_back(v);
+			OurIndices.push_back(index++);
 		}
+		OurIndices.pop_back();
+		OurVertices.pop_back();
 		numIndices = OurIndices.size();
 
 		// create the vertex buffer
