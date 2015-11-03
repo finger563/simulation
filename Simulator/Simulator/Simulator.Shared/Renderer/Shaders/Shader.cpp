@@ -17,7 +17,7 @@ hsFileName(""),
 dsFileName(""),
 numDescriptors(0)
 {
-	SetInputDescriptor(defaultIED, 2);
+	SetInputDescriptor(defaultIED, sizeof(defaultIED) / sizeof(D3D11_INPUT_ELEMENT_DESC));
 	vertexshader = nullptr;
 	pixelshader = nullptr;
 	geometryshader = nullptr;

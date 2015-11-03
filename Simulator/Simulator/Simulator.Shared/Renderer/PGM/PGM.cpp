@@ -22,11 +22,11 @@ namespace Renderer
 	bool PGM::Initialize()
 	{		
 		pgmShader = std::make_unique<Shader>(deviceResources, "PGMPassThroughVertexShader.cso", "PGMPixelShader.cso", "PGMGeometryShader.cso");
-		pgmShader->SetInputDescriptor(gridPointIED, 1);
+		pgmShader->SetInputDescriptor(gridPointIED, sizeof(gridPointIED) / sizeof(D3D11_INPUT_ELEMENT_DESC));
 		pgmShader->Initialize(sizeof(DefaultCBuffer));
 		
 		rasterizationShader = std::make_unique<Shader>(deviceResources, "PGMVertexShader.cso", "PGMPixelShader.cso");
-		rasterizationShader->SetInputDescriptor(pgmRasterizationIED, 1);
+		rasterizationShader->SetInputDescriptor(pgmRasterizationIED, sizeof(pgmRasterizationIED) / sizeof(D3D11_INPUT_ELEMENT_DESC));
 		rasterizationShader->Initialize(sizeof(DefaultCBuffer));
 
 
@@ -40,7 +40,7 @@ namespace Renderer
 			GSFile->Data, 
 			GSFile->Length,
 			gridPointSOIED,
-			1,
+			sizeof(gridPointSOIED) / sizeof(D3D11_SO_DECLARATION_ENTRY),
 			NULL,
 			0,
 			D3D11_SO_NO_RASTERIZED_STREAM, // to not pass SO to pixelshader
