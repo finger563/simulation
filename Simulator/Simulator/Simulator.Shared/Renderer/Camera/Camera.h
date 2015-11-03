@@ -4,7 +4,9 @@
 
 #include "Base\Math\Vector.h"
 #include "..\Device Resources\DeviceResources.h"
+#include "..\Helper.h"
 
+using namespace Microsoft::WRL;
 using namespace DirectX;
 
 namespace Renderer
