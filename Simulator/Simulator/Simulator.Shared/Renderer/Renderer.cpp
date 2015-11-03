@@ -68,7 +68,7 @@ namespace Renderer
 	{
 		Size outputSize = deviceResources->GetOutputSize();
 		float aspectRatio = outputSize.Width / outputSize.Height;
-		float fovAngleY = 70.0f * XM_PI / 180.0f;
+		float fovAngleY = 20.0f;
 
 		// This is a simple example of change that can be made when the app is in
 		// portrait or snapped view.
@@ -76,6 +76,10 @@ namespace Renderer
 		{
 			fovAngleY *= 2.0f;
 		}
+
+		camera.Aspect = aspectRatio;
+		camera.FoVY = fovAngleY;
+		camera.UpdateMatrices();
 
 		// Note that the OrientationTransform3D matrix is post-multiplied here
 		// in order to correctly orient the scene to match the display orientation.
@@ -86,6 +90,7 @@ namespace Renderer
 		XMFLOAT4X4 orientation = deviceResources->GetOrientationTransform3D();
 
 		camera.OrientMatrix = XMLoadFloat4x4(&orientation);
+		pgm.CreateWindowSizeDependentResources();
 	}
 
 	void Renderer::InitStates()
@@ -230,6 +235,9 @@ namespace Renderer
 			NearPlane,
 			FarPlane
 			);
+		pgm.SetViewCamera(camera);
+		pgm.SetSamplingCamera(camera);
+		pgm.CreateWindowSizeDependentResources();
 	}
 	
 	void Renderer::SetObjectsInScene(std::vector<Base::Objects::GameObject>* _objects)

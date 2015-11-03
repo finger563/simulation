@@ -54,7 +54,6 @@ namespace Renderer
 		numGridPointsX = 16;
 		numGridPointsY = 16;
 
-		MakeGridPoints();
 		// END JUST FOR TESTING
 
 		return true;
@@ -80,7 +79,7 @@ namespace Renderer
 	{
 		Size outputSize = deviceResources->GetOutputSize();
 		float aspectRatio = outputSize.Width / outputSize.Height;
-		float fovAngleY = 70.0f * XM_PI / 180.0f;
+		float fovAngleY = 20.0f;
 
 		// This is a simple example of change that can be made when the app is in
 		// portrait or snapped view.
@@ -89,8 +88,12 @@ namespace Renderer
 			fovAngleY *= 2.0f;
 		}
 
+		SamplingCamera.Aspect = aspectRatio;
 		SamplingCamera.FoVY = fovAngleY;
+		ViewCamera.Aspect = aspectRatio;
 		ViewCamera.FoVY = fovAngleY;
+		ViewCamera.UpdateMatrices();
+		SamplingCamera.UpdateMatrices();
 
 		// Note that the OrientationTransform3D matrix is post-multiplied here
 		// in order to correctly orient the scene to match the display orientation.
@@ -265,6 +268,10 @@ namespace Renderer
 
 	void PGM::MakeGridPoints()
 	{
+
+		float FoVX = SamplingCamera.FoVY * 1 / SamplingCamera.Aspect;  // aspect = x/y
+		float width = SamplingCamera.NearPlane * tan(SamplingCamera.FoVY);
+		float height = SamplingCamera.NearPlane * tan(FoVX);
 		std::vector<PGM::GridVertex> OurVertices;
 		std::vector<UINT> OurIndices;
 		int index = 0;
@@ -274,9 +281,9 @@ namespace Renderer
 			for (int i = 0; i < numGridPointsX; i++)
 			{
 				float x, y, z;
-				x = (float)(i) / (float)(numGridPointsX - 1)*2.0f - 1.0f;
-				y = (float)(j) / (float)(numGridPointsY - 1)*2.0f - 1.0f;
-				z = 1.0f;
+				x = (float)(i) / (float)(numGridPointsX - 1)*width - width/2.0;
+				y = (float)(j) / (float)(numGridPointsY - 1)*height - height/2.0;
+				z = SamplingCamera.NearPlane;
 				PGM::GridVertex v = { x, y, z, 1 };
 				OurVertices.push_back(v);
 			}
