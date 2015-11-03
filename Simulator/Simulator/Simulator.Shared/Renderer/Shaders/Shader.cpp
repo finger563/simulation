@@ -66,7 +66,7 @@ void Shader::SetInputDescriptor(D3D11_INPUT_ELEMENT_DESC pElemDesc[], int numDes
 	}
 }
 
-void Shader::Initialize()
+void Shader::Initialize(int cb_bytewidth)
 {
 	// load the shader files
 	Platform::Array<byte>^ VSFile;
@@ -110,7 +110,7 @@ void Shader::Initialize()
 
 	bd.Usage = D3D11_USAGE_DEFAULT;
 	// THIS NEEDS TO BE CHANGED PER SHADER, SINCE SHADERS MAY HAVE DIFFERENT CBUFFERS
-	bd.ByteWidth = sizeof(DefaultCBuffer);		// must always be a multiple of 16 bytes
+	bd.ByteWidth = cb_bytewidth;		// must always be a multiple of 16 bytes
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
 	// create the constant buffer

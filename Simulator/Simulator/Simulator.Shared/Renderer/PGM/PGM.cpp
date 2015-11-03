@@ -23,11 +23,11 @@ namespace Renderer
 	{		
 		pgmShader = std::make_unique<Shader>(deviceResources, "PGMPassThroughVertexShader.cso", "PGMPixelShader.cso", "PGMGeometryShader.cso");
 		pgmShader->SetInputDescriptor(gridPointIED, 1);
-		pgmShader->Initialize();
+		pgmShader->Initialize(sizeof(DefaultCBuffer));
 		
 		rasterizationShader = std::make_unique<Shader>(deviceResources, "PGMVertexShader.cso", "PGMPixelShader.cso");
 		rasterizationShader->SetInputDescriptor(pgmRasterizationIED, 1);
-		rasterizationShader->Initialize();
+		rasterizationShader->Initialize(sizeof(DefaultCBuffer));
 
 
 		// create the SO buffer to get data between PGM and rasterization stages

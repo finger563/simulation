@@ -59,7 +59,7 @@ namespace Renderer
 		
 		shader = std::make_unique<Shader>(deviceResources);
 
-		shader->Initialize();
+		shader->Initialize(sizeof(DefaultCBuffer));
 
 		return true;
 	}
@@ -332,6 +332,6 @@ namespace Renderer
 	// Notifies renderers that device resources may now be recreated.
 	void Renderer::CreateDeviceDependentResources()
 	{
-		shader->Initialize();
+		shader->Initialize(sizeof(DefaultCBuffer));
 	}
 }

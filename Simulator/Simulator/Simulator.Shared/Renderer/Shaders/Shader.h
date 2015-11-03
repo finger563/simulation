@@ -28,7 +28,7 @@ namespace Renderer
 		void SetInputDescriptor(std::initializer_list<D3D11_INPUT_ELEMENT_DESC> l);
 		void SetInputDescriptor(D3D11_INPUT_ELEMENT_DESC pElemDesc[], int numDesc);
 
-		void Initialize();
+		void Initialize(int cb_bytewidth);
 		void UnInitialize();
 		void Apply();
 		void Disable();
