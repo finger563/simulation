@@ -187,6 +187,8 @@ namespace Renderer
 		// clear stream out stage target from previous stage
 		ComPtr<ID3D11Buffer> bufferArray = { 0 };
 		context->SOSetTargets(1, bufferArray.GetAddressOf(), &offset);
+
+		SamplingCamera.MakeFrustumBuffers(deviceResources);
 	}
 
 	void PGM::Render()
@@ -228,6 +230,12 @@ namespace Renderer
 		// Draw the vertices created from the stream-out stage
 		//context->DrawAuto();
 		context->DrawIndexed(numIndices,0,0);
+
+		stride = sizeof(Camera::FrustumVertex);
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+		context->IASetVertexBuffers(0, 1, SamplingCamera.frustumvertexbuffer.GetAddressOf(), &stride, &offset);
+		context->IASetIndexBuffer(SamplingCamera.frustumindexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		context->DrawIndexed(SamplingCamera.numIndices, 0, 0);
 
 		rasterizationShader->Disable();
 	}

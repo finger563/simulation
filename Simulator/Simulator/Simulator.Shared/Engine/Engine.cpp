@@ -28,7 +28,7 @@ namespace Engine
 			Base::Math::VectorInit({ 0.0, 1.0, -5.0, 1.0 }),			// position
 			Base::Math::VectorInit({ 0.0, 0.0, 1.0, 1.0 }),				// view
 			Base::Math::VectorInit({ 0.0, 1.0, 0.0, 1.0 }),				// up
-			45.0f,														// FOVY
+			20.0f,														// FOVY
 			(float)(mWindow->Bounds.Width / mWindow->Bounds.Height),	// aspect ratio
 			1.0f,														// near plane
 			1000.0f														// far plane

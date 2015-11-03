@@ -2,6 +2,9 @@
 
 #include "pch.h"
 
+#include "Base\Math\Vector.h"
+#include "..\Device Resources\DeviceResources.h"
+
 using namespace DirectX;
 
 namespace Renderer
@@ -9,6 +12,10 @@ namespace Renderer
 	class Camera
 	{
 	public:
+		struct FrustumVertex {
+			float x, y, z, w;
+		};
+
 		XMVECTOR Position;
 		XMVECTOR View;
 		XMVECTOR Up;
@@ -56,5 +63,10 @@ namespace Renderer
 		void RotateAroundUp(float Angle);				// + = CW, - = CCW
 		void RotateAroundRight(float Angle);			// + = down, - = up
 		void RotateAroundView(float Angle);		
+
+		int numIndices;
+		ComPtr<ID3D11Buffer> frustumvertexbuffer;				// Dx11.2 GPU vertex buffer interface
+		ComPtr<ID3D11Buffer> frustumindexbuffer;				// Dx11.2 GPU index buffer interface
+		void MakeFrustumBuffers(std::shared_ptr<DeviceResources>& deviceResources);  // make vertex and index buffers for drawing frustum
 	};
 }
