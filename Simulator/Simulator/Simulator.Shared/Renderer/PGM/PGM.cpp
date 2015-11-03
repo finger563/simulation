@@ -21,7 +21,7 @@ namespace Renderer
 
 	bool PGM::Initialize()
 	{		
-		pgmShader = std::make_unique<Shader>(deviceResources, "PGMPassThroughVertexShader.cso", "PGMPixelShader.cso", "PGMGeometryShader.cso");
+		pgmShader = std::make_unique<Shader>(deviceResources, "PGMPassThroughVertexShader.cso", "", "PGMGeometryShader.cso");
 		pgmShader->SetInputDescriptor(gridPointIED, sizeof(gridPointIED) / sizeof(D3D11_INPUT_ELEMENT_DESC));
 		pgmShader->Initialize(sizeof(DefaultCBuffer));
 		
@@ -88,6 +88,9 @@ namespace Renderer
 		{
 			fovAngleY *= 2.0f;
 		}
+
+		SamplingCamera.FoVY = fovAngleY;
+		ViewCamera.FoVY = fovAngleY;
 
 		// Note that the OrientationTransform3D matrix is post-multiplied here
 		// in order to correctly orient the scene to match the display orientation.
@@ -206,10 +209,10 @@ namespace Renderer
 		UINT offset = 0;
 		// set the vertex buffer to the stream out buffer from the previous stage
 		context->IASetVertexBuffers(0, 1, streamOutVertexBuffer.GetAddressOf(), &stride, &offset);
-		context->IASetIndexBuffer(gridindexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		//context->IASetIndexBuffer(gridindexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// set the primitive topology
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
 		// update the constant buffers with relevant info for PGM (camera & surface info)
 		DefaultCBuffer rasterizationCbuffer;
@@ -228,8 +231,8 @@ namespace Renderer
 		context->UpdateSubresource(rasterizationShader->constantbuffer.Get(), 0, 0, &rasterizationCbuffer, 0, 0);
 
 		// Draw the vertices created from the stream-out stage
-		//context->DrawAuto();
-		context->DrawIndexed(numIndices,0,0);
+		context->DrawAuto();
+		//context->DrawIndexed(numIndices,0,0);
 
 		stride = sizeof(Camera::FrustumVertex);
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
@@ -324,7 +327,7 @@ namespace Renderer
 		// create the vertex buffer for stream out between PGM projection and rasterization stages
 		D3D11_BUFFER_DESC SOvertexBD;
 		SOvertexBD.Usage = D3D11_USAGE_DEFAULT;
-		SOvertexBD.ByteWidth = numGridPointsX * numGridPointsY * 4 * 4 * 1;
+		SOvertexBD.ByteWidth = sizeof(PGM::SOVertex) * numGridPointsX * numGridPointsY;
 		SOvertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_STREAM_OUTPUT;
 		SOvertexBD.CPUAccessFlags = 0;
 		SOvertexBD.MiscFlags = 0;

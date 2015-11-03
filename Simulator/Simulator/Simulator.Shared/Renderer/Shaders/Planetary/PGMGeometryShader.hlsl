@@ -9,7 +9,7 @@ void main(
 {
 	GSOutput element[3];
 	
-	//if (input[0].pos.y < cameraPos.y && input[1].pos.y < cameraPos.y && input[2].pos.y < cameraPos.y)
+	if (input[0].pos.y < cameraPos.y && input[1].pos.y < cameraPos.y && input[2].pos.y < cameraPos.y)
 	{
 		// raycast here from grid to surface
 
@@ -22,15 +22,11 @@ void main(
 		// calculate normal to surface here
 
 		//		simple test just uses plane normal
-		//element.normal = float4(0, 1, 0, 1);
-
+		element[0].normal = float4(0, 1, 0, 1);
+		element[1].normal = float4(0, 1, 0, 1);
+		element[2].normal = float4(0, 1, 0, 1);
+		
 		// Write to output
-		//output.Append(element);
-
-		// Write to output
-		//element[0].pos = input[0].pos;
-		//element[1].pos = input[1].pos;
-		//element[2].pos = input[2].pos;
 		output.Append(element[0]);
 		output.Append(element[1]);
 		output.Append(element[2]);
