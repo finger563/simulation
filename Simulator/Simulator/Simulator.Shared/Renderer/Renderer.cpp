@@ -68,7 +68,7 @@ namespace Renderer
 	{
 		Size outputSize = deviceResources->GetOutputSize();
 		float aspectRatio = outputSize.Width / outputSize.Height;
-		float fovAngleY = 20.0f;
+		float fovAngleY = 45.0f;
 
 		// This is a simple example of change that can be made when the app is in
 		// portrait or snapped view.
