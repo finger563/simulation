@@ -234,7 +234,6 @@ namespace Renderer
 
 		// Draw the vertices created from the stream-out stage
 		context->DrawAuto();
-		//context->DrawIndexed(numIndices,0,0);
 
 		stride = sizeof(Camera::FrustumVertex);
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
@@ -287,19 +286,22 @@ namespace Renderer
 			}
 		}
 
-		for (int j = 0; j < numGridPointsY - 1; j++)
+		for (int j = 0; j < numGridPointsY; j++)
 		{
-			for (int i = 0; i < numGridPointsX - 1; i++)
+			for (int i = 0; i < numGridPointsX; i++)
 			{
 				// upper triangle
-				int startingIndex = i + numGridPointsX*j;
-				OurIndices.push_back(startingIndex);
-				OurIndices.push_back(startingIndex + 1);
-				OurIndices.push_back(startingIndex + numGridPointsX);
+				int v0 = i + numGridPointsX*j;
+				int v1 = v0 + 1;
+				int v2 = v0 + numGridPointsX;
+				int v3 = v1 + numGridPointsX;
+				OurIndices.push_back(v0);
+				OurIndices.push_back(v1);
+				OurIndices.push_back(v2);
 				// lower triangle
-				OurIndices.push_back(startingIndex + numGridPointsX);
-				OurIndices.push_back(startingIndex + 1);
-				OurIndices.push_back(startingIndex + numGridPointsX + 1);
+				OurIndices.push_back(v2);
+				OurIndices.push_back(v1);
+				OurIndices.push_back(v3);
 			}
 		}
 		numIndices = OurIndices.size();
