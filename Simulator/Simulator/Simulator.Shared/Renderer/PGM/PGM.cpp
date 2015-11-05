@@ -181,7 +181,7 @@ namespace Renderer
 		context->UpdateSubresource(pgmShader->constantbuffer.Get(), 0, 0, &pgmCbuffer, 0, 0);
 
 		// invoke the shader code for raycasting PGM
-		context->Draw(numIndices, 0);
+		context->DrawIndexed(numIndices, 0, 0);
 
 		pgmShader->Disable();
 
@@ -216,7 +216,7 @@ namespace Renderer
 		//context->IASetIndexBuffer(gridindexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// set the primitive topology
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		// update the constant buffers with relevant info for PGM (camera & surface info)
 		DefaultCBuffer rasterizationCbuffer;

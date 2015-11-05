@@ -28,8 +28,8 @@ void main(
 		
 		// Write to output
 		output.Append(element[0]);
-		output.Append(element[1]);
 		output.Append(element[2]);
+		output.Append(element[1]);
 		output.RestartStrip();
 	}
 }
