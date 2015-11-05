@@ -136,12 +136,12 @@ namespace Renderer
 		//		output:
 		//		* rendered scene
 
-		D3D11_DEPTH_STENCIL_DESC dsd;
-		dsd.DepthEnable = FALSE;
-		dsd.StencilEnable = FALSE;
-		ComPtr<ID3D11DepthStencilState> dss;
-		deviceResources->GetD3DDevice()->CreateDepthStencilState(&dsd, dss.GetAddressOf());
-		context->OMSetDepthStencilState(dss.Get(), 0);
+		//D3D11_DEPTH_STENCIL_DESC dsd;
+		//dsd.DepthEnable = FALSE;
+		//dsd.StencilEnable = FALSE;
+		//ComPtr<ID3D11DepthStencilState> dss;
+		//deviceResources->GetD3DDevice()->CreateDepthStencilState(&dsd, dss.GetAddressOf());
+		//context->OMSetDepthStencilState(dss.Get(), 0);
 
 		pgmShader->Apply();
 		
@@ -185,10 +185,10 @@ namespace Renderer
 
 		pgmShader->Disable();
 
-		D3D11_DEPTH_STENCIL_DESC dsd2;
-		ComPtr<ID3D11DepthStencilState> dss2;
-		deviceResources->GetD3DDevice()->CreateDepthStencilState(&dsd2,dss2.GetAddressOf());
-		context->OMSetDepthStencilState(dss2.Get(),0);
+		//D3D11_DEPTH_STENCIL_DESC dsd2;
+		//ComPtr<ID3D11DepthStencilState> dss2;
+		//deviceResources->GetD3DDevice()->CreateDepthStencilState(&dsd2,dss2.GetAddressOf());
+		//context->OMSetDepthStencilState(dss2.Get(),0);
 
 		// clear stream out stage target from previous stage
 		ComPtr<ID3D11Buffer> bufferArray = { 0 };
@@ -212,6 +212,7 @@ namespace Renderer
 		UINT offset = 0;
 		// set the vertex buffer to the stream out buffer from the previous stage
 		context->IASetVertexBuffers(0, 1, streamOutVertexBuffer.GetAddressOf(), &stride, &offset);
+		//context->IASetIndexBuffer(NULL, DXGI_FORMAT_R32_UINT, 0);
 		//context->IASetIndexBuffer(gridindexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// set the primitive topology

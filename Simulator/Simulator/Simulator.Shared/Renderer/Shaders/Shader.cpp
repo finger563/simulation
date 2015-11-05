@@ -127,18 +127,11 @@ void Shader::Apply()
 	// set the input layout as the active input layout
 	deviceResources->GetD3DDeviceContext()->IASetInputLayout(inputlayout.Get());
 	// set the shader objects as the active shaders
-	if (vertexshader != nullptr)
-		deviceResources->GetD3DDeviceContext()->VSSetShader(vertexshader.Get(), nullptr, 0);
-	if (pixelshader != nullptr)
-		deviceResources->GetD3DDeviceContext()->PSSetShader(pixelshader.Get(), nullptr, 0);
-	else
-		deviceResources->GetD3DDeviceContext()->PSSetShader(nullptr, nullptr, 0);
-	if (geometryshader != nullptr)
-		deviceResources->GetD3DDeviceContext()->GSSetShader(geometryshader.Get(), nullptr, 0);
-	if (hullshader != nullptr)
-		deviceResources->GetD3DDeviceContext()->HSSetShader(hullshader.Get(), nullptr, 0);
-	if (domainshader != nullptr)
-		deviceResources->GetD3DDeviceContext()->DSSetShader(domainshader.Get(), nullptr, 0);
+	deviceResources->GetD3DDeviceContext()->VSSetShader(vertexshader.Get(), nullptr, 0);
+	deviceResources->GetD3DDeviceContext()->PSSetShader(pixelshader.Get(), nullptr, 0);
+	deviceResources->GetD3DDeviceContext()->GSSetShader(geometryshader.Get(), nullptr, 0);
+	deviceResources->GetD3DDeviceContext()->HSSetShader(hullshader.Get(), nullptr, 0);
+	deviceResources->GetD3DDeviceContext()->DSSetShader(domainshader.Get(), nullptr, 0);
 	// set the constant buffer for the active shaders
 	if (vertexshader != nullptr)
 		deviceResources->GetD3DDeviceContext()->VSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());

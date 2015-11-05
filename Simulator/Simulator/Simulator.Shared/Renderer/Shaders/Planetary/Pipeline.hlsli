@@ -15,12 +15,6 @@ struct GSOutput
 	float4 normal : NORMAL;
 };
 
-struct RastVertIn
-{
-	float4 pos : POSITION;
-	float4 normal : NORMAL;
-};
-
 struct RastVertOut
 {
 	float4 pos : SV_POSITION;
