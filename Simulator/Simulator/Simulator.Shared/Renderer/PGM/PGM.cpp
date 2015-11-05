@@ -49,12 +49,13 @@ namespace Renderer
 			pgmShader->geometryshader.GetAddressOf()
 			);
 
+		// initialize the number of grid points to use for the sampling camera
+		numGridPointsX = 64;
+		numGridPointsY = 64;
+
 		// THIS IS JUST FOR TESTING
 		primaryRadius = 1.0f;
 		sphereWorldPos = Base::Math::VectorInit({ 0.0f, 0.0f, 0.0f });
-		numGridPointsX = 32;
-		numGridPointsY = 32;
-
 		// END JUST FOR TESTING
 
 		return true;
@@ -113,6 +114,12 @@ namespace Renderer
 
 	void PGM::Update()
 	{
+		// Update the sampling camera here:
+		//  * with the view vector along the nadir
+		//  * and using the view camera's view vector to 
+		//    create the basis vector system for the sampling
+		//    camera
+
 		// compute ray-sphere intersection point & sphere intersection normal
 		//   gamma1 & gamma 2
 		//		* gamma1 = asin((d / r) sin w) - w : first intersection angle from nadir
@@ -334,7 +341,9 @@ namespace Renderer
 		// create the vertex buffer for stream out between PGM projection and rasterization stages
 		D3D11_BUFFER_DESC SOvertexBD;
 		SOvertexBD.Usage = D3D11_USAGE_DEFAULT;
-		SOvertexBD.ByteWidth = sizeof(PGM::SOVertex) * (int)OurVertices.size();
+		// Need to use indices here because GS will convert from TriangleList to TriangleStrip semantics,
+		//   where vertices are duplicated between adjacent triangles
+		SOvertexBD.ByteWidth = sizeof(PGM::SOVertex) * (int)OurIndices.size();
 		SOvertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_STREAM_OUTPUT;
 		SOvertexBD.CPUAccessFlags = 0;
 		SOvertexBD.MiscFlags = 0;

@@ -166,6 +166,8 @@ namespace Renderer
 		// clear the depth buffer
 		context->ClearDepthStencilView(deviceResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
+		//  JUST FOR TESTING:
+		//    would just send the view camera for generation and processing
 		pgm.SetViewCamera(camera);
 		if (updatePGM)
 		{
