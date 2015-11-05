@@ -136,7 +136,7 @@ namespace Renderer
 		//		output:
 		//		* rendered scene
 
-		//D3D11_DEPTH_STENCIL_DESC dsd;
+		//D3D11_DEPTH_STENCIL_DESC dsd = { 0 };
 		//dsd.DepthEnable = FALSE;
 		//dsd.StencilEnable = FALSE;
 		//ComPtr<ID3D11DepthStencilState> dss;
@@ -185,7 +185,7 @@ namespace Renderer
 
 		pgmShader->Disable();
 
-		//D3D11_DEPTH_STENCIL_DESC dsd2;
+		//D3D11_DEPTH_STENCIL_DESC dsd2 = { 0 };
 		//ComPtr<ID3D11DepthStencilState> dss2;
 		//deviceResources->GetD3DDevice()->CreateDepthStencilState(&dsd2,dss2.GetAddressOf());
 		//context->OMSetDepthStencilState(dss2.Get(),0);
@@ -286,15 +286,15 @@ namespace Renderer
 			}
 		}
 
-		for (int j = 0; j < numGridPointsY; j++)
+		for (int j = 0; j < numGridPointsY - 1; j++)
 		{
-			for (int i = 0; i < numGridPointsX; i++)
+			for (int i = 0; i < numGridPointsX - 1; i++)
 			{
 				// upper triangle
-				int v0 = i + numGridPointsX*j;
-				int v1 = v0 + 1;
-				int v2 = v0 + numGridPointsX;
-				int v3 = v1 + numGridPointsX;
+				UINT v0 = i + numGridPointsX*j;
+				UINT v1 = v0 + 1;
+				UINT v2 = v0 + numGridPointsX;
+				UINT v3 = v1 + numGridPointsX;
 				OurIndices.push_back(v0);
 				OurIndices.push_back(v1);
 				OurIndices.push_back(v2);
@@ -308,7 +308,7 @@ namespace Renderer
 		
 		// create the vertex buffer
 		D3D11_BUFFER_DESC vertexBD = { 0 };
-		vertexBD.ByteWidth = sizeof(PGM::GridVertex) * OurVertices.size();
+		vertexBD.ByteWidth = sizeof(PGM::GridVertex) * (int)OurVertices.size();
 		vertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
 		D3D11_SUBRESOURCE_DATA vertexSRD = { OurVertices.data(), 0, 0 };
@@ -334,7 +334,7 @@ namespace Renderer
 		// create the vertex buffer for stream out between PGM projection and rasterization stages
 		D3D11_BUFFER_DESC SOvertexBD;
 		SOvertexBD.Usage = D3D11_USAGE_DEFAULT;
-		SOvertexBD.ByteWidth = sizeof(PGM::SOVertex) * numGridPointsX * numGridPointsY;
+		SOvertexBD.ByteWidth = sizeof(PGM::SOVertex) * (int)OurVertices.size();
 		SOvertexBD.BindFlags = D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_STREAM_OUTPUT;
 		SOvertexBD.CPUAccessFlags = 0;
 		SOvertexBD.MiscFlags = 0;
