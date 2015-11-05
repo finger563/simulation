@@ -160,7 +160,7 @@ namespace Renderer
 		auto viewport = deviceResources->GetScreenViewport();
 		context->RSSetViewports(1, &viewport);
 
-		// clear the back buffer to a deep blue
+		// clear the back buffer to black
 		context->ClearRenderTargetView(deviceResources->GetBackBufferRenderTargetView(), DirectX::Colors::Black);
 
 		// clear the depth buffer

@@ -224,6 +224,9 @@
     <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Planetary\PGMPassThroughVertexShader.hlsl">
       <Filter>Renderer\Shaders\Planetary</Filter>
     </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Planetary\PGPixelShader.hlsl">
+      <Filter>Renderer\Shaders\Planetary</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Common\ConstantBuffers.hlsli">

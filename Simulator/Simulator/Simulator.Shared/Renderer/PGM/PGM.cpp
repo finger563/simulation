@@ -29,20 +29,21 @@ namespace Renderer
 		rasterizationShader->SetInputDescriptor(pgmRasterizationIED, sizeof(pgmRasterizationIED) / sizeof(D3D11_INPUT_ELEMENT_DESC));
 		rasterizationShader->Initialize(sizeof(DefaultCBuffer));
 
-
 		// create the SO buffer to get data between PGM and rasterization stages
 		auto context = deviceResources->GetD3DDeviceContext();
 
 		Platform::Array<byte>^ GSFile;
 		GSFile = LoadShaderFile(pgmShader->gsFileName);
 
+		UINT stride = sizeof(PGM::SOVertex);
+
 		deviceResources->GetD3DDevice()->CreateGeometryShaderWithStreamOutput(
 			GSFile->Data, 
 			GSFile->Length,
 			gridPointSOIED,
 			sizeof(gridPointSOIED) / sizeof(D3D11_SO_DECLARATION_ENTRY),
-			NULL,
-			0,
+			&stride,
+			1,
 			D3D11_SO_NO_RASTERIZED_STREAM, // to not pass SO to pixelshader
 			NULL,
 			pgmShader->geometryshader.GetAddressOf()
@@ -51,8 +52,8 @@ namespace Renderer
 		// THIS IS JUST FOR TESTING
 		primaryRadius = 1.0f;
 		sphereWorldPos = Base::Math::VectorInit({ 0.0f, 0.0f, 0.0f });
-		numGridPointsX = 16;
-		numGridPointsY = 16;
+		numGridPointsX = 32;
+		numGridPointsY = 32;
 
 		// END JUST FOR TESTING
 
@@ -270,9 +271,7 @@ namespace Renderer
 		float width = SamplingCamera.NearPlane * tan(SamplingCamera.FoVY);
 		float height = SamplingCamera.NearPlane * tan(FoVX);
 		std::vector<PGM::GridVertex> OurVertices;
-		std::vector<UINT> OurIndices;
-		int index = 0;
-		// need to set up verts & inds based on grid
+		// set up vertices based on grid
 		for (int j = 0; j < numGridPointsY; j++)
 		{
 			for (int i = 0; i < numGridPointsX; i++)
@@ -285,16 +284,17 @@ namespace Renderer
 				OurVertices.push_back(v);
 			}
 		}
-
+		// set up the indices for triangles from the grid
+		std::vector<UINT> OurIndices;
 		for (int j = 0; j < numGridPointsY - 1; j++)
 		{
 			for (int i = 0; i < numGridPointsX - 1; i++)
 			{
-				// upper triangle
 				UINT v0 = i + numGridPointsX*j;
 				UINT v1 = v0 + 1;
 				UINT v2 = v0 + numGridPointsX;
 				UINT v3 = v1 + numGridPointsX;
+				// upper triangle
 				OurIndices.push_back(v0);
 				OurIndices.push_back(v1);
 				OurIndices.push_back(v2);
@@ -304,7 +304,7 @@ namespace Renderer
 				OurIndices.push_back(v3);
 			}
 		}
-		numIndices = OurIndices.size();
+		numIndices = (int)OurIndices.size();
 		
 		// create the vertex buffer
 		D3D11_BUFFER_DESC vertexBD = { 0 };
@@ -320,7 +320,7 @@ namespace Renderer
 		// create the index buffer
 		// buffer description
 		D3D11_BUFFER_DESC indexBD = { 0 };
-		indexBD.ByteWidth = sizeof(UINT) * (int)OurIndices.size();    // indices are stored in short values
+		indexBD.ByteWidth = sizeof(UINT) * (int)OurIndices.size();    // indices are stored in UINT values
 		indexBD.BindFlags = D3D11_BIND_INDEX_BUFFER;
 
 		// subresource data

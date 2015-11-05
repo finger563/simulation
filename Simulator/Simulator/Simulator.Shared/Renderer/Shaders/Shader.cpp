@@ -81,11 +81,6 @@ void Shader::Initialize(int cb_bytewidth)
 		VSFile = LoadShaderFile(vsFileName);
 		deviceResources->GetD3DDevice()->CreateVertexShader(VSFile->Data, VSFile->Length, nullptr, &vertexshader);
 	}
-	if (psFileName.compare(""))
-	{
-		PSFile = LoadShaderFile(psFileName);
-		deviceResources->GetD3DDevice()->CreatePixelShader(PSFile->Data, PSFile->Length, nullptr, &pixelshader);
-	}
 	if (gsFileName.compare(""))
 	{
 		GSFile = LoadShaderFile(gsFileName);
@@ -100,6 +95,11 @@ void Shader::Initialize(int cb_bytewidth)
 	{
 		DSFile = LoadShaderFile(dsFileName);
 		deviceResources->GetD3DDevice()->CreateDomainShader(DSFile->Data, DSFile->Length, nullptr, &domainshader);
+	}
+	if (psFileName.compare(""))
+	{
+		PSFile = LoadShaderFile(psFileName);
+		deviceResources->GetD3DDevice()->CreatePixelShader(PSFile->Data, PSFile->Length, nullptr, &pixelshader);
 	}
 	
 	// create the input layout
@@ -129,9 +129,9 @@ void Shader::Apply()
 	// set the shader objects as the active shaders
 	deviceResources->GetD3DDeviceContext()->VSSetShader(vertexshader.Get(), nullptr, 0);
 	deviceResources->GetD3DDeviceContext()->PSSetShader(pixelshader.Get(), nullptr, 0);
+	//deviceResources->GetD3DDeviceContext()->HSSetShader(hullshader.Get(), nullptr, 0);
+	//deviceResources->GetD3DDeviceContext()->DSSetShader(domainshader.Get(), nullptr, 0);
 	deviceResources->GetD3DDeviceContext()->GSSetShader(geometryshader.Get(), nullptr, 0);
-	deviceResources->GetD3DDeviceContext()->HSSetShader(hullshader.Get(), nullptr, 0);
-	deviceResources->GetD3DDeviceContext()->DSSetShader(domainshader.Get(), nullptr, 0);
 	// set the constant buffer for the active shaders
 	if (vertexshader != nullptr)
 		deviceResources->GetD3DDeviceContext()->VSSetConstantBuffers(0, 1, constantbuffer.GetAddressOf());

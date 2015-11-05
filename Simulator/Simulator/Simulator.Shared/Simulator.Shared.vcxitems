@@ -90,6 +90,9 @@
       <ShaderType>Vertex</ShaderType>
       <ShaderModel>5.0</ShaderModel>
     </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Planetary\PGPixelShader.hlsl">
+      <ShaderType>Pixel</ShaderType>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Renderer\Shaders\Common\ConstantBuffers.hlsli" />
