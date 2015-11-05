@@ -212,8 +212,6 @@ namespace Renderer
 		UINT offset = 0;
 		// set the vertex buffer to the stream out buffer from the previous stage
 		context->IASetVertexBuffers(0, 1, streamOutVertexBuffer.GetAddressOf(), &stride, &offset);
-		//context->IASetIndexBuffer(NULL, DXGI_FORMAT_R32_UINT, 0);
-		//context->IASetIndexBuffer(gridindexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// set the primitive topology
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -296,11 +294,11 @@ namespace Renderer
 				// upper triangle
 				int startingIndex = i + numGridPointsX*j;
 				OurIndices.push_back(startingIndex);
-				OurIndices.push_back(startingIndex + numGridPointsX);
 				OurIndices.push_back(startingIndex + 1);
+				OurIndices.push_back(startingIndex + numGridPointsX);
 				// lower triangle
-				OurIndices.push_back(startingIndex + 1);
 				OurIndices.push_back(startingIndex + numGridPointsX);
+				OurIndices.push_back(startingIndex + 1);
 				OurIndices.push_back(startingIndex + numGridPointsX + 1);
 			}
 		}
