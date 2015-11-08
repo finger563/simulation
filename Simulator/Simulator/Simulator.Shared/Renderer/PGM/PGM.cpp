@@ -94,8 +94,6 @@ namespace Renderer
 		SamplingCamera.FoVY = fovAngleY;
 		ViewCamera.Aspect = aspectRatio;
 		ViewCamera.FoVY = fovAngleY;
-		ViewCamera.UpdateMatrices();
-		SamplingCamera.UpdateMatrices();
 
 		// Note that the OrientationTransform3D matrix is post-multiplied here
 		// in order to correctly orient the scene to match the display orientation.
@@ -108,6 +106,9 @@ namespace Renderer
 		ViewCamera.OrientMatrix = XMLoadFloat4x4(&orientation);
 
 		SamplingCamera.OrientMatrix = XMLoadFloat4x4(&orientation);
+
+		ViewCamera.UpdateMatrices();
+		SamplingCamera.UpdateMatrices();
 
 		MakeGridPoints();
 	}
@@ -275,8 +276,8 @@ namespace Renderer
 	void PGM::MakeGridPoints()
 	{
 		float FoVX = SamplingCamera.FoVY * SamplingCamera.Aspect;  // aspect = x/y
-		float width = SamplingCamera.NearPlane * tan(SamplingCamera.FoVY);
-		float height = SamplingCamera.NearPlane * tan(FoVX);
+		float width = SamplingCamera.NearPlane * sin(FoVX * XM_PI / 180.0f);
+		float height = SamplingCamera.NearPlane * sin(SamplingCamera.FoVY * XM_PI / 180.0f);
 		std::vector<PGM::GridVertex> OurVertices;
 		// set up vertices based on grid
 		for (int j = 0; j < numGridPointsY; j++)
@@ -303,11 +304,11 @@ namespace Renderer
 				UINT v3 = v1 + numGridPointsX;
 				// upper triangle
 				OurIndices.push_back(v0);
-				OurIndices.push_back(v1);
 				OurIndices.push_back(v2);
+				OurIndices.push_back(v1);
 				// lower triangle
-				OurIndices.push_back(v2);
 				OurIndices.push_back(v1);
+				OurIndices.push_back(v2);
 				OurIndices.push_back(v3);
 			}
 		}

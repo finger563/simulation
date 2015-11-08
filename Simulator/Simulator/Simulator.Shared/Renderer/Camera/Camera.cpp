@@ -75,10 +75,10 @@ namespace Renderer
 	void Camera::UpdateCorners()
 	{
 		float FoVX = FoVY * Aspect;  // aspect = x/y
-		float width = NearPlane * tan(FoVY);
-		float height = NearPlane * tan(FoVX);
-		XMVECTOR r = Right * width/2;
-		XMVECTOR u = Up * height/2;
+		float width = NearPlane * sin(FoVX * XM_PI / 180.0f);
+		float height = NearPlane * sin(FoVY * XM_PI / 180.0f);
+		XMVECTOR r = Right * width / 2.0;
+		XMVECTOR u = Up * height / 2.0;
 		XMVECTOR v = View * NearPlane;
 		TopLeft = XMVector3Normalize(v + u - r);
 		TopRight = XMVector3Normalize(v + u + r);

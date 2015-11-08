@@ -79,7 +79,6 @@ namespace Renderer
 
 		camera.Aspect = aspectRatio;
 		camera.FoVY = fovAngleY;
-		camera.UpdateMatrices();
 
 		// Note that the OrientationTransform3D matrix is post-multiplied here
 		// in order to correctly orient the scene to match the display orientation.
@@ -90,6 +89,8 @@ namespace Renderer
 		XMFLOAT4X4 orientation = deviceResources->GetOrientationTransform3D();
 
 		camera.OrientMatrix = XMLoadFloat4x4(&orientation);
+		camera.UpdateMatrices();
+
 		pgm.CreateWindowSizeDependentResources();
 	}
 
