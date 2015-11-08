@@ -276,8 +276,8 @@ namespace Renderer
 	void PGM::MakeGridPoints()
 	{
 		float FoVX = SamplingCamera.FoVY * SamplingCamera.Aspect;  // aspect = x/y
-		float width = SamplingCamera.NearPlane * sin(FoVX * XM_PI / 180.0f);
-		float height = SamplingCamera.NearPlane * sin(SamplingCamera.FoVY * XM_PI / 180.0f);
+		float width = SamplingCamera.NearPlane * sin( XMConvertToRadians( FoVX ));
+		float height = SamplingCamera.NearPlane * sin( XMConvertToRadians( SamplingCamera.FoVY ));
 		std::vector<PGM::GridVertex> OurVertices;
 		// set up vertices based on grid
 		for (int j = 0; j < numGridPointsY; j++)

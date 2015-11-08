@@ -75,8 +75,8 @@ namespace Renderer
 	void Camera::UpdateCorners()
 	{
 		float FoVX = FoVY * Aspect;  // aspect = x/y
-		float width = NearPlane * sin(FoVX * XM_PI / 180.0f);
-		float height = NearPlane * sin(FoVY * XM_PI / 180.0f);
+		float width = NearPlane * sin( XMConvertToRadians( FoVX ));
+		float height = NearPlane * sin( XMConvertToRadians( FoVY ));
 		XMVECTOR r = Right * width / 2.0;
 		XMVECTOR u = Up * height / 2.0;
 		XMVECTOR v = View * NearPlane;
@@ -115,7 +115,7 @@ namespace Renderer
 	{
 		ViewMatrix = XMMatrixLookToLH(Position, View, Up);
 		ProjMatrix = XMMatrixPerspectiveFovLH(
-			FoVY * XM_PI / 180.0f,
+			XMConvertToRadians( FoVY ),
 			Aspect,
 			NearPlane,
 			FarPlane
