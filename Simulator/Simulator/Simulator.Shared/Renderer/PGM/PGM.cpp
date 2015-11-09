@@ -81,7 +81,7 @@ namespace Renderer
 	{
 		Size outputSize = deviceResources->GetOutputSize();
 		float aspectRatio = outputSize.Width / outputSize.Height;
-		float fovAngleY = 45.0f;
+		float fovAngleY = XMConvertToRadians(45.0f);
 
 		// This is a simple example of change that can be made when the app is in
 		// portrait or snapped view.
@@ -275,9 +275,8 @@ namespace Renderer
 
 	void PGM::MakeGridPoints()
 	{
-		float FoVX = SamplingCamera.FoVY * SamplingCamera.Aspect;  // aspect = x/y
-		float width = SamplingCamera.NearPlane * sin( XMConvertToRadians( FoVX ));
-		float height = SamplingCamera.NearPlane * sin( XMConvertToRadians( SamplingCamera.FoVY ));
+		float height = 2 * tan(SamplingCamera.FoVY / 2) * SamplingCamera.NearPlane;
+		float width = height * SamplingCamera.Aspect;
 		std::vector<PGM::GridVertex> OurVertices;
 		// set up vertices based on grid
 		for (int j = 0; j < numGridPointsY; j++)

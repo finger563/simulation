@@ -55,7 +55,7 @@ namespace Renderer
 		XMVECTOR a = XMVector3AngleBetweenVectors(bottomRight, topRight);
 		float angle;
 		XMVectorGetByIndexPtr(&angle, a, 0);
-		FoVY = XMConvertToDegrees(angle / 2);
+		FoVY = angle;
 	}
 
 	void Camera::Set(const Renderer::Camera& c)
@@ -68,15 +68,14 @@ namespace Renderer
 		Aspect = c.Aspect;
 		NearPlane = c.NearPlane;
 		FarPlane = c.FarPlane;
-		OrientMatrix = XMMatrixIdentity();
+		OrientMatrix = c.OrientMatrix;
 		UpdateCorners();
 	}
 
 	void Camera::UpdateCorners()
 	{
-		float FoVX = FoVY * Aspect;  // aspect = x/y
-		float width = NearPlane * sin( XMConvertToRadians( FoVX ));
-		float height = NearPlane * sin( XMConvertToRadians( FoVY ));
+		float height = 2 * tan(FoVY / 2) * NearPlane;
+		float width = height * Aspect;
 		XMVECTOR r = Right * width / 2.0;
 		XMVECTOR u = Up * height / 2.0;
 		XMVECTOR v = View * NearPlane;
@@ -115,7 +114,7 @@ namespace Renderer
 	{
 		ViewMatrix = XMMatrixLookToLH(Position, View, Up);
 		ProjMatrix = XMMatrixPerspectiveFovLH(
-			XMConvertToRadians( FoVY ),
+			FoVY,
 			Aspect,
 			NearPlane,
 			FarPlane
