@@ -74,17 +74,46 @@ namespace Renderer
 		ViewCamera.UpdateMatrices();
 	}
 
+	Renderer::Camera PGM::GetViewCamera()
+	{
+		return ViewCamera;
+	}
+
 	void PGM::SetSamplingCamera(const Renderer::Camera& c)
 	{
 		SamplingCamera.Set(c);
 
 		// calculate extents here for the view camera
 		// use extents for the surface here, along with the nadir
-		XMVECTOR nadir = XMVectorSet(0, 1, 0, 1);
-		nadir = XMVector4Dot(ViewCamera.Position, nadir);
+		XMVECTOR nadir = XMVectorSet(0, -1, 0, 0);
+		XMVECTOR nadir_length = XMVector4Dot(ViewCamera.Position, nadir);
 		float n_length;
-		Base::Math::VectorGet(XMVector4Length(nadir), &n_length, 0);
-		float alpha = atan2(n_length, ViewCamera.FarPlane);  // angle of the extent vector
+		float farplane = ViewCamera.FarPlane;
+		float nearplane = ViewCamera.NearPlane;
+		float fovy, aspect = 1.0f;
+
+		Base::Math::VectorGet(nadir_length, &n_length, 0);
+		float alpha = atan2(farplane, abs(n_length));  // angle of the extent vector
+
+		// get the vectors corresponding to a frustum around the surface, where the nadir is the view vector
+		nadir = XMVector3Normalize(nadir);
+		XMVECTOR view = nadir;
+		XMVECTOR right = XMVector3Cross(ViewCamera.View, nadir);
+		XMVECTOR up = XMVector3Cross(view, right);
+		XMVECTOR u = up * farplane;
+		XMVECTOR v = view * nearplane;
+		XMVECTOR r = right * farplane;
+		XMVECTOR tl = (v + u - r);
+		XMVECTOR tr = (v + u + r);
+		XMVECTOR bl = (v - u - r);
+		XMVECTOR br = (v - u + r);
+
+		// compute the view/right/up vectors for the new sampling camera
+		SamplingCamera.Set(ViewCamera.Position,
+			tl, tr, bl, br);
+		//SamplingCamera.Set(ViewCamera.Position,
+		//	view, up, fovy, aspect, nearplane, farplane);
+
 		// make extent vectors based on the right and up vectors of the camera?
 		// compare extents and determine minimum volume that must be sampled
 		// which must also include the nadir
@@ -93,6 +122,18 @@ namespace Renderer
 
 		// update sampling camera
 		SamplingCamera.UpdateMatrices();
+
+		// should this be done when updating the sampling camera?
+		// should just take the sampling camera and generate points/triangles
+		// within its view volume : should keep this within view space;
+		// don't require matrix transformation into world space
+		// probably need to switch to texture/uav based deferred shading model
+		MakeGridPoints();
+	}
+
+	Renderer::Camera PGM::GetSamplingCamera()
+	{
+		return SamplingCamera;
 	}
 
 	void PGM::CreateWindowSizeDependentResources()
@@ -108,8 +149,8 @@ namespace Renderer
 			fovAngleY *= 2.0f;
 		}
 
-		SamplingCamera.Aspect = aspectRatio;
-		SamplingCamera.FoVY = fovAngleY;
+		//SamplingCamera.Aspect = aspectRatio;
+		//SamplingCamera.FoVY = fovAngleY;
 		ViewCamera.Aspect = aspectRatio;
 		ViewCamera.FoVY = fovAngleY;
 
@@ -123,17 +164,11 @@ namespace Renderer
 
 		ViewCamera.OrientMatrix = XMLoadFloat4x4(&orientation);
 
-		SamplingCamera.OrientMatrix = XMLoadFloat4x4(&orientation);
+		//SamplingCamera.OrientMatrix = XMLoadFloat4x4(&orientation);
 
 		ViewCamera.UpdateMatrices();
-		SamplingCamera.UpdateMatrices();
-
-		// should this be done when updating the sampling camera?
-		// should just take the sampling camera and generate points/triangles
-		// within its view volume : should keep this within view space;
-		// don't require matrix transformation into world space
-		// probably need to switch to texture/uav based deferred shading model
-		MakeGridPoints();
+		SetSamplingCamera(ViewCamera);
+		//SamplingCamera.UpdateMatrices();
 	}
 
 	void PGM::Update()
@@ -258,20 +293,14 @@ namespace Renderer
 
 		// Lighting related
 		rasterizationCbuffer.matRotation = XMMatrixIdentity();
-		rasterizationCbuffer.DiffuseVector = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
-		rasterizationCbuffer.DiffuseColor = XMVectorSet(0.5f, 0.5f, 0.5f, 1.0f);
-		rasterizationCbuffer.AmbientColor = XMVectorSet(0.2f, 0.2f, 0.2f, 1.0f);
+		rasterizationCbuffer.DiffuseVector = XMVectorSet(0.5f, 0.5f, 0.5f, 0.0f);
+		rasterizationCbuffer.DiffuseColor = XMVectorSet(0.1f, 0.1f, 0.5f, 1.0f);
+		rasterizationCbuffer.AmbientColor = XMVectorSet(0.2f, 2.0f, 0.2f, 1.0f);
 
 		context->UpdateSubresource(rasterizationShader->constantbuffer.Get(), 0, 0, &rasterizationCbuffer, 0, 0);
 
 		// Draw the vertices created from the stream-out stage
 		context->DrawAuto();
-
-		stride = sizeof(Camera::FrustumVertex);
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-		context->IASetVertexBuffers(0, 1, SamplingCamera.frustumvertexbuffer.GetAddressOf(), &stride, &offset);
-		context->IASetIndexBuffer(SamplingCamera.frustumindexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-		context->DrawIndexed(SamplingCamera.numIndices, 0, 0);
 
 		rasterizationShader->Disable();
 	}

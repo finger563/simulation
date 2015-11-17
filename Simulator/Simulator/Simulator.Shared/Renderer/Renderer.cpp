@@ -221,6 +221,12 @@ namespace Renderer
 		
 		context->DrawIndexed(numIndices, 0, 0);
 
+		stride = sizeof(Camera::FrustumVertex);
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+		context->IASetVertexBuffers(0, 1, pgm.GetSamplingCamera().frustumvertexbuffer.GetAddressOf(), &stride, &offset);
+		context->IASetIndexBuffer(pgm.GetSamplingCamera().frustumindexbuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		context->DrawIndexed(pgm.GetSamplingCamera().numIndices, 0, 0);
+
 		shader->Disable();
 
 		return;

@@ -37,24 +37,30 @@ namespace Renderer
 		BottomLeft = bottomLeft;
 		BottomRight = bottomRight;
 		Position = position;
+
 		XMVECTOR v = (topLeft + bottomRight) / 2;
 		XMVECTOR top = (topLeft + topRight) / 2;
 		XMVECTOR w = XMVector4Length(topRight - topLeft);
+
 		float width;
 		XMVectorGetByIndexPtr(&width, w, 0);
-		width = width / 2;
+		width = width;
 		XMVECTOR h = XMVector4Length(topRight - bottomRight);
+
 		float height;
 		XMVectorGetByIndexPtr(&height, h, 0);
-		height = height / 2;
+		height = height;
+
 		XMVECTOR u = top - v;
+
+		XMVECTOR a = XMVector3AngleBetweenVectors(bottomRight, topRight);
+		float angle;
+		XMVectorGetByIndexPtr(&angle, a, 0);
+
 		Up = XMVector3Normalize(u);
 		View = XMVector3Normalize(v);
 		Right = XMVector3Cross(-View, Up);
 		Aspect = width / height;
-		XMVECTOR a = XMVector3AngleBetweenVectors(bottomRight, topRight);
-		float angle;
-		XMVectorGetByIndexPtr(&angle, a, 0);
 		FoVY = angle;
 	}
 

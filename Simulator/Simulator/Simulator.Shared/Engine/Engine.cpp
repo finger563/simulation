@@ -31,7 +31,7 @@ namespace Engine
 			XMConvertToRadians(45.0f),									// FOVY
 			(float)(mWindow->Bounds.Width / mWindow->Bounds.Height),	// aspect ratio
 			0.1f,														// near plane
-			1000.0f														// far plane
+			100000.0f													// far plane
 			);
 
 		gameObjects.push_back(Base::Objects::GameObject());

@@ -29,7 +29,9 @@ namespace Renderer
 
 		// need interface here to update the camera
 		virtual void SetViewCamera(const Renderer::Camera& c);
+		virtual Renderer::Camera GetViewCamera();
 		virtual void SetSamplingCamera(const Renderer::Camera& c);
+		virtual Renderer::Camera GetSamplingCamera();
 		// need interface here to get the grid points for rendering
 		//   -- should probably try to get this done in tessellator stage if possible
 		virtual void MakeGridPoints();
