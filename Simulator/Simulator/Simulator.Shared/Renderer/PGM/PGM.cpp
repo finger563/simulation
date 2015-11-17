@@ -94,28 +94,42 @@ namespace Renderer
 		float nearplane = ViewCamera.NearPlane;
 
 		float alpha = atan2(farplane, abs(n_length));  // angle of the extent vector
-		float fovy = alpha * 2;
+		float fovy = alpha * 2; // max fov possible
 		float aspect = 1.0;
-
-		// need to minimize fovy -> this will minimize viewable volume
-		// find extents which contain nadir and have minimum fov
-
-		// from those extents figure out view, up, fov, and aspect
-		// possibly set near/far based on the surface as well
 
 		// get the vectors corresponding to a frustum around the surface, where the nadir is the view vector
 		nadir = XMVector3Normalize(nadir);
 		XMVECTOR view = nadir;
-		XMVECTOR right = XMVector3Cross(ViewCamera.View, nadir);
+		XMVECTOR right;
+		if (!XMVector3Equal(ViewCamera.View, nadir))
+			right = XMVector3Cross(ViewCamera.View, nadir);
+		else
+			right = XMVector3Cross(ViewCamera.Right, nadir);
 		XMVECTOR up = XMVector3Cross(view, right);
 
+		SamplingCamera.Set(ViewCamera.Position,
+			view, up, fovy, aspect, nearplane, farplane);
+
+		// frustum corners:
+		XMVECTOR ftl = SamplingCamera.TopLeft;
+		XMVECTOR ftr = SamplingCamera.TopRight;
+		XMVECTOR fbl = SamplingCamera.BottomLeft;
+		XMVECTOR fbr = SamplingCamera.BottomRight;
+		XMVECTOR ftop = (ftl + ftr ) / 2.0;
+		XMVECTOR fbottom = (fbr + fbl) / 2.0;
+		XMVECTOR fright = (ftr + fbr) / 2.0;
+		XMVECTOR fleft = (ftl + fbl) / 2.0;
+
+		// variables for testing within a frustum
 		XMVECTOR test;
 		float dot_test1, dot_test2;
-		
-		test = XMVector3Dot(nadir, ViewCamera.TopLeft);
+		XMVECTOR bottom, top;
+
+		// test nadir in frustum:
+		test = XMVector3Dot(nadir, ftl);
 		Base::Math::VectorGet(test, &dot_test1, 0);
 
-		test = XMVector3Dot(nadir, ViewCamera.BottomRight);
+		test = XMVector3Dot(nadir, fbr);
 		Base::Math::VectorGet(test, &dot_test2, 0);
 
 		if (dot_test1 >= 0 && dot_test2 >= 0)
@@ -124,22 +138,42 @@ namespace Renderer
 		}
 		else
 		{
+			bottom = nadir;
 		}
-#if 0
-		XMVECTOR u = up * farplane;
-		XMVECTOR v = view * nearplane;
-		XMVECTOR r = right * farplane;
-		XMVECTOR tl = (v + u - r);
-		XMVECTOR tr = (v + u + r);
-		XMVECTOR bl = (v - u - r);
-		XMVECTOR br = (v - u + r);
 
+		// compute extent vectors
+		XMMATRIX R = XMMatrixRotationAxis(right, alpha / 2);
+		XMVECTOR etop = XMVector3TransformNormal(view, R);
+		R = XMMatrixRotationAxis(right, -alpha / 2);
+		XMVECTOR ebottom = XMVector3TransformNormal(view, R);
+		R = XMMatrixRotationAxis(up, alpha / 2);
+		XMVECTOR eright = XMVector3TransformNormal(view, R);
+		R = XMMatrixRotationAxis(up, -alpha / 2);
+		XMVECTOR eleft = XMVector3TransformNormal(view, R);
+
+		// need to minimize fovy -> this will minimize viewable volume
+		// find extents which contain nadir and have minimum fov
+
+		// from those extents figure out view, up, fov, and aspect
+		// possibly set near/far based on the surface as well
+
+		XMVECTOR u = up;
+		XMVECTOR v = view * nearplane;
+		XMVECTOR r = right;
+		XMVECTOR tl = XMVector3Normalize(v + u - r);
+		XMVECTOR tr = XMVector3Normalize(v + u + r);
+		XMVECTOR bl = XMVector3Normalize(v - u - r);
+		XMVECTOR br = XMVector3Normalize(v - u + r);
+
+		// need to figure out which frustum vectors are going to be which extents
+#if 0
 		// compute the view/right/up vectors for the new sampling camera
-		//SamplingCamera.Set(ViewCamera.Position,
-		//	tl, tr, bl, br);
-#endif
+		SamplingCamera.Set(ViewCamera.Position,
+			tl, tr, bl, br);
+#else
 		SamplingCamera.Set(ViewCamera.Position,
 			view, up, fovy, aspect, nearplane, farplane);
+#endif
 
 		// make extent vectors based on the right and up vectors of the camera?
 		// compare extents and determine minimum volume that must be sampled
