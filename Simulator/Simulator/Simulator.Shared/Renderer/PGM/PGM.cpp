@@ -56,6 +56,11 @@ namespace Renderer
 		// THIS IS JUST FOR TESTING
 		primaryRadius = 1.0f;
 		sphereWorldPos = Base::Math::VectorInit({ 0.0f, 0.0f, 0.0f });
+		// set surface extents here:
+		// plane: extent x = FarPlane, y = FarPlane
+		// sphere: extent x = radius, y = radius
+		// do we just have two extents?  how does this work when you're talking about viewing
+		// this object 3-dimensionally?
 		// END JUST FOR TESTING
 
 		return true;
@@ -75,6 +80,12 @@ namespace Renderer
 
 		// calculate extents here for the view camera
 		// use extents for the surface here, along with the nadir
+		XMVECTOR nadir = XMVectorSet(0, 1, 0, 1);
+		nadir = XMVector4Dot(ViewCamera.Position, nadir);
+		float n_length;
+		Base::Math::VectorGet(XMVector4Length(nadir), &n_length, 0);
+		float alpha = atan2(n_length, ViewCamera.FarPlane);  // angle of the extent vector
+		// make extent vectors based on the right and up vectors of the camera?
 		// compare extents and determine minimum volume that must be sampled
 		// which must also include the nadir
 		// use the minimum volume extents to form a sampling camera centered at the

@@ -25,6 +25,10 @@ void main(
 		element[0].normal = float4(0, 1, 0, 1);
 		element[1].normal = float4(0, 1, 0, 1);
 		element[2].normal = float4(0, 1, 0, 1);
+
+		//element[0].pos += element[0].normal * noise(element[0].pos.xyz);
+		//element[1].pos += element[1].normal * noise(element[1].pos.xyz);
+		//element[2].pos += element[2].normal * noise(element[2].pos.xyz);
 		
 		// Write to output
 		output.Append(element[0]);
