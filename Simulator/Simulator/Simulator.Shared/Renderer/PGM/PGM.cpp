@@ -107,6 +107,20 @@ namespace Renderer
 			right = XMVector3Cross(ViewCamera.Right, nadir);
 		XMVECTOR up = XMVector3Cross(view, right);
 		
+		// how to take into account the rotated view camera?  
+		// and how the aspect ratio of it affects the sampling camera?
+		// do we simply recreate the full sampling camera from scratch every time?
+
+		// can we do this entirely using fov for the calculations?
+		// need to average the nadir and the extents to get the proper view vector
+		// (assuming the nadir is an extent vector; else just average the frustum/surface extents
+
+		// keep view vector the same
+		// get angle between current top extent & new top extent
+		// subtract that angle from fovy and then rotate the view vector by angle/2
+		// do the same for right extent
+		// recalculate the aspect as fovy/fovx
+
 		// frustum corners:
 		XMVECTOR ftl = ViewCamera.TopLeft;
 		XMVECTOR ftr = ViewCamera.TopRight;
