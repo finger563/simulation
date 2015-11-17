@@ -85,13 +85,14 @@ namespace Renderer
 
 		// calculate extents here for the view camera
 		// use extents for the surface here, along with the nadir
-		XMVECTOR nadir = XMVectorSet(0, -1, 0, 0);
-		XMVECTOR nadir_length = XMVector4Dot(ViewCamera.Position, nadir);
+		XMVECTOR nadir = XMVectorSet(0, -1, 0, 1);
+		XMVECTOR nadir_length = XMVector3Dot(ViewCamera.Position, nadir);
 		float n_length;
+		Base::Math::VectorGet(nadir_length, &n_length, 0);
+
 		float farplane = ViewCamera.FarPlane;
 		float nearplane = ViewCamera.NearPlane;
 
-		Base::Math::VectorGet(nadir_length, &n_length, 0);
 		float alpha = atan2(farplane, abs(n_length));  // angle of the extent vector
 		float fovy = alpha * 2;
 		float aspect = 1.0;
@@ -107,6 +108,23 @@ namespace Renderer
 		XMVECTOR view = nadir;
 		XMVECTOR right = XMVector3Cross(ViewCamera.View, nadir);
 		XMVECTOR up = XMVector3Cross(view, right);
+
+		XMVECTOR test;
+		float dot_test1, dot_test2;
+		
+		test = XMVector3Dot(nadir, ViewCamera.TopLeft);
+		Base::Math::VectorGet(test, &dot_test1, 0);
+
+		test = XMVector3Dot(nadir, ViewCamera.BottomRight);
+		Base::Math::VectorGet(test, &dot_test2, 0);
+
+		if (dot_test1 >= 0 && dot_test2 >= 0)
+		{  // nadir is contained within the view frustum
+			float tmp = 0;
+		}
+		else
+		{
+		}
 #if 0
 		XMVECTOR u = up * farplane;
 		XMVECTOR v = view * nearplane;
