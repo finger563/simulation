@@ -90,16 +90,24 @@ namespace Renderer
 		float n_length;
 		float farplane = ViewCamera.FarPlane;
 		float nearplane = ViewCamera.NearPlane;
-		float fovy, aspect = 1.0f;
 
 		Base::Math::VectorGet(nadir_length, &n_length, 0);
 		float alpha = atan2(farplane, abs(n_length));  // angle of the extent vector
+		float fovy = alpha * 2;
+		float aspect = 1.0;
+
+		// need to minimize fovy -> this will minimize viewable volume
+		// find extents which contain nadir and have minimum fov
+
+		// from those extents figure out view, up, fov, and aspect
+		// possibly set near/far based on the surface as well
 
 		// get the vectors corresponding to a frustum around the surface, where the nadir is the view vector
 		nadir = XMVector3Normalize(nadir);
 		XMVECTOR view = nadir;
 		XMVECTOR right = XMVector3Cross(ViewCamera.View, nadir);
 		XMVECTOR up = XMVector3Cross(view, right);
+#if 0
 		XMVECTOR u = up * farplane;
 		XMVECTOR v = view * nearplane;
 		XMVECTOR r = right * farplane;
@@ -109,10 +117,11 @@ namespace Renderer
 		XMVECTOR br = (v - u + r);
 
 		// compute the view/right/up vectors for the new sampling camera
-		SamplingCamera.Set(ViewCamera.Position,
-			tl, tr, bl, br);
 		//SamplingCamera.Set(ViewCamera.Position,
-		//	view, up, fovy, aspect, nearplane, farplane);
+		//	tl, tr, bl, br);
+#endif
+		SamplingCamera.Set(ViewCamera.Position,
+			view, up, fovy, aspect, nearplane, farplane);
 
 		// make extent vectors based on the right and up vectors of the camera?
 		// compare extents and determine minimum volume that must be sampled
