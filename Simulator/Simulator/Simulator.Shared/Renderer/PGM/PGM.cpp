@@ -73,6 +73,13 @@ namespace Renderer
 	{
 		SamplingCamera.Set(c);
 
+		// calculate extents here for the view camera
+		// use extents for the surface here, along with the nadir
+		// compare extents and determine minimum volume that must be sampled
+		// which must also include the nadir
+		// use the minimum volume extents to form a sampling camera centered at the
+		// position of the view camera
+
 		// update sampling camera
 		SamplingCamera.UpdateMatrices();
 	}
@@ -110,6 +117,11 @@ namespace Renderer
 		ViewCamera.UpdateMatrices();
 		SamplingCamera.UpdateMatrices();
 
+		// should this be done when updating the sampling camera?
+		// should just take the sampling camera and generate points/triangles
+		// within its view volume : should keep this within view space;
+		// don't require matrix transformation into world space
+		// probably need to switch to texture/uav based deferred shading model
 		MakeGridPoints();
 	}
 
