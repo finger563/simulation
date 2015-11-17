@@ -106,40 +106,16 @@ namespace Renderer
 		else
 			right = XMVector3Cross(ViewCamera.Right, nadir);
 		XMVECTOR up = XMVector3Cross(view, right);
-
-		SamplingCamera.Set(ViewCamera.Position,
-			view, up, fovy, aspect, nearplane, farplane);
-
+		
 		// frustum corners:
-		XMVECTOR ftl = SamplingCamera.TopLeft;
-		XMVECTOR ftr = SamplingCamera.TopRight;
-		XMVECTOR fbl = SamplingCamera.BottomLeft;
-		XMVECTOR fbr = SamplingCamera.BottomRight;
+		XMVECTOR ftl = ViewCamera.TopLeft;
+		XMVECTOR ftr = ViewCamera.TopRight;
+		XMVECTOR fbl = ViewCamera.BottomLeft;
+		XMVECTOR fbr = ViewCamera.BottomRight;
 		XMVECTOR ftop = (ftl + ftr ) / 2.0;
 		XMVECTOR fbottom = (fbr + fbl) / 2.0;
 		XMVECTOR fright = (ftr + fbr) / 2.0;
 		XMVECTOR fleft = (ftl + fbl) / 2.0;
-
-		// variables for testing within a frustum
-		XMVECTOR test;
-		float dot_test1, dot_test2;
-		XMVECTOR bottom, top;
-
-		// test nadir in frustum:
-		test = XMVector3Dot(nadir, ftl);
-		Base::Math::VectorGet(test, &dot_test1, 0);
-
-		test = XMVector3Dot(nadir, fbr);
-		Base::Math::VectorGet(test, &dot_test2, 0);
-
-		if (dot_test1 >= 0 && dot_test2 >= 0)
-		{  // nadir is contained within the view frustum
-			float tmp = 0;
-		}
-		else
-		{
-			bottom = nadir;
-		}
 
 		// compute extent vectors
 		XMMATRIX R = XMMatrixRotationAxis(right, alpha / 2);
@@ -151,12 +127,101 @@ namespace Renderer
 		R = XMMatrixRotationAxis(up, -alpha / 2);
 		XMVECTOR eleft = XMVector3TransformNormal(view, R);
 
+		// variables for testing within a frustum
+		XMVECTOR test;
+		float dot_test1, dot_test2;
+		XMVECTOR sbottom, stop, sleft, sright;
+
+		// test nadir in frustum:
+		test = XMVector3Dot(nadir, ftl);
+		Base::Math::VectorGet(test, &dot_test1, 0);
+
+		test = XMVector3Dot(nadir, fbr);
+		Base::Math::VectorGet(test, &dot_test2, 0);
+
+		if (dot_test1 >= 0 && dot_test2 >= 0)
+		{  // nadir is contained within the view frustum
+			test = XMVector3Dot(ebottom, ftl);
+			Base::Math::VectorGet(test, &dot_test1, 0);
+
+			test = XMVector3Dot(ebottom, fbr);
+			Base::Math::VectorGet(test, &dot_test2, 0);
+			if (dot_test1 >= 0 && dot_test2 >= 0)
+			{   // ebottom is contained within the frustum
+				sbottom = ebottom;
+			}
+			else
+			{
+				sbottom = fbottom;
+			}
+		}
+		else
+		{
+			sbottom = nadir;
+		}
+
+		test = XMVector3Dot(etop, ftl);
+		Base::Math::VectorGet(test, &dot_test1, 0);
+
+		test = XMVector3Dot(etop, fbr);
+		Base::Math::VectorGet(test, &dot_test2, 0);
+		if (dot_test1 >= 0 && dot_test2 >= 0)
+		{   // etop is contained within the frustum
+			stop = etop;
+		}
+		else
+		{
+			stop = ftop;
+		}
+
+		test = XMVector3Dot(eright, ftl);
+		Base::Math::VectorGet(test, &dot_test1, 0);
+
+		test = XMVector3Dot(eright, fbr);
+		Base::Math::VectorGet(test, &dot_test2, 0);
+		if (dot_test1 >= 0 && dot_test2 >= 0)
+		{   // eright is contained within the frustum
+			sright = eright;
+		}
+		else
+		{
+			sright = fright;
+		}
+
+		test = XMVector3Dot(eleft, ftl);
+		Base::Math::VectorGet(test, &dot_test1, 0);
+
+		test = XMVector3Dot(eleft, fbr);
+		Base::Math::VectorGet(test, &dot_test2, 0);
+		if (dot_test1 >= 0 && dot_test2 >= 0)
+		{   // eleft is contained within the frustum
+			sleft = eleft;
+		}
+		else
+		{
+			sleft = fleft;
+		}
+
 		// need to minimize fovy -> this will minimize viewable volume
 		// find extents which contain nadir and have minimum fov
 
 		// from those extents figure out view, up, fov, and aspect
 		// possibly set near/far based on the surface as well
 
+		view = XMVector3Normalize((sright + sleft) / 2.0);
+		up = XMVector3Normalize((stop - sbottom) / 2.0);
+		XMVECTOR tmp_angle = XMVector3AngleBetweenVectors(stop, sbottom);
+		Base::Math::VectorGet(tmp_angle, &fovy, 0);
+		tmp_angle = XMVector3Length(sright - sleft);
+		float width;
+		Base::Math::VectorGet(tmp_angle, &width, 0);
+		tmp_angle = XMVector3Length(stop - sbottom);
+		float height;
+		Base::Math::VectorGet(tmp_angle, &height, 0);
+		aspect = height / width;
+
+		// need to figure out which frustum vectors are going to be which extents
+#if 0
 		XMVECTOR u = up;
 		XMVECTOR v = view * nearplane;
 		XMVECTOR r = right;
@@ -164,9 +229,6 @@ namespace Renderer
 		XMVECTOR tr = XMVector3Normalize(v + u + r);
 		XMVECTOR bl = XMVector3Normalize(v - u - r);
 		XMVECTOR br = XMVector3Normalize(v - u + r);
-
-		// need to figure out which frustum vectors are going to be which extents
-#if 0
 		// compute the view/right/up vectors for the new sampling camera
 		SamplingCamera.Set(ViewCamera.Position,
 			tl, tr, bl, br);
