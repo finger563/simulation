@@ -222,17 +222,21 @@ namespace Renderer
 		// from those extents figure out view, up, fov, and aspect
 		// possibly set near/far based on the surface as well
 
-		view = XMVector3Normalize((sright + sleft) / 2.0);
-		up = XMVector3Normalize((stop - sbottom) / 2.0);
+		//view = XMVector3Normalize((sright + sleft) / 2.0);
+		//up = XMVector3Normalize((stop - sbottom) / 2.0);
+		
 		XMVECTOR tmp_angle = XMVector3AngleBetweenVectors(stop, sbottom);
-		Base::Math::VectorGet(tmp_angle, &fovy, 0);
+		//Base::Math::VectorGet(tmp_angle, &fovy, 0);
+		
 		tmp_angle = XMVector3Length(sright - sleft);
 		float width;
 		Base::Math::VectorGet(tmp_angle, &width, 0);
+		
 		tmp_angle = XMVector3Length(stop - sbottom);
 		float height;
 		Base::Math::VectorGet(tmp_angle, &height, 0);
-		aspect = height / width;
+		
+		//aspect = height / width;
 
 		// need to figure out which frustum vectors are going to be which extents
 #if 0
@@ -250,6 +254,12 @@ namespace Renderer
 		SamplingCamera.Set(ViewCamera.Position,
 			view, up, fovy, aspect, nearplane, farplane);
 #endif
+
+		SamplingCamera.Set(ViewCamera.Position,
+			ViewCamera.TopLeft,
+			ViewCamera.TopRight,
+			ViewCamera.BottomLeft,
+			ViewCamera.BottomRight);
 
 		// make extent vectors based on the right and up vectors of the camera?
 		// compare extents and determine minimum volume that must be sampled
