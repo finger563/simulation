@@ -226,7 +226,6 @@ namespace Renderer
 		//up = XMVector3Normalize((stop - sbottom) / 2.0);
 		
 		XMVECTOR tmp_angle = XMVector3AngleBetweenVectors(stop, sbottom);
-		//Base::Math::VectorGet(tmp_angle, &fovy, 0);
 		
 		tmp_angle = XMVector3Length(sright - sleft);
 		float width;
@@ -235,8 +234,9 @@ namespace Renderer
 		tmp_angle = XMVector3Length(stop - sbottom);
 		float height;
 		Base::Math::VectorGet(tmp_angle, &height, 0);
-		
-		//aspect = height / width;
+
+		Base::Math::VectorGet(tmp_angle, &fovy, 0);
+		aspect = height / width;
 
 		// need to figure out which frustum vectors are going to be which extents
 #if 0
@@ -440,9 +440,9 @@ namespace Renderer
 
 		// Lighting related
 		rasterizationCbuffer.matRotation = XMMatrixIdentity();
-		rasterizationCbuffer.DiffuseVector = XMVectorSet(0.5f, 0.5f, 0.5f, 0.0f);
-		rasterizationCbuffer.DiffuseColor = XMVectorSet(0.1f, 0.1f, 0.5f, 1.0f);
-		rasterizationCbuffer.AmbientColor = XMVectorSet(0.2f, 2.0f, 0.2f, 1.0f);
+		rasterizationCbuffer.DiffuseVector = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
+		rasterizationCbuffer.DiffuseColor = XMVectorSet(0.1f, 0.2f, 0.2f, 1.0f);
+		rasterizationCbuffer.AmbientColor = XMVectorSet(0.1f, 0.1f, 0.1f, 1.0f);
 
 		context->UpdateSubresource(rasterizationShader->constantbuffer.Get(), 0, 0, &rasterizationCbuffer, 0, 0);
 

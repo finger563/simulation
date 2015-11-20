@@ -26,7 +26,7 @@ void main(
 		element[1].normal = float4(0, 1, 0, 1);
 		element[2].normal = float4(0, 1, 0, 1);
 
-#if 0
+#if 1
 		float4 n1, n2, n3;
 		n1 = dnoise3f(element[0].pos.x, element[0].pos.y, element[0].pos.z);
 		n2 = dnoise3f(element[1].pos.x, element[1].pos.y, element[1].pos.z);
@@ -36,14 +36,10 @@ void main(
 		element[1].pos.y += n2.x;
 		element[2].pos.y += n3.x;
 
-		element[0].normal.xyz = n1.yzw;
-		element[1].normal.xyz = n2.yzw;
-		element[2].normal.xyz = n3.yzw;
+		element[0].normal.xyz = -n1.yzw;
+		element[1].normal.xyz = -n2.yzw;
+		element[2].normal.xyz = -n3.yzw;
 #endif
-
-		//element[0].pos.y += noise(element[0].pos.xyz);
-		//element[1].pos.y += noise(element[1].pos.xyz);
-		//element[2].pos.y += noise(element[2].pos.xyz);
 		
 		// Write to output
 		output.Append(element[0]);

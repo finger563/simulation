@@ -30,12 +30,13 @@ float4 main(RastVertOut pin) : SV_TARGET
 	color = float4(1.0f, 1.0f, 1.0f, 1.0f);
 	return color;
 	*/
+
 	float4 norm = normalize(pin.normal);
 	float diffusebrightness = saturate(dot(norm, lightvec));
 
 	float4 color = ambientcol;
 	color += lightcol * diffusebrightness;    // find the diffuse color and add
 	return color;
-	return pin.normal;// / abs(pin.pos.z - cameraPos.z);
-	return float4(1.0f, 1.0f, 1.0f, 1.0f);
+	//return pin.normal;// / abs(pin.pos.z - cameraPos.z);
+	//return float4(1.0f, 1.0f, 1.0f, 1.0f);
 }
