@@ -1,3 +1,6 @@
+Deferred Rendering:
+-------------------
+
 Engine Design:
 --------------
 * GPU Pro 3 : Section V : Chapter 1 : Z3 Culling
@@ -55,7 +58,7 @@ Terrain:
 * 3D Engine Design for Virtual Globes : Chapter 13 : Geometry Clipmapping
 * Advanced 3D Game Programming with DX9 : Chapter 9 : Advanced 3D Programming
 * GPU Gems 3 : Section I : Chapter 1 : Generating Complex Procedural Terrains using the GPU
-* Shader X6 : Section 1 : Chapter 1 : Fast Evaluation of Subdivision Surfaces 
+* Shader X6 : Section 1 : Chapter 1 : Fast Evaluation of Subdivision Surfaces
 * Shader X6 : Section 1 : Chapter 3 : Implementing RT Mesh Simplification on GPU
 * Shader X6 : Section 2 : Chapter 7 : Practical Geometry Clipmaps for Rendering Terrains
 * Shader X7 : Section I : Chapter 2 : Fast High Quality Rendering with RT Tesselation on GPUs

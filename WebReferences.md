@@ -1,3 +1,6 @@
+Deferred Rendering:
+-------------------
+
 Chunked LoD:
 ------------
 * http://tulrich.com/geekstuff/chunklod.html
